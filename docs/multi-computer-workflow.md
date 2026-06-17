@@ -155,7 +155,7 @@ git commit -m "<清晰提交信息>"
 git push -u origin <当前分支>
 ```
 
-指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge，并删除对应分支。
+创建指向 `main`、来源于本仓库分支、且不是 Draft 的 PR 后，使用本机已登录的 GitHub CLI 启用 auto-merge。`validate` 通过后，GitHub 会自动 squash merge，并删除对应分支。
 
 如果工作还没准备好进入 `main`，必须保持 Draft PR。
 

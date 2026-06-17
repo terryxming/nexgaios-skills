@@ -169,6 +169,6 @@ gh auth login
 
 PR 验证会自动评论本次变更涉及哪些 skill、版本是否变化、合并到 `main` 后是否会发布。
 
-指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge，并删除对应分支。未准备好合并的 PR 必须保持 Draft。
+创建指向 `main`、来源于本仓库分支、且不是 Draft 的 PR 后，使用本机已登录的 GitHub CLI 启用 auto-merge。`validate` 通过后，GitHub 会自动 squash merge，并删除对应分支。未准备好合并的 PR 必须保持 Draft。
 
 GitHub Release 使用 `pnpm skill-cli release-notes` 生成中文发布说明。

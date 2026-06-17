@@ -1539,13 +1539,43 @@ function maybeCreatePullRequest(message, branch) {
 
   const result = spawnSync(gh, ["pr", "create", "--fill", "--title", message, "--head", branch], {
     cwd: repoRoot,
-    stdio: "inherit",
+    encoding: "utf8",
+    stdio: "pipe",
     shell: false
   });
 
   if (result.status !== 0) {
+    process.stdout.write(result.stdout || "");
+    process.stderr.write(result.stderr || "");
     console.log("分支已推送，但 PR 没有创建完成。你可以在 GitHub 上手动打开。");
+    return;
   }
+
+  const prUrl = result.stdout.trim().split(/\r?\n/).find((line) => /^https:\/\/github\.com\//.test(line.trim())) || "";
+  if (prUrl) {
+    console.log(prUrl);
+    enablePullRequestAutoMerge(gh, prUrl);
+  } else {
+    console.log("PR 已创建，但无法从输出中识别 PR URL。请手动启用 auto-merge。");
+  }
+}
+
+function enablePullRequestAutoMerge(gh, prUrl) {
+  const result = spawnSync(gh, ["pr", "merge", prUrl, "--auto", "--squash", "--delete-branch"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: "pipe",
+    shell: false
+  });
+
+  if (result.status === 0) {
+    console.log("已启用 PR auto-merge：validate 通过后会自动 squash merge 并删除分支。");
+    return;
+  }
+
+  process.stdout.write(result.stdout || "");
+  process.stderr.write(result.stderr || "");
+  console.log("PR 已创建，但 auto-merge 没有启用。请确认 PR 不是 Draft，且仓库允许 auto-merge。");
 }
 
 function findGhExecutable() {
