@@ -162,7 +162,7 @@ def load_export(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     result = payload.get("result", payload)
     if result.get("ok") is not True:
-        raise SystemExit(f"MCP export is not ok: {result.get('error')}")
+        raise SystemExit(f"MCP 导出结果不是 ok：{result.get('error')}")
     return payload
 
 
@@ -479,7 +479,7 @@ def load_performance(path: Path | None) -> dict[str, Any] | None:
     if not path:
         return None
     if not path.exists():
-        raise SystemExit(f"Performance context not found: {path}")
+        raise SystemExit(f"找不到效果层数据文件：{path}")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -1658,7 +1658,7 @@ def main() -> None:
     result = payload.get("result", payload)
     records = result.get("data") or []
     if not isinstance(records, list):
-        raise SystemExit("MCP result data is not a list")
+        raise SystemExit("MCP 返回的 result.data 不是列表")
 
     log_df, change_df = normalize_rows(records)
     log_df, change_df, filter_summary = filter_analysis_variables(log_df, change_df)

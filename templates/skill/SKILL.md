@@ -1,11 +1,10 @@
 # {{title}}
 
-Use this skill when ...
+当用户需要……时使用这个技能。
 
-## Instructions
+## 使用说明
 
-1. Clarify the user's intent.
-2. Inspect the relevant local context.
-3. Execute the smallest safe workflow.
-4. Verify the result before responding.
-
+1. 先确认用户的真实目标和输入条件。
+2. 检查相关的本地文件、配置和上下文。
+3. 执行最小且安全的工作流。
+4. 回复前验证结果是否可用。

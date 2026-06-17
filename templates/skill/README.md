@@ -1,16 +1,16 @@
 # {{title}}
 
-## Purpose
+## 用途
 
-Describe what this skill helps Codex do.
+说明这个技能帮助 Codex 完成什么事情。
 
-## Usage
+## 使用方式
 
 ```text
-Ask Codex to use {{skill_id}} when ...
+当需要……时，让 Codex 使用 {{skill_id}}。
 ```
 
-## Development
+## 开发命令
 
 ```bash
 pnpm skill:validate {{skill_id}}

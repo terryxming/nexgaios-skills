@@ -1,6 +1,5 @@
-# Changelog
+# 更新日志
 
 ## 0.1.0 - {{date}}
 
-- Initial skill scaffold.
-
+- 初始化技能骨架。

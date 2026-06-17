@@ -24,15 +24,15 @@ v0.1.3
 
 如果你没有 `X-Mcp-Key`，脚本会返回鉴权失败，无法导出数据。
 
-## Skill 位置
+## 技能位置
 
-本 skill 已迁移到 `terryxming/nexgaios-skills` monorepo：
+本技能已迁移到 `terryxming/nexgaios-skills` monorepo：
 
 ```text
 skills/amazon/lingxing-ad-operation-audit
 ```
 
-skill 根目录包含 `SKILL.md` 和 `skill.yaml`。如果你拿到的是发布包，解压后进入该 skill 根目录即可。
+技能根目录包含 `SKILL.md` 和 `skill.yaml`。如果你拿到的是发布包，解压后进入该技能根目录即可。
 
 ## 第一次配置
 
