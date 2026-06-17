@@ -63,3 +63,68 @@ pnpm skill:import <domain> <skill-id> --from <本地目录或 GitHub URL> [--ref
 ```
 
 导入命令会复制技能文件、补齐缺失的 `skill.yaml`、`README.md` 和 `CHANGELOG.md`、更新 `catalog.yaml`，并做基础协议验证。
+
+## 安装与同步
+
+安装单个 skill：
+
+```powershell
+pnpm skill:install <skill-id>
+```
+
+同步仓库内全部 `status: active` 的 skill 到本机 Codex：
+
+```powershell
+pnpm skill:sync
+```
+
+同步命令默认不会删除本机 Codex 目录中其他来源的 skill。只有使用 `--prune` 时，才会删除带有本仓库安装标记、且当前仓库已经不存在的旧 skill。
+
+## 生成文档
+
+生成稳定的仓库文档：
+
+```powershell
+pnpm skills:docs
+```
+
+该命令会生成：
+
+- `docs/skills-overview.md`
+- `skills/<domain>/README.md`
+
+这些文档只记录仓库内稳定信息，不记录本机安装状态。原因是本机安装状态属于机器状态，在 Windows 本机和 GitHub Actions Linux runner 上不一致。
+
+## PR 说明与发布说明
+
+PR 变更说明：
+
+```powershell
+pnpm skills:pr-summary --base origin/main...HEAD
+```
+
+Release Notes：
+
+```powershell
+node tools/skills/skill-cli.mjs release-notes <skill-id> --base <before-sha>...HEAD
+```
+
+发布判断严格使用 `skill.yaml` 的 `version` 字段：版本号变化则发布该 skill，版本号未变化则不发布该 skill。
+
+## 防误传检查
+
+运行：
+
+```powershell
+pnpm skills:guard
+```
+
+检查范围包括：
+
+- `.env`、`.env.local` 等本地环境变量文件。
+- `artifacts/`、`data/`、`outputs/`、`reports/`、`screenshots/`、`tmp/`、`temp/` 中的生成产物。
+- `__pycache__/`、`.pytest_cache/`、`.mypy_cache/`、`node_modules/`、`dist/` 等缓存或构建目录。
+- 超过 5 MiB 的文件。
+- 常见 GitHub token、OpenAI API key、AWS access key、private key、Slack token 格式。
+
+该检查是误提交拦截器，不等同于完整安全审计。

@@ -30,6 +30,14 @@ jobs:
       - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
+      - name: 校验生成文档
+        run: pnpm skills:docs:check
+
+      - name: 防误传检查
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: pnpm skills:guard --base "$BEFORE_SHA...HEAD"
+
       - name: 发布已变更版本的技能
         env:
           GH_TOKEN: ${{ github.token }}
@@ -52,6 +60,8 @@ jobs:
 
             node tools/skills/skill-cli.mjs validate "$skill"
             artifact="$(node tools/skills/skill-cli.mjs package "$skill" --print-path)"
+            notes_file="$(mktemp)"
+            node tools/skills/skill-cli.mjs release-notes "$skill" --base "$BEFORE_SHA...HEAD" > "$notes_file"
             version="$(node tools/skills/skill-cli.mjs version "$skill")"
             tag="$skill@$version"
 
@@ -63,5 +73,5 @@ jobs:
             gh release create "$tag" "$artifact" \
               --target "${{ github.sha }}" \
               --title "$tag" \
-              --notes "$skill $version 发布"
+              --notes-file "$notes_file"
           done
