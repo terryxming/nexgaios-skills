@@ -1,0 +1,20 @@
+{
+  "name": "nexgaios-skills",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "skill:list": "node tools/skills/skill-cli.mjs list",
+    "skill:new": "node tools/skills/skill-cli.mjs new",
+    "skill:changed": "node tools/skills/skill-cli.mjs changed",
+    "skill:validate": "node tools/skills/skill-cli.mjs validate",
+    "skill:install": "node tools/skills/skill-cli.mjs install",
+    "skill:package": "node tools/skills/skill-cli.mjs package",
+    "skill:ship": "node tools/skills/skill-cli.mjs ship",
+    "skills:validate": "node tools/skills/skill-cli.mjs validate --all"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

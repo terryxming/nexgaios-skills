@@ -1,0 +1,32 @@
+name: Validate changed skills
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate changed skills
+        shell: bash
+        run: |
+          CHANGED="$(node tools/skills/skill-cli.mjs changed --base "origin/${{ github.base_ref }}...HEAD")"
+          if [ -z "$CHANGED" ]; then
+            echo "No changed skills."
+            exit 0
+          fi
+
+          echo "$CHANGED" | while read -r skill; do
+            [ -z "$skill" ] && continue
+            node tools/skills/skill-cli.mjs validate "$skill"
+          done
+

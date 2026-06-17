@@ -1,0 +1,15 @@
+id: {{skill_id}}
+domain: {{domain}}
+version: 0.1.0
+entry: SKILL.md
+status: active
+
+validate:
+  command: ""
+
+package:
+  command: ""
+
+release:
+  tag: {{skill_id}}@0.1.0
+

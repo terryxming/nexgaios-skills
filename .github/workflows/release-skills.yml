@@ -1,0 +1,59 @@
+name: Release changed skills
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Release versioned skills
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          CHANGED="$(node tools/skills/skill-cli.mjs changed --base "$BEFORE_SHA...HEAD")"
+          if [ -z "$CHANGED" ]; then
+            echo "No changed skills."
+            exit 0
+          fi
+
+          echo "$CHANGED" | while read -r skill; do
+            [ -z "$skill" ] && continue
+
+            if ! node tools/skills/skill-cli.mjs version-changed "$skill" --base "$BEFORE_SHA"; then
+              echo "$skill changed, but version did not change. Skipping release."
+              continue
+            fi
+
+            node tools/skills/skill-cli.mjs validate "$skill"
+            artifact="$(node tools/skills/skill-cli.mjs package "$skill" --print-path)"
+            version="$(node tools/skills/skill-cli.mjs version "$skill")"
+            tag="$skill@$version"
+
+            if git rev-parse "$tag" >/dev/null 2>&1; then
+              echo "Tag $tag already exists. Skipping."
+              continue
+            fi
+
+            gh release create "$tag" "$artifact" \
+              --target "${{ github.sha }}" \
+              --title "$tag" \
+              --notes "Release for $skill $version"
+          done
+
