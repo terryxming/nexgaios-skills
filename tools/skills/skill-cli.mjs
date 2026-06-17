@@ -478,6 +478,9 @@ function changedFiles(base) {
   ensureGitRepo();
 
   if (base) {
+    if (hasZeroSha(base)) {
+      return gitLines(["ls-files"]);
+    }
     return gitLines(["diff", "--name-only", base]);
   }
 
@@ -499,6 +502,10 @@ function changedFiles(base) {
   }
 
   return [];
+}
+
+function hasZeroSha(value) {
+  return /(^|[.\s])0{40}($|[.\s])/.test(value);
 }
 
 function isSharedToolingPath(file) {
