@@ -35,6 +35,18 @@ templates/
 pnpm skill:new amazon amazon-review-insight
 ```
 
+从本地目录或 GitHub 仓库导入技能：
+
+```bash
+pnpm skill:import product-design apple-hig-web-design --from https://github.com/terryxming/apple-hig-web-design --ref v1.1
+```
+
+如果目标技能已存在，需要显式追加 `--force` 才会覆盖：
+
+```bash
+pnpm skill:import product-design apple-hig-web-design --from D:\skills\apple-hig-web-design --version 1.1.0 --force
+```
+
 列出所有技能：
 
 ```bash

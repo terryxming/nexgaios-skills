@@ -7,6 +7,7 @@
   "scripts": {
     "skill:list": "node tools/skills/skill-cli.mjs list",
     "skill:new": "node tools/skills/skill-cli.mjs new",
+    "skill:import": "node tools/skills/skill-cli.mjs import",
     "skill:changed": "node tools/skills/skill-cli.mjs changed",
     "skill:validate": "node tools/skills/skill-cli.mjs validate",
     "skill:install": "node tools/skills/skill-cli.mjs install",

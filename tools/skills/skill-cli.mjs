@@ -30,6 +30,8 @@ async function main() {
       return listCommand(args);
     case "new":
       return newCommand(args);
+    case "import":
+      return importCommand(args);
     case "changed":
       return changedCommand(args);
     case "validate":
@@ -57,6 +59,7 @@ function printHelp() {
 命令：
   list [--write-catalog]
   new <domain> <skill-id>
+  import <domain> <skill-id> --from <path-or-git-url> [--ref <tag-or-branch>] [--version <semver>] [--force]
   changed [--base <git-range-or-ref>]
   validate <skill-id>|--all
   install <skill-id> [--target <path>]
@@ -150,6 +153,57 @@ function newCommand(rawArgs) {
 
   writeCatalog(loadSkills());
   console.log(`已创建 ${relative(targetDir)}`);
+}
+
+function importCommand(rawArgs) {
+  const { flags, positionals } = parseOptions(rawArgs);
+  const [domain, skillId] = positionals;
+
+  assertSlug(domain, "domain");
+  assertSlug(skillId, "skill-id");
+
+  if (!flags.from) {
+    throw new Error("缺少 --from 参数，请提供本地目录或 GitHub 仓库 URL");
+  }
+
+  const targetDir = path.join(skillsRoot, domain, skillId);
+  assertPathInside(targetDir, skillsRoot);
+  if (fs.existsSync(targetDir) && !flags.force) {
+    throw new Error(`技能已存在：${relative(targetDir)}。如需覆盖导入，请追加 --force`);
+  }
+
+  const source = prepareImportSource(String(flags.from), flags.ref ? String(flags.ref) : "");
+
+  try {
+    assertImportSourceTargetSafe(source.dir, targetDir);
+
+    if (!fs.existsSync(path.join(source.dir, "SKILL.md"))) {
+      throw new Error(`导入源缺少 SKILL.md：${source.display}`);
+    }
+
+    if (fs.existsSync(targetDir)) {
+      fs.rmSync(targetDir, { recursive: true, force: true });
+    }
+    fs.mkdirSync(targetDir, { recursive: true });
+    copyDir(source.dir, targetDir, shouldCopyImportFile);
+
+    const version = resolveImportVersion(targetDir, source, flags.version ? String(flags.version) : "");
+    writeImportedSkillYaml(targetDir, {
+      id: skillId,
+      domain,
+      version,
+      source,
+      validateCommand: inferValidateCommand(targetDir)
+    });
+    ensureImportedReadme(targetDir, { id: skillId, domain, version, source });
+    ensureImportedChangelog(targetDir, { id: skillId, version, source });
+
+    writeCatalog(loadSkills());
+    validateSkill(findSkill(skillId));
+    console.log(`已导入 ${skillId} 到 ${relative(targetDir)}`);
+  } finally {
+    cleanupImportSource(source);
+  }
 }
 
 function changedCommand(rawArgs) {
@@ -686,6 +740,283 @@ function titleize(value) {
     .join(" ");
 }
 
+function prepareImportSource(sourceValue, refValue) {
+  const parsed = parseImportSource(sourceValue);
+  if (parsed.kind === "git") {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nexgaios-skill-import-"));
+    const cloneArgs = ["clone", "--depth", "1"];
+    if (refValue || parsed.ref) {
+      cloneArgs.push("--branch", refValue || parsed.ref);
+    }
+    cloneArgs.push(parsed.url, tempRoot);
+    run("git", cloneArgs, { cwd: repoRoot });
+
+    const commit = run("git", ["rev-parse", "HEAD"], { cwd: tempRoot, capture: true }).trim();
+    return {
+      kind: "git",
+      dir: tempRoot,
+      display: parsed.url,
+      repository: parsed.url.replace(/\.git$/, ""),
+      ref: refValue || parsed.ref || "",
+      commit,
+      cleanupDir: tempRoot
+    };
+  }
+
+  const localPath = path.resolve(sourceValue);
+  if (!fs.existsSync(localPath)) {
+    throw new Error(`导入源不存在：${localPath}`);
+  }
+  if (!fs.statSync(localPath).isDirectory()) {
+    throw new Error(`导入源必须是目录：${localPath}`);
+  }
+
+  const source = {
+    kind: "path",
+    dir: localPath,
+    display: localPath,
+    path: localPath,
+    ref: refValue || "",
+    commit: ""
+  };
+
+  if (runQuiet("git", ["rev-parse", "--show-toplevel"], { cwd: localPath })) {
+    source.commit = run("git", ["rev-parse", "HEAD"], { cwd: localPath, capture: true }).trim();
+    const remote = spawnSync("git", ["config", "--get", "remote.origin.url"], {
+      cwd: localPath,
+      encoding: "utf8",
+      stdio: "pipe",
+      shell: false
+    });
+    source.repository = remote.status === 0 ? remote.stdout.trim().replace(/\.git$/, "") : "";
+  }
+
+  return source;
+}
+
+function parseImportSource(sourceValue) {
+  const trimmed = sourceValue.trim();
+  const githubMatch = trimmed.match(/^https?:\/\/github\.com\/([^/\s]+)\/([^/\s]+)(?:\/(?:tree|releases\/tag)\/([^?\s#]+)|\/tags)?\/?$/);
+  if (githubMatch) {
+    const owner = githubMatch[1];
+    const repo = githubMatch[2].replace(/\.git$/, "");
+    return {
+      kind: "git",
+      url: `https://github.com/${owner}/${repo}.git`,
+      ref: githubMatch[3] ? decodeURIComponent(githubMatch[3]) : ""
+    };
+  }
+
+  if (/^https?:\/\/.+\.git$/i.test(trimmed) || /^git@.+:.+\.git$/i.test(trimmed)) {
+    return { kind: "git", url: trimmed, ref: "" };
+  }
+
+  return { kind: "path" };
+}
+
+function cleanupImportSource(source) {
+  if (!source.cleanupDir) {
+    return;
+  }
+  const resolved = path.resolve(source.cleanupDir);
+  if (!resolved.startsWith(os.tmpdir())) {
+    throw new Error(`拒绝清理非临时导入目录：${resolved}`);
+  }
+  fs.rmSync(resolved, { recursive: true, force: true });
+}
+
+function resolveImportVersion(targetDir, source, explicitVersion) {
+  const candidates = [
+    explicitVersion,
+    readVersionFromSkillYaml(targetDir),
+    readVersionFromPackageJson(targetDir),
+    normalizeSemver(source.ref || "")
+  ].filter(Boolean);
+
+  return candidates[0] || "0.1.0";
+}
+
+function readVersionFromSkillYaml(skillDir) {
+  const yamlPath = path.join(skillDir, "skill.yaml");
+  if (!fs.existsSync(yamlPath)) {
+    return "";
+  }
+  const data = parseYamlLoose(fs.readFileSync(yamlPath, "utf8"));
+  return normalizeSemver(data.version || "");
+}
+
+function readVersionFromPackageJson(skillDir) {
+  const packagePath = path.join(skillDir, "package.json");
+  if (!fs.existsSync(packagePath)) {
+    return "";
+  }
+  try {
+    const data = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+    return normalizeSemver(data.version || "");
+  } catch {
+    return "";
+  }
+}
+
+function normalizeSemver(value) {
+  if (!value) {
+    return "";
+  }
+  const match = String(value).trim().match(/^v?(\d+)(?:\.(\d+))?(?:\.(\d+))?((?:-[0-9A-Za-z.-]+)?)$/);
+  if (!match) {
+    return "";
+  }
+  return `${match[1]}.${match[2] || "0"}.${match[3] || "0"}${match[4] || ""}`;
+}
+
+function inferValidateCommand(skillDir) {
+  const scriptsDir = path.join(skillDir, "scripts");
+  if (!fs.existsSync(scriptsDir)) {
+    return "";
+  }
+
+  const pythonScripts = fs.readdirSync(scriptsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".py"))
+    .map((entry) => `scripts/${entry.name}`)
+    .sort();
+
+  if (pythonScripts.length === 1) {
+    return `python -m py_compile ${pythonScripts[0]}`;
+  }
+
+  return "";
+}
+
+function writeImportedSkillYaml(targetDir, options) {
+  const lines = [
+    `id: ${options.id}`,
+    `domain: ${options.domain}`,
+    `version: ${options.version}`,
+    "entry: SKILL.md",
+    "status: active",
+    "",
+    "source:"
+  ];
+
+  if (options.source.kind === "git") {
+    lines.push(`  repository: ${quoteYaml(options.source.repository)}`);
+    if (options.source.ref) {
+      lines.push(`  ref: ${quoteYaml(options.source.ref)}`);
+    }
+    lines.push(`  commit: ${quoteYaml(options.source.commit)}`);
+  } else {
+    lines.push(`  path: ${quoteYaml(options.source.path)}`);
+    if (options.source.repository) {
+      lines.push(`  repository: ${quoteYaml(options.source.repository)}`);
+    }
+    if (options.source.commit) {
+      lines.push(`  commit: ${quoteYaml(options.source.commit)}`);
+    }
+  }
+
+  lines.push(
+    "",
+    "validate:",
+    `  command: ${quoteYaml(options.validateCommand)}`,
+    "",
+    "package:",
+    "  command: \"\"",
+    "",
+    "release:",
+    `  tag: ${options.id}@${options.version}`,
+    ""
+  );
+
+  fs.writeFileSync(path.join(targetDir, "skill.yaml"), `${lines.join("\n")}\n`);
+}
+
+function ensureImportedReadme(targetDir, options) {
+  const readmePath = path.join(targetDir, "README.md");
+  if (fs.existsSync(readmePath)) {
+    return;
+  }
+
+  const content = `# ${titleize(options.id)}
+
+\`${options.id}\` 是迁移到 \`nexgaios-skills\` monorepo 的 Codex skill。
+
+## 当前版本
+
+\`\`\`text
+${options.version}
+\`\`\`
+
+## 来源
+
+${formatSourceBlock(options.source)}
+
+## 仓库位置
+
+\`\`\`text
+skills/${options.domain}/${options.id}
+\`\`\`
+
+## 开发命令
+
+\`\`\`powershell
+pnpm skill:validate ${options.id}
+pnpm skill:install ${options.id}
+pnpm skill:package ${options.id} --print-path
+\`\`\`
+`;
+
+  fs.writeFileSync(readmePath, content);
+}
+
+function ensureImportedChangelog(targetDir, options) {
+  const changelogPath = path.join(targetDir, "CHANGELOG.md");
+  if (fs.existsSync(changelogPath)) {
+    return;
+  }
+
+  const content = `# 更新日志
+
+## ${options.version} - ${today()}
+
+- 迁移到 \`nexgaios-skills\` monorepo。
+- 补充 \`skill.yaml\`，纳入独立版本发布流程。
+${formatSourceListItem(options.source)}
+`;
+
+  fs.writeFileSync(changelogPath, content);
+}
+
+function formatSourceBlock(source) {
+  if (source.kind === "git") {
+    return [
+      "```text",
+      `仓库：${source.repository}`,
+      source.ref ? `Ref：${source.ref}` : "",
+      `Commit：${source.commit}`,
+      "```"
+    ].filter(Boolean).join("\n");
+  }
+
+  return [
+    "```text",
+    `本地路径：${source.path}`,
+    source.repository ? `仓库：${source.repository}` : "",
+    source.commit ? `Commit：${source.commit}` : "",
+    "```"
+  ].filter(Boolean).join("\n");
+}
+
+function formatSourceListItem(source) {
+  if (source.kind === "git") {
+    return `- 来源：${source.repository}${source.ref ? `（${source.ref}）` : ""}。`;
+  }
+  return `- 来源：${source.path}。`;
+}
+
+function quoteYaml(value) {
+  return JSON.stringify(value || "");
+}
+
 function replaceTokens(content, replacements) {
   let result = content;
   for (const [token, value] of Object.entries(replacements)) {
@@ -730,6 +1061,49 @@ function shouldCopySkillFile(sourcePath, entry) {
     ".env"
   ]);
   return !ignored.has(entry.name) && !sourcePath.includes(`${path.sep}.git${path.sep}`);
+}
+
+function shouldCopyImportFile(sourcePath, entry) {
+  const ignored = new Set([
+    ".git",
+    ".github",
+    "node_modules",
+    "dist",
+    ".DS_Store",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "artifacts",
+    "data",
+    ".env"
+  ]);
+  return !ignored.has(entry.name) && !sourcePath.includes(`${path.sep}.git${path.sep}`);
+}
+
+function assertPathInside(targetPath, parentPath) {
+  const relativePath = path.relative(path.resolve(parentPath), path.resolve(targetPath));
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+    throw new Error(`路径不在允许范围内：${targetPath}`);
+  }
+}
+
+function assertImportSourceTargetSafe(sourceDir, targetDir) {
+  const resolvedSource = path.resolve(sourceDir);
+  const resolvedTarget = path.resolve(targetDir);
+  const sourceToTarget = path.relative(resolvedSource, resolvedTarget);
+  const targetToSource = path.relative(resolvedTarget, resolvedSource);
+
+  if (!sourceToTarget || !targetToSource) {
+    throw new Error("导入源目录不能和目标技能目录相同");
+  }
+
+  if (!sourceToTarget.startsWith("..") && !path.isAbsolute(sourceToTarget)) {
+    throw new Error("目标技能目录不能位于导入源目录内部");
+  }
+
+  if (!targetToSource.startsWith("..") && !path.isAbsolute(targetToSource)) {
+    throw new Error("导入源目录不能位于目标技能目录内部");
+  }
 }
 
 function relative(targetPath) {
