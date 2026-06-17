@@ -133,6 +133,8 @@ PR 变更说明：
 pnpm skills:pr-summary --base origin/main...HEAD
 ```
 
+指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge。未准备好合并时，必须保持 Draft PR。
+
 Release Notes：
 
 ```powershell

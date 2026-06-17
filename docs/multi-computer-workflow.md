@@ -24,7 +24,7 @@ $env:USERPROFILE\.codex\skills
 E:\Terry LLM-Wiki Obsidian\raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
-这是公司电脑上的 Obsidian 镜像文件。它不是 GitHub 源码仓库的一部分。
+这是公司电脑和家用电脑当前约定使用的 Obsidian 镜像文件路径。它不是 GitHub 源码仓库的一部分；两台电脑都需要各自保证这个本机路径存在。
 
 ## 唯一源码事实源
 
@@ -155,7 +155,11 @@ git commit -m "<清晰提交信息>"
 git push -u origin <当前分支>
 ```
 
-通过 PR 合并到 `main` 后，在另一台电脑执行：
+指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge，并删除对应分支。
+
+如果工作还没准备好进入 `main`，必须保持 Draft PR。
+
+PR 合并到 `main` 后，在另一台电脑执行：
 
 ```powershell
 cd D:\nexgaios-skills
