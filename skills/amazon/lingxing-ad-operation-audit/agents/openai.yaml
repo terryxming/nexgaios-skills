@@ -1,13 +1,13 @@
 interface:
-  display_name: "LingXing Ad Operation Audit"
-  short_description: "Generate readonly LingXing ad operation audit reports"
+  display_name: "领星广告操作审计"
+  short_description: "生成只读领星广告操作日志审计报告"
   brand_color: "#1F6FEB"
-  default_prompt: "Use $lingxing-ad-operation-audit to generate a 90-day LingXing advertising operation audit HTML report."
+  default_prompt: "使用 $lingxing-ad-operation-audit 生成近 90 天领星广告操作日志 HTML 审计报告。"
 dependencies:
   tools:
     - type: "mcp"
       value: "LingXing-Readonly-AWS"
-      description: "Deployed readonly LingXing MCP server"
+      description: "已部署的只读领星 MCP 服务"
       transport: "streamable_http"
       url: "https://mcp.nexgaios.com/mcp-services/lingxing-mcp"
 policy:

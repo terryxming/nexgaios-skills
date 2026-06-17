@@ -1,32 +1,47 @@
-# Changelog
+# 更新日志
+
+## v0.1.2 - 2026-06-17
+
+### 修复
+
+- 修复 GitHub 安装后默认命令仍引用 monorepo 路径的问题，统一改为从 skill 根目录执行 `scripts/...`。
+- 统一导出脚本 MCP client version 为 `0.1.2`。
+- 删除已经废弃的 matplotlib/seaborn 静态图表代码和空 `charts` 输出，报告只保留当前使用的交互式 SVG 趋势图。
+- 删除不再需要的 Python 依赖，`requirements.txt` 仅保留 `pandas`。
+- 明确外部用户前置条件：必须通过托管 MCP endpoint 和管理员分配的 `X-Mcp-Key` 访问。
+
+### 文档
+
+- 中文化发布说明、安全说明和 skill 元数据。
+- 更新效果层说明到 `v0.1.2`。
 
 ## v0.1.1 - 2026-06-17
 
-### Added
+### 新增
 
-- Added a readonly Codex skill for LingXing advertising operation audit reports.
-- Added MCP-based log export through `lingxing_ad_operation_log_scan`.
-- Added optional performance-context export for SP campaign and SP keyword reports.
-- Added standalone HTML report generation with:
-  - dual-month date picker
-  - campaign fuzzy search with dropdown suggestions
-  - Chinese labels for object types and variables
-  - full-width campaign trend chart
-  - multi-metric true-value axes
-  - click-to-highlight trend series
-  - dense date-axis ticks based on available chart width
-  - full metric tooltip by date
-  - separated tooltip sections for advertising metrics and operation records
-  - row-level before/after effect windows
+- 新增只读 Codex skill，用于生成领星广告操作日志审计报告。
+- 新增基于 MCP 工具 `lingxing_ad_operation_log_scan` 的广告操作日志导出。
+- 新增可选效果层导出，覆盖 SP 广告活动报表和 SP 关键词报表。
+- 新增单文件 HTML 报告生成能力，包含：
+  - 双月日期选择器
+  - 带下拉建议的广告活动模糊搜索
+  - 对象类型和变量中文标签
+  - 全宽广告活动趋势图
+  - 多指标真实值坐标轴
+  - 点击高亮趋势曲线
+  - 基于可用图表宽度的密集日期轴
+  - 按日期展示完整指标的悬浮提示
+  - 广告指标和操作记录分区展示的悬浮提示
+  - 行级改前/改后效果窗口
 
-### Changed
+### 变更
 
-- Default analysis now filters operation-noise variables before summaries, trends, detail rows, and effect windows:
+- 默认在摘要、趋势、明细行和效果窗口计算前过滤操作噪音变量：
   - `(empty)` / 无变量明细
   - `IN_BUDGET` / 是否预算内
-- Operation-date marker legend now uses a round dot symbol to match the chart marker.
+- 操作日期标记图例改为圆点，和图表中的圆形标记保持一致。
 
-### Security
+### 安全
 
-- Generated data and report artifacts are ignored by default.
-- Real MCP keys must stay in local `.env` files only.
+- 生成的数据和报告产物默认被忽略，不进入 Git。
+- 真实 MCP Key 只能保存在本地 `.env` 文件中。

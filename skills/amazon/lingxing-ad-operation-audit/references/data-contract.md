@@ -1,6 +1,6 @@
-# Data Contract
+# 数据契约
 
-The export script calls `lingxing_ad_operation_log_scan` and expects a text MCP result containing a JSON envelope:
+导出脚本会调用 `lingxing_ad_operation_log_scan`，并预期 MCP 返回一个文本内容，文本中包含如下 JSON envelope：
 
 ```json
 {
@@ -32,25 +32,25 @@ The export script calls `lingxing_ad_operation_log_scan` and expects a text MCP 
 }
 ```
 
-If `changes` is empty, keep the log-level record and mark the variable code as `(empty)`.
+如果 `changes` 为空，仍保留日志级记录，并把变量 code 标记为 `(empty)`。
 
-The report generator excludes the following variable codes from analysis before calculating summaries, trend markers, detail rows, and effect windows:
+报告生成器会在计算摘要、趋势标记、明细行和效果窗口之前，排除以下变量 code：
 
 - `(empty)` / 无变量明细
 - `IN_BUDGET` / 是否预算内
 
-These records are treated as analysis noise because they usually represent pause/status propagation or budget-in/out state synchronization rather than an optimization lever whose before/after effect should be evaluated.
+这些记录通常代表暂停/状态传导或预算内外状态同步，不是用于评估广告优化收益的操作变量，因此视为分析噪音。
 
-Core filters:
+核心筛选字段：
 
-- `sponsored_type`: `sp`, `sb`, `sd`
-- `operate_type`: `campaigns`, `adGroups`, `productAds`, `keywords`, `negativeKeywords`, `targets`, `negativeTargets`, `profiles`
-- `log_source`: `all`, `erp`, `amazon`
-- `campaign_query`: fuzzy query across campaign, object, and ad group names
+- `sponsored_type`：`sp`、`sb`、`sd`
+- `operate_type`：`campaigns`、`adGroups`、`productAds`、`keywords`、`negativeKeywords`、`targets`、`negativeTargets`、`profiles`
+- `log_source`：`all`、`erp`、`amazon`
+- `campaign_query`：在广告活动、对象和广告组名称中做模糊查询
 
-## Performance Context
+## 效果层上下文
 
-`export_ad_performance_context.ts` produces an optional second JSON file:
+`export_ad_performance_context.ts` 会生成可选的第二个 JSON 文件：
 
 ```json
 {
@@ -63,63 +63,63 @@ Core filters:
 }
 ```
 
-The HTML generator uses this data to calculate a before/after impact object per supported operation. The default row-level effect window compares adjacent stable intervals for the same ad object and same variable:
+HTML 生成器使用这份数据，为支持的操作计算每一行的改前/改后效果对象。默认行级效果窗口会针对同一个广告对象和同一个变量，比较相邻稳定区间：
 
-- Before interval: previous change date + 1 through current change date - 1, or the first available performance date through current change date - 1 when there is no previous change.
-- After interval: current change date + 1 through next change date - 1, or current change date + 1 through the last available performance date when there is no next change.
-- The operation date is excluded because operation logs are timestamped but performance reports are daily.
+- 改前区间：上一次变化日期 + 1 到当前变化日期 - 1；如果没有上一次变化，则使用第一天可用效果日报到当前变化日期 - 1。
+- 改后区间：当前变化日期 + 1 到下一次变化日期 - 1；如果没有下一次变化，则使用当前变化日期 + 1 到最后一天可用效果日报。
+- 操作当天排除，因为操作日志有具体时间戳，而效果报表是按天统计。
 
-Metrics:
+指标定义：
 
-- CPC = cost / clicks
-- CTR = clicks / impressions
-- CVR = orders / clicks
-- ACOS = cost / sales
-- ad orders = `orders`
-- direct orders = `same_orders`
-- indirect orders = `orders - same_orders`
-- indirect order share = indirect orders / orders
+- CPC = 花费 / 点击
+- CTR = 点击 / 曝光量
+- CVR = 广告订单 / 点击
+- ACOS = 花费 / 销售额
+- 广告订单 = `orders`
+- 直接订单 = `same_orders`
+- 间接订单 = `orders - same_orders`
+- 间接订单占比 = 间接订单 / 广告订单
 
-In the HTML effect window, quantity metrics are displayed as daily averages based on covered report days: impressions/day, clicks/day, cost/day, ad orders/day, direct orders/day, and indirect orders/day. Rate metrics remain weighted interval rates from the summed numerator/denominator.
+HTML 效果窗口中，数量型指标按覆盖日报天数展示为日均值：曝光量/日、点击/日、花费/日、广告订单/日、直接订单/日、间接订单/日。比例型指标仍使用区间内分子/分母汇总后的加权比例。
 
-When both before and after intervals have covered report days, the after interval displays an arrow before each metric value. Direction reflects numeric movement; color reflects whether that movement is favorable. Lower is better for CPC, ACOS, and cost/day. Higher is better for impressions/day, clicks/day, CTR, CVR, ad orders/day, direct orders/day, indirect orders/day, and indirect order share.
+当改前和改后区间都有覆盖日报时，改后区间会在每个指标值前展示箭头。箭头方向表示数值变化；颜色表示这个变化是否有利。CPC、ACOS、花费/日越低越好。曝光量/日、点击/日、CTR、CVR、广告订单/日、直接订单/日、间接订单/日、间接订单占比越高越好。
 
-## Campaign Trend Chart
+## 广告活动趋势图
 
-The HTML embeds `sp_campaign_reports` from the performance context to draw a client-side SVG campaign trend chart. The chart follows only two controls:
+HTML 会内嵌效果层中的 `sp_campaign_reports`，并用客户端 SVG 绘制广告活动趋势图。趋势图只跟随两个控件：
 
-- operation date range
-- campaign fuzzy-search text
+- 操作日期范围
+- 广告活动模糊搜索文本
 
-Other detail-table filters such as variable, user, object type, and operation type must not change the trend chart dataset.
+变量、用户、对象类型、操作类型等明细表筛选条件不得改变趋势图数据集。
 
-Metrics are multi-select in true-value mode. The default selected metrics are cost, ad orders, and ACOS.
+指标采用多选真实值模式。默认选中指标为花费、广告订单和 ACOS。
 
-The SVG chart must fill the available content width. Calculate the SVG viewBox width from the rendered chart container and rerender on browser resize.
+SVG 图表必须铺满可用内容宽度。根据图表容器的实际渲染宽度计算 SVG viewBox，并在浏览器 resize 时重绘。
 
-The chart interaction model:
+图表交互模型：
 
-- Clicking a legend item or a plotted curve/point toggles highlight for that metric.
-- While one metric is highlighted, other selected metrics are dimmed but remain visible for context.
-- Hovering the chart should show a custom tooltip for the hovered date with the full trend metric set, not only the single series under the cursor.
-- The tooltip should separate the advertising-metric block from the operation-record block with clear spacing or a divider.
-- The operation-date marker legend should use a round dot symbol to match the chart marker dots.
-- X-axis date labels should be density-aware and based on available plot width plus date count. Avoid a fixed six-tick axis because it is too sparse on wide screens and short ranges.
+- 点击图例项、曲线或数据点时，切换该指标的高亮状态。
+- 当某个指标高亮时，其他已选指标降透明，但仍保留在图中作为上下文。
+- hover 图表时，应展示自定义悬浮提示，内容为 hover 日期下的完整趋势指标集，而不是只展示鼠标下单条曲线的值。
+- 悬浮提示应用清晰的间距或分割线区分广告指标区块和操作记录区块。
+- 操作日期标记图例应使用圆点符号，和图表中的圆形标记保持一致。
+- X 轴日期标签应根据可用图表宽度和日期数量智能计算。避免固定 6 个 tick，因为这在宽屏和短日期范围下太稀疏。
 
-Trend axis behavior follows LingXing ERP's multi-axis pattern:
+趋势图坐标轴遵循领星 ERP 的多轴模式：
 
-- Show at most three business metrics at once.
-- Each selected metric owns an independent Y axis.
-- The first selected metric uses the left axis.
-- The second selected metric uses the right axis.
-- The third selected metric uses a second right-side axis with visual offset.
-- Selecting a fourth metric automatically removes the earliest selected metric.
-- Deselecting the final remaining metric is blocked so the chart always has at least one business metric.
-- Each axis is dynamically scaled from currently visible data. Percentage axes such as CTR, CVR, ACOS, and indirect order share must not be forced to 0-100% unless the visible data requires it.
+- 最多同时显示 3 个业务指标。
+- 每个选中指标独立拥有一个 Y 轴。
+- 第一个选中指标使用左轴。
+- 第二个选中指标使用右轴。
+- 第三个选中指标使用右侧偏移的第二右轴。
+- 选择第 4 个指标时，自动移除最早选中的指标。
+- 禁止取消最后一个指标，保证图表始终至少有一个业务指标。
+- 每个坐标轴都基于当前可见数据动态缩放。CTR、CVR、ACOS、间接订单占比等百分比指标，除非可见数据确实需要，不应强制使用 0-100%。
 
-Operation dates are rendered as marker lines/dots. Markers aggregate all matched operations on that date and expose a hover summary with operation count, variable, before/after values, and user.
+操作日期会渲染为标记线和圆点。标记会聚合该日期下所有匹配操作，并在 hover 摘要中展示操作数、变量、改前/改后值和用户。
 
-Supported v0.1.1 joins:
+v0.1.2 支持的效果层关联：
 
-- `sp/campaigns` -> `sp_campaign_reports`, matched by `campaign_id`
-- `sp/keywords` -> `sp_keyword_reports`, matched by `object_id = keyword_id`, fallback `campaign_id + ad_group_id + keyword_text`
+- `sp/campaigns` -> `sp_campaign_reports`，按 `campaign_id` 匹配
+- `sp/keywords` -> `sp_keyword_reports`，按 `object_id = keyword_id` 匹配，并用 `campaign_id + ad_group_id + keyword_text` 兜底

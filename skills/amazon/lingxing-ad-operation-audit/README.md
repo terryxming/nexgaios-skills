@@ -1,4 +1,4 @@
-# LingXing Ad Operation Audit
+# 领星广告操作日志审计
 
 `lingxing-ad-operation-audit` 是一个 Codex skill，用于通过只读 LingXing MCP 拉取广告操作日志，并生成可交互的 HTML 审计报告。
 
@@ -7,8 +7,18 @@
 ## 当前版本
 
 ```text
-v0.1.1
+v0.1.2
 ```
+
+## 前置条件
+
+本 skill 默认通过已经部署好的只读 LingXing MCP 服务访问领星数据：
+
+```text
+https://mcp.nexgaios.com/mcp-services/lingxing-mcp
+```
+
+外部用户必须先由管理员分配 `X-Mcp-Key`。没有有效 Key 时，导出脚本无法通过 MCP 鉴权，也不会尝试绕过 MCP 直接调用领星 OpenAPI。
 
 ## 能力
 
@@ -19,7 +29,7 @@ v0.1.1
   - 广告活动趋势图
   - 多指标真实值坐标轴
   - 曲线/图例点击高亮
-  - 日期级全量指标 tooltip
+  - 日期级全量指标悬浮提示
   - 操作记录标记点
   - 变量变化前后稳定区间对比
   - 明细表和字段说明

@@ -9,6 +9,8 @@ artifacts/
 data/
 *.log
 *.html
+*.json
+!package.json
 *.csv
 *.xlsx
 *.png

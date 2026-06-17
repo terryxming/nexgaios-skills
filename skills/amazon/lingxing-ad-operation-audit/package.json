@@ -1,7 +1,7 @@
 {
   "name": "lingxing-ad-operation-audit",
-  "version": "0.1.1",
-  "description": "Codex skill for readonly LingXing advertising operation audit HTML reports.",
+  "version": "0.1.2",
+  "description": "用于生成只读领星广告操作日志 HTML 审计报告的 Codex skill。",
   "type": "module",
   "private": true,
   "scripts": {

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import html
 import json
 from collections import Counter, defaultdict
@@ -9,12 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 
 
 OBJECT_LABELS = {
@@ -258,66 +252,6 @@ def top_counts(frame: pd.DataFrame, column: str, limit: int = 10) -> list[tuple[
     return counts.most_common(limit)
 
 
-def save_barh(items: list[tuple[str, int]], title: str, subtitle: str, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    data = pd.DataFrame(items, columns=["name", "count"])
-    if data.empty:
-        data = pd.DataFrame([("No data", 0)], columns=["name", "count"])
-    data = data.sort_values("count", ascending=True)
-
-    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
-    plt.rcParams["axes.unicode_minus"] = False
-    sns.set_theme(style="whitegrid", font="Microsoft YaHei")
-    fig_height = max(4.0, min(8.0, 0.46 * len(data) + 1.5))
-    fig, ax = plt.subplots(figsize=(10.5, fig_height))
-    palette = sns.color_palette("tab20", n_colors=max(len(data), 1))
-    sns.barplot(data=data, y="name", x="count", ax=ax, palette=palette, hue="name", legend=False)
-    ax.set_xlabel("记录数")
-    ax.set_ylabel("")
-    ax.grid(axis="x", color="#e5e7eb", linewidth=0.9)
-    ax.grid(axis="y", visible=False)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    for container in ax.containers:
-        ax.bar_label(container, fmt="%d", padding=3, fontsize=9, color="#374151")
-    fig.suptitle(title, x=0.02, y=0.98, ha="left", fontsize=15, fontweight="bold")
-    ax.set_title(subtitle, loc="left", fontsize=10, color="#4b5563", pad=10)
-    fig.tight_layout(rect=[0, 0, 1, 0.92])
-    fig.savefig(output, dpi=160, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-
-
-def save_daily_line(frame: pd.DataFrame, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    daily = frame.groupby("operate_date").size().reset_index(name="count") if not frame.empty else pd.DataFrame()
-    if daily.empty:
-        daily = pd.DataFrame([{"operate_date": "-", "count": 0}])
-    daily = daily[daily["operate_date"] != "-"]
-    daily["operate_date"] = pd.to_datetime(daily["operate_date"])
-
-    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
-    plt.rcParams["axes.unicode_minus"] = False
-    sns.set_theme(style="whitegrid", font="Microsoft YaHei")
-    fig, ax = plt.subplots(figsize=(11, 4.4))
-    sns.lineplot(data=daily, x="operate_date", y="count", ax=ax, color="#1f6feb", linewidth=2.2)
-    ax.fill_between(daily["operate_date"], daily["count"], color="#1f6feb", alpha=0.10)
-    ax.set_xlabel("")
-    ax.set_ylabel("记录数")
-    ax.grid(axis="y", color="#e5e7eb", linewidth=0.9)
-    ax.grid(axis="x", visible=False)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    fig.suptitle("每日操作量", x=0.02, y=0.98, ha="left", fontsize=15, fontweight="bold")
-    ax.set_title("峰值通常意味着集中维护、批量复制或系统同步。", loc="left", fontsize=10, color="#4b5563", pad=10)
-    fig.tight_layout(rect=[0, 0, 1, 0.92])
-    fig.savefig(output, dpi=160, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-
-
-def b64(path: Path) -> str:
-    return base64.b64encode(path.read_bytes()).decode("ascii")
-
-
 def format_table(items: list[tuple[str, int]], headers: tuple[str, str]) -> str:
     rows = "\n".join(f"<tr><td>{esc(name)}</td><td>{count:,}</td></tr>" for name, count in items)
     return f"<table><thead><tr><th>{esc(headers[0])}</th><th>{esc(headers[1])}</th></tr></thead><tbody>{rows}</tbody></table>"
@@ -558,7 +492,6 @@ def build_html(
     log_df: pd.DataFrame,
     change_df: pd.DataFrame,
     filter_summary: dict[str, int],
-    chart_paths: dict[str, Path],
     window_days: int,
 ) -> None:
     result = payload.get("result", payload)
@@ -723,8 +656,8 @@ def build_html(
     <div class="meta">
       <span>{esc(store_label)}</span>
       <span>{esc(start_date)} 至 {esc(end_date)}</span>
-      <span>Exported {esc(exported_at)}</span>
-      <span>Source: {esc(payload.get("endpoint", "LingXing MCP"))}</span>
+      <span>导出时间：{esc(exported_at)}</span>
+      <span>数据来源：{esc(payload.get("endpoint", "LingXing MCP"))}</span>
     </div>
   </header>
   <main>
@@ -830,7 +763,7 @@ def build_html(
     </section>
 
     <section>
-      <h2>Top Lists</h2>
+      <h2>重点排行</h2>
       <div class="grid mini-tables">
         <div>{format_table(variables[:10], ("变量", "变更数"))}</div>
         <div>{format_table(campaigns_top[:10], ("广告活动", "日志数"))}</div>
@@ -842,7 +775,7 @@ def build_html(
       <h2>口径说明</h2>
       <p>本报告来自只读 MCP 工具 `lingxing_ad_operation_log_scan`，范围为 {esc(json.dumps(args.get("scope", {}), ensure_ascii=False))}。效果层使用广告日报按同一广告对象、同一变量的连续变化切分稳定区间，比较本次变化前后的两段数据，操作当天默认排除。</p>
       <p>分析口径已默认过滤“无变量明细”和“是否预算内（IN_BUDGET）”，这类记录通常表示暂停/预算状态同步，对评估广告操作收益帮助有限；本次共过滤 {filter_summary.get("removed_change_rows", 0):,} 条变量级记录、{filter_summary.get("removed_log_rows", 0):,} 条操作日志。</p>
-      <p>v0.1.1-preview 效果层优先覆盖 SP 广告活动和 SP 关键词，按 `campaign_id`、`keyword_id/object_id` 精确关联；没有日报匹配时显示“日报无匹配数据”。如果相邻两次变化发生在连续日期，可能没有可比较的前置或后置区间。</p>
+      <p>v0.1.2 效果层优先覆盖 SP 广告活动和 SP 关键词，按 `campaign_id`、`keyword_id/object_id` 精确关联；没有日报匹配时显示“日报无匹配数据”。如果相邻两次变化发生在连续日期，可能没有可比较的前置或后置区间。</p>
     </section>
   </main>
   <script id="audit-data" type="application/json">{safe_detail_json}</script>
@@ -1714,7 +1647,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--title", default="LingXing Ad Operation Audit")
+    parser.add_argument("--title", default="领星广告操作日志审计")
     parser.add_argument("--store-label", default="LingXing store")
     parser.add_argument("--performance-input", type=Path)
     parser.add_argument("--impact-window-days", type=int, default=7)
@@ -1730,16 +1663,14 @@ def main() -> None:
     log_df, change_df = normalize_rows(records)
     log_df, change_df, filter_summary = filter_analysis_variables(log_df, change_df)
     change_df = attach_impact(change_df, performance_payload, args.impact_window_days)
-    chart_paths: dict[str, Path] = {}
 
-    build_html(args.output, args.title, args.store_label, payload, performance_payload, log_df, change_df, filter_summary, chart_paths, args.impact_window_days)
+    build_html(args.output, args.title, args.store_label, payload, performance_payload, log_df, change_df, filter_summary, args.impact_window_days)
     print(json.dumps({
         "output": str(args.output),
         "records": len(log_df),
         "change_rows": len(change_df),
         "filtered": filter_summary,
         "impact_rows": int(change_df["impact_status"].isin(["ready", "partial"]).sum()) if "impact_status" in change_df else 0,
-        "charts": {},
     }, ensure_ascii=False, indent=2))
 
 

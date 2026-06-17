@@ -71,7 +71,7 @@ if (process.env.LINGXING_AD_AUDIT_USER_QUERY) filters.user_query = process.env.L
 const transport = new StreamableHTTPClientTransport(new URL(endpoint), {
   requestInit: { headers: { "X-Mcp-Key": key } },
 });
-const client = new Client({ name: "lingxing-ad-operation-audit-export", version: "0.1.0" });
+const client = new Client({ name: "lingxing-ad-operation-audit-export", version: "0.1.2" });
 
 try {
   await client.connect(transport);

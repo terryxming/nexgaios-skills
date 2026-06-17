@@ -2,6 +2,6 @@
 skills:
   - id: lingxing-ad-operation-audit
     domain: amazon
-    version: 0.1.1
+    version: 0.1.2
     path: skills/amazon/lingxing-ad-operation-audit
     status: active

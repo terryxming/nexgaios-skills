@@ -1,6 +1,6 @@
 id: lingxing-ad-operation-audit
 domain: amazon
-version: 0.1.1
+version: 0.1.2
 entry: SKILL.md
 status: active
 
@@ -11,5 +11,4 @@ package:
   command: ""
 
 release:
-  tag: lingxing-ad-operation-audit@0.1.1
-
+  tag: lingxing-ad-operation-audit@0.1.2
