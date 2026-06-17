@@ -25,6 +25,15 @@ release:
   tag: lingxing-ad-operation-audit@0.1.0
 ```
 
+导入来源也可以记录在 `source` 中：
+
+```yaml
+source:
+  repository: "https://github.com/terryxming/apple-hig-web-design"
+  ref: "v1.1"
+  commit: "4115b523cb0649b7a595d478abb4dfeffec5162f"
+```
+
 规则：
 
 - 业务域目录只负责分类，不作为发布单位。
@@ -46,3 +55,11 @@ Windows 下可以使用仓库包装脚本：
 pnpm skill:validate lingxing-ad-operation-audit
 pnpm skill:ship lingxing-ad-operation-audit --patch -m "优化审计报告"
 ```
+
+导入已有技能：
+
+```powershell
+pnpm skill:import <domain> <skill-id> --from <本地目录或 GitHub URL> [--ref <tag/branch>] [--version <semver>] [--force]
+```
+
+导入命令会复制技能文件、补齐缺失的 `skill.yaml`、`README.md` 和 `CHANGELOG.md`、更新 `catalog.yaml`，并做基础协议验证。
