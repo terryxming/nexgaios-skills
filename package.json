@@ -20,7 +20,9 @@
     "skills:guard": "node tools/skills/skill-cli.mjs guard",
     "skills:pr-summary": "node tools/skills/skill-cli.mjs pr-summary",
     "guide:sync": "node tools/skills/skill-cli.mjs guide-sync",
-    "guide:check": "node tools/skills/skill-cli.mjs guide-sync --check"
+    "guide:check": "node tools/skills/skill-cli.mjs guide-sync --check",
+    "experience:search": "node tools/skills/skill-cli.mjs experience-search",
+    "experience:new": "node tools/skills/skill-cli.mjs experience-new"
   },
   "engines": {
     "node": ">=20"
