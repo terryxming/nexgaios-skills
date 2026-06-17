@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
     "skill:list": "node tools/skills/skill-cli.mjs list",
     "skill:new": "node tools/skills/skill-cli.mjs new",
@@ -17,4 +18,3 @@
     "node": ">=20"
   }
 }
-

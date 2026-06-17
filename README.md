@@ -32,41 +32,47 @@ templates/
 Create a new skill:
 
 ```bash
-.\skill.cmd new amazon amazon-review-insight
+pnpm skill:new amazon amazon-review-insight
 ```
 
 List skills:
 
 ```bash
-.\skill.cmd list
+pnpm skill:list
 ```
 
 Validate one skill:
 
 ```bash
-.\skill.cmd validate lingxing-ad-operation-audit
+pnpm skill:validate lingxing-ad-operation-audit
 ```
 
 Install one skill into the local Codex runtime:
 
 ```bash
-.\skill.cmd install lingxing-ad-operation-audit
+pnpm skill:install lingxing-ad-operation-audit
 ```
 
 Ship a skill change to a branch and open a PR:
 
 ```bash
-.\skill.cmd ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+pnpm skill:ship lingxing-ad-operation-audit --patch -m "Improve audit report"
 ```
 
 Use `--minor`, `--major`, or `--no-release` when appropriate.
 
-If you install pnpm later, the equivalent scripts are also available:
+On Windows, the direct wrapper is also available:
 
 ```bash
-pnpm skill:new amazon amazon-review-insight
-pnpm skill:validate lingxing-ad-operation-audit
-pnpm skill:ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+.\skill.cmd new amazon amazon-review-insight
+.\skill.cmd validate lingxing-ad-operation-audit
+.\skill.cmd ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+```
+
+For automatic PR creation, install and log in to GitHub CLI:
+
+```bash
+gh auth login
 ```
 
 ## Release Rule

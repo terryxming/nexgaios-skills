@@ -39,3 +39,10 @@ On Windows, use the repository wrapper:
 .\skill.cmd validate lingxing-ad-operation-audit
 .\skill.cmd ship lingxing-ad-operation-audit --patch -m "Improve audit report"
 ```
+
+The preferred package-manager entry points are also available:
+
+```powershell
+pnpm skill:validate lingxing-ad-operation-audit
+pnpm skill:ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+```

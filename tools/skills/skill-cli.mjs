@@ -597,12 +597,18 @@ function ensureBranch(skillId) {
 }
 
 function maybeCreatePullRequest(message, branch) {
-  if (!runQuiet("gh", ["--version"], { cwd: repoRoot })) {
+  const gh = findGhExecutable();
+  if (!gh) {
     console.log("GitHub CLI was not found. Open a PR manually from the pushed branch.");
     return;
   }
 
-  const result = spawnSync("gh", ["pr", "create", "--fill", "--title", message, "--head", branch], {
+  if (!runQuiet(gh, ["auth", "status"], { cwd: repoRoot })) {
+    console.log(`GitHub CLI is installed, but not logged in. Run \`gh auth login\`, then create the PR with: gh pr create --fill --title "${message}" --head ${branch}`);
+    return;
+  }
+
+  const result = spawnSync(gh, ["pr", "create", "--fill", "--title", message, "--head", branch], {
     cwd: repoRoot,
     stdio: "inherit",
     shell: false
@@ -611,6 +617,27 @@ function maybeCreatePullRequest(message, branch) {
   if (result.status !== 0) {
     console.log("Branch was pushed, but PR creation did not complete. You can open it from GitHub.");
   }
+}
+
+function findGhExecutable() {
+  if (runQuiet("gh", ["--version"], { cwd: repoRoot })) {
+    return "gh";
+  }
+
+  if (process.platform === "win32") {
+    const candidates = [
+      "C:\\Program Files\\GitHub CLI\\gh.exe",
+      path.join(process.env.LOCALAPPDATA || "", "Programs", "GitHub CLI", "gh.exe")
+    ];
+
+    for (const candidate of candidates) {
+      if (candidate && fs.existsSync(candidate)) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
 }
 
 function currentBranch() {

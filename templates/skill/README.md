@@ -13,6 +13,6 @@ Ask Codex to use {{skill_id}} when ...
 ## Development
 
 ```bash
-.\skill.cmd validate {{skill_id}}
-.\skill.cmd install {{skill_id}}
+pnpm skill:validate {{skill_id}}
+pnpm skill:install {{skill_id}}
 ```

@@ -12,9 +12,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+          run_install: false
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Validate changed skills
         shell: bash
@@ -29,4 +38,3 @@ jobs:
             [ -z "$skill" ] && continue
             node tools/skills/skill-cli.mjs validate "$skill"
           done
-
