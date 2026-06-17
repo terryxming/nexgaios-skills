@@ -10,3 +10,8 @@ skills:
     version: 0.1.3
     path: skills/amazon/lingxing-ad-operation-audit
     status: active
+  - id: skill-doctor
+    domain: skill-governance
+    version: 0.1.0
+    path: skills/skill-governance/skill-doctor
+    status: active

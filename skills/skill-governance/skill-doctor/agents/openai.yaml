@@ -1,0 +1,4 @@
+interface:
+  display_name: "技能医生 Skill Doctor"
+  short_description: "中文化 skill 质量诊断与发布治理"
+  default_prompt: "使用 $skill-doctor 审计我指定的 Codex skill，并从资深 AI 产品经理、生产端、消费端三个视角给出问题证据、优先级和修复建议。"

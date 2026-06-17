@@ -64,6 +64,29 @@ pnpm skill:import <domain> <skill-id> --from <本地目录或 GitHub URL> [--ref
 
 导入命令会复制技能文件、补齐缺失的 `skill.yaml`、`README.md` 和 `CHANGELOG.md`、更新 `catalog.yaml`，并做基础协议验证。
 
+## 新建 skill 的验证边界
+
+`pnpm skill:new <domain> <skill-id>` 只证明“仓库骨架和基础协议已经生成”，不证明“这个 skill 的业务能力已经正确”。
+
+`skill:new` 能自动完成并可被基础命令验证的范围：
+
+- 创建 `skills/<domain>/<skill-id>/`。
+- 生成 `skill.yaml`、`SKILL.md`、`README.md`、`CHANGELOG.md`。
+- 生成 `references/`、`scripts/`、`assets/`、`tests/` 目录说明。
+- 更新 `catalog.yaml`。
+- 允许 `pnpm skill:validate <skill-id>` 检查必填字段、SemVer 版本号、目录位置和入口文件。
+
+`skill:new` 不验证以下业务能力：
+
+- 触发描述是否覆盖真实用户表达。
+- 工作流程是否足以完成目标任务。
+- references 是否完整、准确、按需路由。
+- scripts 是否正确、安全、可复现。
+- 输出格式是否符合用户验收标准。
+- 发布版本是否可回滚、可测试、可复盘。
+
+业务能力需要通过该 skill 自己的验证命令、脚本测试、真实 prompt 测试、误触发测试、输出契约测试和必要的 forward-test 证明。
+
 ## 安装与同步
 
 安装单个 skill：
