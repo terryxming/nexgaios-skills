@@ -254,6 +254,36 @@ skills/product-design/README.md
 
 原因是本机安装状态是机器状态，Windows 本机和 GitHub Actions Linux runner 上不一致。
 
+### 3.1 Obsidian 镜像文档
+
+`docs/repository-guide.md` 还有一份本机 Obsidian 镜像：
+
+```text
+E:\Terry LLM-Wiki Obsidian\raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+```
+
+当仓库内 `docs/repository-guide.md` 发生变化时，必须同步维护这份 E 盘文件。
+
+同步命令：
+
+```powershell
+pnpm guide:sync
+```
+
+一致性检查：
+
+```powershell
+pnpm guide:check
+```
+
+硬性规则：
+
+- `docs/repository-guide.md` 是源文件。
+- E 盘路径是本机 Obsidian 镜像文件。
+- 如果 E 盘路径中找不到 `repository-guide.md`，不得自动创建文件。
+- 如果 E 盘路径中找不到该文件，必须先显示询问用户是否要创建或恢复这个文件。
+- 该检查不接入 GitHub Actions，因为 GitHub Actions 无法访问本机 E 盘。
+
 ### 4. 新建 skill 模板
 
 新建 skill：
@@ -533,6 +563,8 @@ version: 0.1.4
 
    ```powershell
    pnpm skills:docs
+   pnpm guide:sync
+   pnpm guide:check
    pnpm skills:guard
    pnpm skills:validate
    ```
