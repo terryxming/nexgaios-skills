@@ -93,6 +93,18 @@ pnpm skills:docs
 pnpm skills:docs:check
 ```
 
+同步仓库架构指南到 Obsidian 镜像：
+
+```bash
+pnpm guide:sync
+```
+
+检查仓库架构指南与 Obsidian 镜像是否一致：
+
+```bash
+pnpm guide:check
+```
+
 检查是否误提交临时文件、大文件或常见密钥格式：
 
 ```bash

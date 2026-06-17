@@ -14,6 +14,8 @@ const distRoot = path.join(repoRoot, "dist");
 const installMarkerFile = ".nexgaios-skill-install.json";
 const generatedFileNotice = "此文件由 `pnpm skills:docs` 生成。不要手动编辑。";
 const maxGuardFileBytes = 5 * 1024 * 1024;
+const repositoryGuidePath = path.join(repoRoot, "docs", "repository-guide.md");
+const repositoryGuideMirrorPath = "E:\\Terry LLM-Wiki Obsidian\\raw\\01 - AI Work\\0102 - 项目\\Nexgaios-skills 仓库\\repository-guide.md";
 
 const command = process.argv[2] || "help";
 const args = process.argv.slice(3);
@@ -53,6 +55,8 @@ async function main() {
       return guardCommand(args);
     case "pr-summary":
       return prSummaryCommand(args);
+    case "guide-sync":
+      return guideSyncCommand(args);
     case "release-notes":
       return releaseNotesCommand(args);
     case "version":
@@ -82,6 +86,7 @@ function printHelp() {
   docs [--check]
   guard [--base <git-range-or-ref>|--all]
   pr-summary [--base <git-range-or-ref>]
+  guide-sync [--check]
   release-notes <skill-id> [--base <git-range-or-ref>]
   version <skill-id>
   info <skill-id> [--field id|domain|version|path|entry]
@@ -429,6 +434,30 @@ function guardCommand(rawArgs) {
 function prSummaryCommand(rawArgs) {
   const { flags } = parseOptions(rawArgs);
   console.log(generatePrSummary(flags.base || ""));
+}
+
+function guideSyncCommand(rawArgs) {
+  const { flags } = parseOptions(rawArgs);
+  ensureRepositoryGuideMirrorExists();
+
+  const sourceContent = fs.readFileSync(repositoryGuidePath, "utf8");
+  const mirrorContent = fs.readFileSync(repositoryGuideMirrorPath, "utf8");
+
+  if (flags.check) {
+    if (normalizeNewlines(sourceContent) !== normalizeNewlines(mirrorContent)) {
+      throw new Error(`Obsidian 镜像文件未同步：${repositoryGuideMirrorPath}。请运行 pnpm guide:sync`);
+    }
+    console.log(`仓库指南与 Obsidian 镜像一致：${repositoryGuideMirrorPath}`);
+    return;
+  }
+
+  if (normalizeNewlines(sourceContent) === normalizeNewlines(mirrorContent)) {
+    console.log(`Obsidian 镜像已是最新：${repositoryGuideMirrorPath}`);
+    return;
+  }
+
+  fs.copyFileSync(repositoryGuidePath, repositoryGuideMirrorPath);
+  console.log(`已同步仓库指南到 Obsidian：${repositoryGuideMirrorPath}`);
 }
 
 function releaseNotesCommand(rawArgs) {
@@ -1719,6 +1748,20 @@ function repositoryIdentity() {
   }
 
   return repoRoot;
+}
+
+function ensureRepositoryGuideMirrorExists() {
+  if (!fs.existsSync(repositoryGuidePath)) {
+    throw new Error(`仓库内指南文件不存在：${repositoryGuidePath}`);
+  }
+
+  if (!fs.existsSync(repositoryGuideMirrorPath)) {
+    throw new Error(`未找到 Obsidian 镜像文件：${repositoryGuideMirrorPath}。必须先显示询问用户：是否要创建或恢复这个文件；在用户确认前，不要自动创建 E 盘镜像文件。`);
+  }
+
+  if (!fs.statSync(repositoryGuideMirrorPath).isFile()) {
+    throw new Error(`Obsidian 镜像路径不是文件：${repositoryGuideMirrorPath}`);
+  }
 }
 
 function copyDir(source, target, predicate) {
