@@ -22,7 +22,9 @@
     "guide:sync": "node tools/skills/skill-cli.mjs guide-sync",
     "guide:check": "node tools/skills/skill-cli.mjs guide-sync --check",
     "experience:search": "node tools/skills/skill-cli.mjs experience-search",
-    "experience:new": "node tools/skills/skill-cli.mjs experience-new"
+    "experience:new": "node tools/skills/skill-cli.mjs experience-new",
+    "handoff:new": "node tools/skills/skill-cli.mjs handoff-new",
+    "handoff:list": "node tools/skills/skill-cli.mjs handoff-list"
   },
   "engines": {
     "node": ">=20"

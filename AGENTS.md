@@ -18,6 +18,18 @@
 docs/multi-computer-workflow.md
 ```
 
+如果任务是继续未完成的 skill 开发或维护，阅读：
+
+```text
+docs/handoffs/README.md
+```
+
+并运行：
+
+```powershell
+pnpm handoff:list <skill-id>
+```
+
 ## 经验库检索规则
 
 不要一次性读取整个 `docs/experience/cards/` 目录。
@@ -30,6 +42,7 @@ docs/multi-computer-workflow.md
 - Git 状态、分支、合并、路径解析异常。
 - `docs/repository-guide.md` 和 Obsidian 镜像不一致。
 - 两台电脑同步、Codex skill 安装目录、E 盘路径问题。
+- 未完成工作交接、换电脑续工、handoff 文档问题。
 - skill 新建、迁移、发布、验证边界不清楚。
 
 检索命令：
@@ -62,7 +75,6 @@ pnpm skills:docs
 pnpm skills:docs:check
 pnpm skills:guard
 pnpm skills:validate
-pnpm skill:sync
 ```
 
 如果修改了 `docs/repository-guide.md`，必须同步本机 Obsidian 镜像：
@@ -86,10 +98,39 @@ git status --short --branch
 git fetch origin
 git pull --ff-only
 pnpm install --frozen-lockfile
+```
+
+Codex skill 安装目录使用当前系统用户目录计算，概念路径是：
+
+```powershell
+$env:USERPROFILE\.codex\skills
+```
+
+不要把某台电脑的 Codex skill 安装目录当作源码目录。它只是当前电脑的安装目录，不是源码事实源。
+
+如果未完成工作需要换电脑继续，必须创建或更新交接文档，并把交接文档随当前分支提交、推送到 GitHub：
+
+```powershell
+pnpm handoff:new <skill-id> --title "<交接标题>"
+```
+
+## 本机 Codex 安装同步规则
+
+每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。
+
+只有用户明确回复需要同步时，才运行：
+
+```powershell
+pnpm skill:install <skill-id>
+```
+
+如果用户明确要求同步全部 active skill，才运行：
+
+```powershell
 pnpm skill:sync
 ```
 
-不要把 `C:\Users\EDY\.codex\skills` 当作源码目录。它只是当前电脑的 Codex skill 安装目录。
+不得把“已修改源码仓库”等同于“已同步到本机 Codex 安装目录”。
 
 ## 新建 skill 的验证边界
 

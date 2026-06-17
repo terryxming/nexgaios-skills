@@ -18,6 +18,8 @@ const repositoryGuidePath = path.join(repoRoot, "docs", "repository-guide.md");
 const repositoryGuideMirrorPath = "E:\\Terry LLM-Wiki Obsidian\\raw\\01 - AI Work\\0102 - 项目\\Nexgaios-skills 仓库\\repository-guide.md";
 const experienceRoot = path.join(repoRoot, "docs", "experience");
 const experienceCardsRoot = path.join(experienceRoot, "cards");
+const handoffsRoot = path.join(repoRoot, "docs", "handoffs");
+const handoffTemplatePath = path.join(repoRoot, "templates", "handoff", "skill-handoff.md");
 
 const command = process.argv[2] || "help";
 const args = process.argv.slice(3);
@@ -63,6 +65,10 @@ async function main() {
       return experienceSearchCommand(args);
     case "experience-new":
       return experienceNewCommand(args);
+    case "handoff-new":
+      return handoffNewCommand(args);
+    case "handoff-list":
+      return handoffListCommand(args);
     case "release-notes":
       return releaseNotesCommand(args);
     case "version":
@@ -95,6 +101,8 @@ function printHelp() {
   guide-sync [--check]
   experience-search <query> [--limit <n>]
   experience-new <slug> [--domain <domain>] [--tags <tag1,tag2>]
+  handoff-new <skill-id> [--title <title>]
+  handoff-list [skill-id]
   release-notes <skill-id> [--base <git-range-or-ref>]
   version <skill-id>
   info <skill-id> [--field id|domain|version|path|entry]
@@ -560,6 +568,74 @@ status: active
 
   fs.writeFileSync(targetPath, content);
   console.log(`已创建经验卡片：${relative(targetPath)}`);
+}
+
+function handoffNewCommand(rawArgs) {
+  const { flags, positionals } = parseOptions(rawArgs);
+  const skill = findSkill(positionals[0]);
+  const title = String(flags.title || flags.message || `${skill.id} handoff`).trim();
+  const slug = slugify(title || `${skill.id} handoff`);
+  const targetDir = path.join(handoffsRoot, skill.id);
+  const targetPath = path.join(targetDir, `${today()}-${slug}.md`);
+
+  assertPathInside(targetPath, handoffsRoot);
+  if (fs.existsSync(targetPath)) {
+    throw new Error(`交接文档已存在：${relative(targetPath)}`);
+  }
+  if (!fs.existsSync(handoffTemplatePath)) {
+    throw new Error(`交接文档模板不存在：${relative(handoffTemplatePath)}`);
+  }
+
+  const worktreeStatus = safeGitValue(["status", "--short"], "无法读取 git status").trim();
+  const replacements = {
+    "{{title}}": title,
+    "{{date}}": today(),
+    "{{skill_id}}": skill.id,
+    "{{skill_domain}}": skill.domain,
+    "{{skill_version}}": skill.version,
+    "{{skill_path}}": relative(skill.dir).replaceAll("\\", "/"),
+    "{{branch}}": safeGitValue(["branch", "--show-current"], "未知分支").trim() || "未知分支",
+    "{{commit}}": safeGitValue(["rev-parse", "--short", "HEAD"], "未知 commit").trim() || "未知 commit",
+    "{{worktree_status}}": worktreeStatus || "工作区干净"
+  };
+
+  fs.mkdirSync(targetDir, { recursive: true });
+  const template = fs.readFileSync(handoffTemplatePath, "utf8");
+  fs.writeFileSync(targetPath, replaceTokens(template, replacements));
+  console.log(`已创建交接文档：${relative(targetPath)}`);
+}
+
+function handoffListCommand(rawArgs) {
+  const { positionals } = parseOptions(rawArgs);
+  const skillId = positionals[0] || "";
+
+  if (skillId) {
+    findSkill(skillId);
+  }
+
+  if (!fs.existsSync(handoffsRoot)) {
+    console.log("没有找到交接文档。");
+    return;
+  }
+
+  const root = skillId ? path.join(handoffsRoot, skillId) : handoffsRoot;
+  if (!fs.existsSync(root)) {
+    console.log(`没有找到 ${skillId} 的交接文档。`);
+    return;
+  }
+
+  const files = listMarkdownFiles(root)
+    .filter((file) => !file.endsWith(`${path.sep}README.md`))
+    .sort((left, right) => relative(left).localeCompare(relative(right)));
+
+  if (files.length === 0) {
+    console.log(skillId ? `没有找到 ${skillId} 的交接文档。` : "没有找到交接文档。");
+    return;
+  }
+
+  for (const file of files) {
+    console.log(`- ${relative(file)}`);
+  }
 }
 
 function releaseNotesCommand(rawArgs) {
@@ -1516,6 +1592,15 @@ function titleize(value) {
     .join(" ");
 }
 
+function slugify(value) {
+  const slug = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || "handoff";
+}
+
 function prepareImportSource(sourceValue, refValue) {
   const parsed = parseImportSource(sourceValue);
   if (parsed.kind === "git") {
@@ -2083,6 +2168,21 @@ function run(commandName, commandArgs, options = {}) {
   }
 
   return options.capture ? result.stdout : "";
+}
+
+function safeGitValue(commandArgs, fallback) {
+  const result = spawnSync("git", commandArgs, {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: "pipe",
+    shell: false
+  });
+
+  if (result.status !== 0) {
+    return fallback;
+  }
+
+  return result.stdout;
 }
 
 function runShell(commandLine, options = {}) {
