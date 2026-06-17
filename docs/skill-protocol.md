@@ -133,7 +133,7 @@ PR 变更说明：
 pnpm skills:pr-summary --base origin/main...HEAD
 ```
 
-指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge。未准备好合并时，必须保持 Draft PR。
+创建指向 `main`、来源于本仓库分支、且不是 Draft 的 PR 后，使用本机已登录的 GitHub CLI 启用 auto-merge。`validate` 通过后，GitHub 会自动 squash merge。未准备好合并时，必须保持 Draft PR。
 
 Release Notes：
 

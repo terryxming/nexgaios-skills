@@ -144,4 +144,4 @@ pnpm skill:sync
 - 提交前先看 `git status --short --branch`。
 - 暂存文件时只暂存当前任务相关文件。
 - 不提交 `.env`、临时报告、截图缓存、`__pycache__`、`dist`、`artifacts`、`data` 或大文件。
-- 指向 `main` 的非 Draft PR 会在 `validate` 通过后自动 squash merge。未准备好合并时必须创建或保持 Draft PR。
+- 创建指向 `main` 的非 Draft PR 后，必须用本机已登录的 GitHub CLI 启用 auto-merge。不要用 GitHub Actions 的 `GITHUB_TOKEN` 合并需要触发后续 workflow 的 PR。

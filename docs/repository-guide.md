@@ -30,7 +30,6 @@ nexgaios-skills/
   .github/
     workflows/
       pr-validate.yml
-      auto-merge.yml
       release-skills.yml
 
   skills/
@@ -458,7 +457,7 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 因此，`skill:new` 的结论只能写成“骨架创建正确”，不能写成“skill 已经可用”或“业务能力已经正确”。
 
-### 9. PR 自动说明与自动合并
+### 9. PR 自动说明与 auto-merge
 
 创建 PR 后，GitHub Actions 会自动评论：
 
@@ -469,9 +468,17 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 这能避免你在 PR 页面里看不清影响范围。
 
-指向 `main`、来源于本仓库分支、且不是 Draft 的 PR，会在 `validate` 通过后自动 squash merge，并删除对应分支。
+创建指向 `main`、来源于本仓库分支、且不是 Draft 的 PR 后，使用本机已登录的 GitHub CLI 启用 auto-merge：
+
+```powershell
+gh pr merge <PR 编号或 URL> --auto --squash --delete-branch
+```
+
+`validate` 通过后，GitHub 会自动 squash merge，并删除对应分支。
 
 Draft PR 是暂停开关。只要 PR 仍是 Draft，就不会自动合并。
+
+不要用 GitHub Actions 的 `GITHUB_TOKEN` 合并需要触发后续 workflow 的 PR。`GITHUB_TOKEN` 触发的合并不会再触发 `push` workflow，可能导致 `release-skills.yml` 不运行。
 
 ### 10. 防误传检查
 
