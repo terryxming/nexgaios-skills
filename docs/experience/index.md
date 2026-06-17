@@ -21,6 +21,7 @@ pnpm experience:search "<关键词>"
 | 两台电脑协同、pull/push/同步安装目录 | `multi-computer workflow` |
 | 未完成工作换电脑继续 | `handoff 交接 未完成 下一步` |
 | 修改 skill 后是否同步到本机 Codex | `skill install sync 安装目录` |
+| PR 是否会自动合并、CI 通过后的行为 | `pr auto-merge validate` |
 
 ## 使用规则
 
