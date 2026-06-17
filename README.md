@@ -1,14 +1,14 @@
 # nexgaios-skills
 
-Monorepo for Nexgaios Codex skills.
+这是 Nexgaios Codex 技能的统一源码仓库。
 
-The repository uses these boundaries:
+这个仓库按三层边界管理：
 
-- Repository boundary: shared governance, scripts, CI, templates.
-- Domain boundary: cognitive grouping only, such as `amazon` or `product-design`.
-- Release boundary: a single skill directory.
+- 仓库边界：统一管理脚本、CI、模板和发布规则。
+- 业务域边界：只用于分类，例如 `amazon`、`product-design`。
+- 发布边界：永远是单个技能目录。
 
-## Layout
+## 目录结构
 
 ```text
 skills/
@@ -27,56 +27,56 @@ templates/
   skill/
 ```
 
-## Daily Commands
+## 日常命令
 
-Create a new skill:
+新建技能：
 
 ```bash
 pnpm skill:new amazon amazon-review-insight
 ```
 
-List skills:
+列出所有技能：
 
 ```bash
 pnpm skill:list
 ```
 
-Validate one skill:
+验证单个技能：
 
 ```bash
 pnpm skill:validate lingxing-ad-operation-audit
 ```
 
-Install one skill into the local Codex runtime:
+安装到本地 Codex 运行目录：
 
 ```bash
 pnpm skill:install lingxing-ad-operation-audit
 ```
 
-Ship a skill change to a branch and open a PR:
+提交技能变更、推送分支并创建 PR：
 
 ```bash
-pnpm skill:ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+pnpm skill:ship lingxing-ad-operation-audit --patch -m "优化审计报告"
 ```
 
-Use `--minor`, `--major`, or `--no-release` when appropriate.
+需要时可以使用 `--minor`、`--major` 或 `--no-release`。
 
-On Windows, the direct wrapper is also available:
+Windows 下也可以直接使用仓库里的包装脚本：
 
 ```bash
 .\skill.cmd new amazon amazon-review-insight
 .\skill.cmd validate lingxing-ad-operation-audit
-.\skill.cmd ship lingxing-ad-operation-audit --patch -m "Improve audit report"
+.\skill.cmd ship lingxing-ad-operation-audit --patch -m "优化审计报告"
 ```
 
-For automatic PR creation, install and log in to GitHub CLI:
+如果要自动创建 PR，需要先安装并登录 GitHub CLI：
 
 ```bash
 gh auth login
 ```
 
-## Release Rule
+## 发布规则
 
-A skill is released only when its own `skill.yaml` version changes.
+只有某个技能自己的 `skill.yaml` 版本号发生变化时，才会发布这个技能。
 
-Updating `tools/`, `templates/`, CI, or another skill does not release unrelated skills.
+更新 `tools/`、`templates/`、CI 或其他技能，不会发布无关技能。

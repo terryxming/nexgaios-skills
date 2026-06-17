@@ -56,7 +56,7 @@ npx tsx scripts/export_ad_performance_context.ts
 
 ## 默认报告生成命令
 
-优先使用 Codex bundled Python，因为它通常已经包含报表依赖：
+优先使用 Codex 内置 Python，因为它通常已经包含报表依赖：
 
 ```powershell
 C:\Users\EDY\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe `

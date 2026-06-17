@@ -1,4 +1,4 @@
-name: Release changed skills
+name: 发布变更技能
 
 on:
   push:
@@ -27,10 +27,10 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
+      - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
-      - name: Release versioned skills
+      - name: 发布已变更版本的技能
         env:
           GH_TOKEN: ${{ github.token }}
           BEFORE_SHA: ${{ github.event.before }}
@@ -38,7 +38,7 @@ jobs:
         run: |
           CHANGED="$(node tools/skills/skill-cli.mjs changed --base "$BEFORE_SHA...HEAD")"
           if [ -z "$CHANGED" ]; then
-            echo "No changed skills."
+            echo "没有变更的技能。"
             exit 0
           fi
 
@@ -46,7 +46,7 @@ jobs:
             [ -z "$skill" ] && continue
 
             if ! node tools/skills/skill-cli.mjs version-changed "$skill" --base "$BEFORE_SHA"; then
-              echo "$skill changed, but version did not change. Skipping release."
+              echo "$skill 有变更，但版本号没有变化，跳过发布。"
               continue
             fi
 
@@ -56,12 +56,12 @@ jobs:
             tag="$skill@$version"
 
             if git rev-parse "$tag" >/dev/null 2>&1; then
-              echo "Tag $tag already exists. Skipping."
+              echo "标签 $tag 已存在，跳过。"
               continue
             fi
 
             gh release create "$tag" "$artifact" \
               --target "${{ github.sha }}" \
               --title "$tag" \
-              --notes "Release for $skill $version"
+              --notes "$skill $version 发布"
           done
