@@ -23,40 +23,55 @@
 
 这套设计解决的问题是：多个 skill 可以放在同一个仓库中维护，但互相不影响发布节奏。
 
-## 仓库结构
+## 仓库关键结构
 
 ```text
 nexgaios-skills/
+  .github/
+    workflows/
+      pr-validate.yml
+      release-skills.yml
+
   skills/
     amazon/
       lingxing-ad-operation-audit/
     product-design/
       apple-hig-web-design/
+    skill-governance/
+      skill-doctor/
 
   tools/
     skills/
       skill-cli.mjs
 
   templates/
+    experience/
+      lesson.md
+    handoff/
+      skill-handoff.md
     skill/
 
   docs/
+    experience/
+      cards/
+      index.md
+      README.md
+    handoffs/
+      README.md
     skill-protocol.md
     skills-overview.md
     repository-guide.md
     multi-computer-workflow.md
-    experience/
-    handoffs/
 
   catalog.yaml
   package.json
   pnpm-lock.yaml
-
-  .github/
-    workflows/
-      pr-validate.yml
-      release-skills.yml
+  pnpm-workspace.yaml
+  skill.cmd
+  skill.ps1
 ```
+
+这不是全量文件清单。它只展示仓库中需要理解的稳定源码层级；`node_modules/`、临时报告、构建产物和本机缓存不属于仓库结构说明。
 
 ## 各目录职责
 
