@@ -35,6 +35,8 @@ templates/
 pnpm skill:new amazon amazon-review-insight
 ```
 
+新建命令会生成 `SKILL.md`、`skill.yaml`、`README.md`、`CHANGELOG.md`，以及 `references/`、`scripts/`、`assets/`、`tests/` 目录说明。
+
 从本地目录或 GitHub 仓库导入技能：
 
 ```bash
@@ -65,6 +67,36 @@ pnpm skill:validate lingxing-ad-operation-audit
 pnpm skill:install lingxing-ad-operation-audit
 ```
 
+安装仓库内全部 active 技能到本机 Codex：
+
+```bash
+pnpm skill:sync
+```
+
+`skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除本机 Codex 里的其他 skill。如果要删除曾由本仓库安装、但当前仓库已经不存在的旧 skill，显式使用：
+
+```bash
+pnpm skill:sync --prune
+```
+
+重新生成技能总览和业务域 README：
+
+```bash
+pnpm skills:docs
+```
+
+检查生成文档是否已同步：
+
+```bash
+pnpm skills:docs:check
+```
+
+检查是否误提交临时文件、大文件或常见密钥格式：
+
+```bash
+pnpm skills:guard
+```
+
 提交技能变更、推送分支并创建 PR：
 
 ```bash
@@ -92,3 +124,5 @@ gh auth login
 只有某个技能自己的 `skill.yaml` 版本号发生变化时，才会发布这个技能。
 
 更新 `tools/`、`templates/`、CI 或其他技能，不会发布无关技能。
+
+PR 验证会自动评论本次变更涉及哪些 skill、版本是否变化、合并到 `main` 后是否会发布。GitHub Release 使用 `pnpm skill-cli release-notes` 生成中文发布说明。

@@ -11,9 +11,14 @@
     "skill:changed": "node tools/skills/skill-cli.mjs changed",
     "skill:validate": "node tools/skills/skill-cli.mjs validate",
     "skill:install": "node tools/skills/skill-cli.mjs install",
+    "skill:sync": "node tools/skills/skill-cli.mjs sync",
     "skill:package": "node tools/skills/skill-cli.mjs package",
     "skill:ship": "node tools/skills/skill-cli.mjs ship",
-    "skills:validate": "node tools/skills/skill-cli.mjs validate --all"
+    "skills:validate": "node tools/skills/skill-cli.mjs validate --all",
+    "skills:docs": "node tools/skills/skill-cli.mjs docs",
+    "skills:docs:check": "node tools/skills/skill-cli.mjs docs --check",
+    "skills:guard": "node tools/skills/skill-cli.mjs guard",
+    "skills:pr-summary": "node tools/skills/skill-cli.mjs pr-summary"
   },
   "engines": {
     "node": ">=20"
