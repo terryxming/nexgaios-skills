@@ -287,7 +287,7 @@ skills/product-design/README.md
 
 原因是本机安装状态是机器状态，Windows 本机和 GitHub Actions Linux runner 上不一致。
 
-### 3.1 Obsidian 镜像文档
+### 4. Obsidian 镜像文档
 
 `docs/repository-guide.md` 还有一份本机 Obsidian 镜像：
 
@@ -317,7 +317,7 @@ pnpm guide:check
 - 如果 E 盘路径中找不到该文件，必须先显示询问用户是否要创建或恢复这个文件。
 - 该检查不接入 GitHub Actions，因为 GitHub Actions 无法访问本机 E 盘。
 
-### 3.2 经验库
+### 5. 经验库
 
 项目经验存放在：
 
@@ -343,7 +343,7 @@ pnpm experience:new <slug> --domain <domain> --tags "<tag1,tag2>"
 
 经验卡片必须包含触发场景、症状、根因、解法、适用边界和验证记录。
 
-### 3.3 双电脑协同
+### 6. 双电脑协同
 
 公司电脑和家里电脑之间以 GitHub 仓库作为唯一源码事实源。
 
@@ -367,7 +367,7 @@ pnpm install --frozen-lockfile
 
 开始工作前不默认同步到本机 Codex 安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
 
-### 3.4 未完成工作交接
+### 7. 未完成工作交接
 
 如果公司电脑上的 skill 开发或维护没有完成，需要家里电脑继续，必须创建或更新交接文档：
 
@@ -400,7 +400,7 @@ pnpm handoff:list <skill-id>
 
 交接文档必须随当前分支提交并推送到 GitHub。否则另一台电脑拉取仓库后，无法可靠知道下一步要做什么。
 
-### 4. 新建 skill 模板
+### 8. 新建 skill 模板
 
 新建 skill：
 
@@ -423,7 +423,7 @@ tests/
 
 这样新 skill 从一开始就有统一结构。
 
-### `skill:new` 的验证边界
+#### `skill:new` 的验证边界
 
 `pnpm skill:new` 只负责生成标准骨架，不负责证明 skill 的业务能力正确。
 
@@ -457,7 +457,7 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 因此，`skill:new` 的结论只能写成“骨架创建正确”，不能写成“skill 已经可用”或“业务能力已经正确”。
 
-### 5. PR 自动说明
+### 9. PR 自动说明
 
 创建 PR 后，GitHub Actions 会自动评论：
 
@@ -468,7 +468,7 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 这能避免你在 PR 页面里看不清影响范围。
 
-### 6. 防误传检查
+### 10. 防误传检查
 
 执行：
 
@@ -486,7 +486,7 @@ pnpm skills:guard
 
 这个检查是误提交拦截器，不等同于完整安全审计。
 
-### 7. GitHub Release Notes 中文化
+### 11. GitHub Release Notes 中文化
 
 发布 workflow 会使用：
 
