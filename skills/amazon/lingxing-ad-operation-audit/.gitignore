@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+artifacts/
+data/
+*.log
+*.html
+*.csv
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.tar.gz

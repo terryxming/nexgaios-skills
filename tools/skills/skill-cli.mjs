@@ -209,7 +209,21 @@ function packageCommand(rawArgs) {
     fs.rmSync(outputPath);
   }
 
-  run("tar", ["-czf", outputPath, "-C", skill.dir, "."], { cwd: repoRoot });
+  run("tar", [
+    "-czf",
+    outputPath,
+    "--exclude", "node_modules",
+    "--exclude", "__pycache__",
+    "--exclude", ".pytest_cache",
+    "--exclude", ".mypy_cache",
+    "--exclude", "artifacts",
+    "--exclude", "data",
+    "--exclude", ".env",
+    "--exclude", "*.pyc",
+    "-C",
+    skill.dir,
+    "."
+  ], { cwd: repoRoot });
 
   if (flags.printPath) {
     console.log(outputPath);
@@ -694,7 +708,18 @@ function copyDir(source, target, predicate) {
 }
 
 function shouldCopySkillFile(sourcePath, entry) {
-  const ignored = new Set([".git", "node_modules", "dist", ".DS_Store"]);
+  const ignored = new Set([
+    ".git",
+    "node_modules",
+    "dist",
+    ".DS_Store",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "artifacts",
+    "data",
+    ".env"
+  ]);
   return !ignored.has(entry.name) && !sourcePath.includes(`${path.sep}.git${path.sep}`);
 }
 

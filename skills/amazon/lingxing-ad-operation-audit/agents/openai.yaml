@@ -1,0 +1,14 @@
+interface:
+  display_name: "LingXing Ad Operation Audit"
+  short_description: "Generate readonly LingXing ad operation audit reports"
+  brand_color: "#1F6FEB"
+  default_prompt: "Use $lingxing-ad-operation-audit to generate a 90-day LingXing advertising operation audit HTML report."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "LingXing-Readonly-AWS"
+      description: "Deployed readonly LingXing MCP server"
+      transport: "streamable_http"
+      url: "https://mcp.nexgaios.com/mcp-services/lingxing-mcp"
+policy:
+  allow_implicit_invocation: true
