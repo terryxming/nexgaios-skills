@@ -29,7 +29,7 @@ docs/repository-guide.md
 E 盘镜像路径：
 
 ```text
-E:\Terry LLM-Wiki Obsidian\raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+E:\terry-nexgaios-gbrain\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
 ## 解法

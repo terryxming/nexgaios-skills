@@ -21,7 +21,7 @@ $env:USERPROFILE\.codex\skills
 这是每台电脑自己的 Codex skill 安装目录。CLI 实际按当前登录用户的 home 目录计算，等价于 Node.js 的 `os.homedir()` 下的 `.codex\skills`。它由用户明确确认后，通过 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync` 从源码仓库同步生成，不作为源码事实源。
 
 ```text
-E:\Terry LLM-Wiki Obsidian\raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+E:\terry-nexgaios-gbrain\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
 这是公司电脑和家用电脑当前约定使用的 Obsidian 镜像文件路径。它不是 GitHub 源码仓库的一部分；两台电脑都需要各自保证这个本机路径存在。

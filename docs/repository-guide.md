@@ -293,7 +293,7 @@ skills/product-design/README.md
 `docs/repository-guide.md` 还有一份本机 Obsidian 镜像：
 
 ```text
-E:\Terry LLM-Wiki Obsidian\raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+E:\terry-nexgaios-gbrain\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
 当仓库内 `docs/repository-guide.md` 发生变化时，必须同步维护这份 E 盘文件。
