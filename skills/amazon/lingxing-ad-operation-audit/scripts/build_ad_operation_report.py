@@ -775,7 +775,7 @@ def build_html(
       <h2>口径说明</h2>
       <p>本报告来自只读 MCP 工具 `lingxing_ad_operation_log_scan`，范围为 {esc(json.dumps(args.get("scope", {}), ensure_ascii=False))}。效果层使用广告日报按同一广告对象、同一变量的连续变化切分稳定区间，比较本次变化前后的两段数据，操作当天默认排除。</p>
       <p>分析口径已默认过滤“无变量明细”和“是否预算内（IN_BUDGET）”，这类记录通常表示暂停/预算状态同步，对评估广告操作收益帮助有限；本次共过滤 {filter_summary.get("removed_change_rows", 0):,} 条变量级记录、{filter_summary.get("removed_log_rows", 0):,} 条操作日志。</p>
-      <p>v0.1.2 效果层优先覆盖 SP 广告活动和 SP 关键词，按 `campaign_id`、`keyword_id/object_id` 精确关联；没有日报匹配时显示“日报无匹配数据”。如果相邻两次变化发生在连续日期，可能没有可比较的前置或后置区间。</p>
+      <p>v0.1.3 效果层优先覆盖 SP 广告活动和 SP 关键词，按 `campaign_id`、`keyword_id/object_id` 精确关联；没有日报匹配时显示“日报无匹配数据”。如果相邻两次变化发生在连续日期，可能没有可比较的前置或后置区间。</p>
     </section>
   </main>
   <script id="audit-data" type="application/json">{safe_detail_json}</script>

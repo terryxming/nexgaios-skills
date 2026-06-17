@@ -4,7 +4,7 @@
 
 | Version | Status |
 | --- | --- |
-| `v0.1.2` | Supported |
+| `v0.1.3` | Supported |
 
 ## 密钥处理
 

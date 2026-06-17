@@ -22,7 +22,7 @@ description: 当需要做只读的领星广告操作日志审计时使用此 ski
    - 使用已部署的 `lingxing_ad_operation_log_scan` 工具。
    - 输出 JSON 放在 `artifacts/` 下，不要打印或持久化完整 MCP Key。
 3. 用 `scripts/export_ad_performance_context.ts` 导出可选效果层数据。
-   - v0.1.2 默认覆盖 SP 广告活动报表和 SP 关键词报表。
+   - v0.1.3 默认覆盖 SP 广告活动报表和 SP 关键词报表。
    - 拉取操作日志日期范围内的广告日报，供报告比较每次变量变化前后的稳定区间。
    - 报告会按同一个广告对象和同一个变量，比较相邻稳定区间；操作当天默认排除，因为日报无法表达日内改动。
 4. 用 `scripts/build_ad_operation_report.py` 生成报告。
@@ -63,7 +63,7 @@ C:\Users\EDY\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\pyt
   scripts/build_ad_operation_report.py `
   --input artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-90d.json `
   --performance-input artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-performance-context.json `
-  --output artifacts/lingxing-ad-operation-audit/hk-aoka-us-ad-operation-audit-v0.1.2.html `
+  --output artifacts/lingxing-ad-operation-audit/hk-aoka-us-ad-operation-audit-v0.1.3.html `
   --title "香港奥卡-US 广告操作日志监控" `
   --store-label "香港奥卡-US (SID 7481)"
 ```
@@ -96,7 +96,7 @@ HTML 报告应包含：
 
 ## 效果层规则
 
-v0.1.2 的效果层刻意保持保守：
+v0.1.3 的效果层刻意保持保守：
 
 - 比较单元是同一个广告对象 + 同一个变化变量。
 - 改前区间：从上一次变化的后一天到当前变化的前一天。如果导出日志中没有上一次变化，则使用第一天可用效果日报到当前变化的前一天。

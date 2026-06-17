@@ -137,7 +137,7 @@ const dates = dateRange(startDate, endDate);
 const transport = new StreamableHTTPClientTransport(new URL(endpoint), {
   requestInit: { headers: { "X-Mcp-Key": key } },
 });
-const client = new Client({ name: "lingxing-ad-performance-context-export", version: "0.1.2" });
+const client = new Client({ name: "lingxing-ad-performance-context-export", version: "0.1.3" });
 
 const reportRows: Record<string, Record<string, unknown>[]> = {};
 const errors: Array<{ report_type: string; report_date: string; error: string }> = [];
