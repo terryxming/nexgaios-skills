@@ -103,6 +103,13 @@ pnpm skill:sync
 
 同步命令默认不会删除本机 Codex 目录中其他来源的 skill。只有使用 `--prune` 时，才会删除带有本仓库安装标记、且当前仓库已经不存在的旧 skill。
 
+执行边界：
+
+- 每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。
+- 用户明确同意同步单个 skill 时，优先运行 `pnpm skill:install <skill-id>`。
+- 用户明确要求同步全部 active skill 时，才运行 `pnpm skill:sync`。
+- 不得把“源码已更新”表述为“本机 Codex 已安装更新”。
+
 ## 生成文档
 
 生成稳定的仓库文档：

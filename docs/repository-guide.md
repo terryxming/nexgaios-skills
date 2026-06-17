@@ -6,9 +6,11 @@
 
 `D:\nexgaios-skills` 是 Codex skill 的统一源码仓库。
 
-`C:\Users\EDY\.codex\skills` 是本机 Codex 实际读取和运行 skill 的安装目录。
+这是当前电脑的本地仓库路径。另一台电脑可以使用自己的本地克隆路径，源码事实源仍然是 GitHub 仓库。
 
-日常开发应该在 `D:\nexgaios-skills` 中进行。开发、验证、提交、发布完成后，再通过命令同步到本机 Codex 安装目录。
+`$env:USERPROFILE\.codex\skills` 是本机 Codex 实际读取和运行 skill 的安装目录。CLI 实际按当前系统用户的 home 目录计算，不能写死某一台电脑的用户名。
+
+日常开发应该在 `D:\nexgaios-skills` 中进行。开发、验证、提交、发布完成后，必须显式询问用户是否要同步到本机 Codex 安装目录；只有用户明确同意后，才执行同步命令。
 
 ## 核心设计原则
 
@@ -21,39 +23,55 @@
 
 这套设计解决的问题是：多个 skill 可以放在同一个仓库中维护，但互相不影响发布节奏。
 
-## 仓库结构
+## 仓库关键结构
 
 ```text
 nexgaios-skills/
+  .github/
+    workflows/
+      pr-validate.yml
+      release-skills.yml
+
   skills/
     amazon/
       lingxing-ad-operation-audit/
     product-design/
       apple-hig-web-design/
+    skill-governance/
+      skill-doctor/
 
   tools/
     skills/
       skill-cli.mjs
 
   templates/
+    experience/
+      lesson.md
+    handoff/
+      skill-handoff.md
     skill/
 
   docs/
+    experience/
+      cards/
+      index.md
+      README.md
+    handoffs/
+      README.md
     skill-protocol.md
     skills-overview.md
     repository-guide.md
     multi-computer-workflow.md
-    experience/
 
   catalog.yaml
   package.json
   pnpm-lock.yaml
-
-  .github/
-    workflows/
-      pr-validate.yml
-      release-skills.yml
+  pnpm-workspace.yaml
+  skill.cmd
+  skill.ps1
 ```
+
+这不是全量文件清单。它只展示仓库中需要理解的稳定源码层级；`node_modules/`、临时报告、构建产物和本机缓存不属于仓库结构说明。
 
 ## 各目录职责
 
@@ -140,7 +158,7 @@ status: active
 
 ```powershell
 pnpm skill:list
-pnpm skill:sync
+pnpm skill:install <skill-id>
 pnpm skills:validate
 ```
 
@@ -167,6 +185,7 @@ pnpm skill:new amazon amazon-review-insight
 - `docs/skills-overview.md`：自动生成的 skill 总览。
 - `docs/multi-computer-workflow.md`：公司电脑和家里电脑之间的协同工作流。
 - `docs/experience/`：失败、踩坑、根因和解法的可检索经验库。
+- `docs/handoffs/`：未完成 skill 开发或维护工作的交接文档。
 
 ### `catalog.yaml`
 
@@ -206,11 +225,7 @@ pnpm skill:import product-design apple-hig-web-design --from https://github.com/
 
 ### 2. 同步到本机 Codex
 
-同步全部 active skill：
-
-```powershell
-pnpm skill:sync
-```
+同步命令只在用户明确同意时执行。
 
 安装单个 skill：
 
@@ -218,13 +233,27 @@ pnpm skill:sync
 pnpm skill:install lingxing-ad-operation-audit
 ```
 
+同步全部 active skill：
+
+```powershell
+pnpm skill:sync
+```
+
 同步目标是：
 
 ```text
-C:\Users\EDY\.codex\skills
+$env:USERPROFILE\.codex\skills
 ```
 
-`skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除其他来源的 skill。
+CLI 实际按当前系统用户的 home 目录计算目标路径，等价于 Node.js 的 `os.homedir()` 下的 `.codex\skills`。
+
+规则：
+
+- 每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。
+- 用户明确同意同步单个 skill 时，优先运行 `pnpm skill:install <skill-id>`。
+- 用户明确要求同步全部 active skill 时，才运行 `pnpm skill:sync`。
+- 不得把“源码已更新”表述为“本机 Codex 已安装更新”。
+- `skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除其他来源的 skill。
 
 如果要删除曾由本仓库安装、但当前仓库已经不存在的旧 skill，显式执行：
 
@@ -258,7 +287,7 @@ skills/product-design/README.md
 
 原因是本机安装状态是机器状态，Windows 本机和 GitHub Actions Linux runner 上不一致。
 
-### 3.1 Obsidian 镜像文档
+### 4. Obsidian 镜像文档
 
 `docs/repository-guide.md` 还有一份本机 Obsidian 镜像：
 
@@ -288,7 +317,7 @@ pnpm guide:check
 - 如果 E 盘路径中找不到该文件，必须先显示询问用户是否要创建或恢复这个文件。
 - 该检查不接入 GitHub Actions，因为 GitHub Actions 无法访问本机 E 盘。
 
-### 3.2 经验库
+### 5. 经验库
 
 项目经验存放在：
 
@@ -314,7 +343,7 @@ pnpm experience:new <slug> --domain <domain> --tags "<tag1,tag2>"
 
 经验卡片必须包含触发场景、症状、根因、解法、适用边界和验证记录。
 
-### 3.3 双电脑协同
+### 6. 双电脑协同
 
 公司电脑和家里电脑之间以 GitHub 仓库作为唯一源码事实源。
 
@@ -332,12 +361,46 @@ git status --short --branch
 git fetch origin
 git pull --ff-only
 pnpm install --frozen-lockfile
-pnpm skill:sync
 ```
 
-不要把 `C:\Users\EDY\.codex\skills` 当作源码目录。它只是当前电脑的 Codex 安装目录。
+不要把某台电脑的 Codex skill 安装目录当作源码目录。安装目录概念路径是 `$env:USERPROFILE\.codex\skills`，它只是当前电脑的 Codex 安装目录。
 
-### 4. 新建 skill 模板
+开始工作前不默认同步到本机 Codex 安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
+
+### 7. 未完成工作交接
+
+如果公司电脑上的 skill 开发或维护没有完成，需要家里电脑继续，必须创建或更新交接文档：
+
+```powershell
+pnpm handoff:new <skill-id> --title "<交接标题>"
+```
+
+交接文档位置：
+
+```text
+docs/handoffs/<skill-id>/<yyyy-mm-dd>-<slug>.md
+```
+
+查看交接文档：
+
+```powershell
+pnpm handoff:list <skill-id>
+```
+
+交接文档必须记录：
+
+- 目标 skill。
+- 当前分支和 commit。
+- 已完成事项。
+- 未完成事项和下一步。
+- 阻塞或风险。
+- 需要继续查看的文件。
+- 已运行的验证命令和结果。
+- 是否已经同步到本机 Codex 安装目录。
+
+交接文档必须随当前分支提交并推送到 GitHub。否则另一台电脑拉取仓库后，无法可靠知道下一步要做什么。
+
+### 8. 新建 skill 模板
 
 新建 skill：
 
@@ -360,7 +423,7 @@ tests/
 
 这样新 skill 从一开始就有统一结构。
 
-### `skill:new` 的验证边界
+#### `skill:new` 的验证边界
 
 `pnpm skill:new` 只负责生成标准骨架，不负责证明 skill 的业务能力正确。
 
@@ -394,7 +457,7 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 因此，`skill:new` 的结论只能写成“骨架创建正确”，不能写成“skill 已经可用”或“业务能力已经正确”。
 
-### 5. PR 自动说明
+### 9. PR 自动说明
 
 创建 PR 后，GitHub Actions 会自动评论：
 
@@ -405,7 +468,7 @@ python <skill-dir>\scripts\<script-name>.py <test-input>
 
 这能避免你在 PR 页面里看不清影响范围。
 
-### 6. 防误传检查
+### 10. 防误传检查
 
 执行：
 
@@ -423,7 +486,7 @@ pnpm skills:guard
 
 这个检查是误提交拦截器，不等同于完整安全审计。
 
-### 7. GitHub Release Notes 中文化
+### 11. GitHub Release Notes 中文化
 
 发布 workflow 会使用：
 
@@ -499,10 +562,10 @@ skills/amazon/lingxing-ad-operation-audit/
 pnpm skill:validate lingxing-ad-operation-audit
 ```
 
-同步到本机 Codex：
+如果需要同步到本机 Codex，先询问用户。用户确认后，优先同步当前修改的单个 skill：
 
 ```powershell
-pnpm skill:sync
+pnpm skill:install lingxing-ad-operation-audit
 ```
 
 ### 新建 skill
@@ -606,10 +669,10 @@ version: 0.1.4
    pnpm skill:validate <skill-id>
    ```
 
-5. 同步到 Codex：
+5. 询问用户是否要同步到本机 Codex；用户确认后执行：
 
    ```powershell
-   pnpm skill:sync
+   pnpm skill:install <skill-id>
    ```
 
 6. 提交 PR 前检查：

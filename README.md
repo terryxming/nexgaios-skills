@@ -71,6 +71,8 @@ pnpm skill:validate lingxing-ad-operation-audit
 pnpm skill:install lingxing-ad-operation-audit
 ```
 
+修改 `skills/<domain>/<skill-id>/` 后，需要先询问用户是否同步到本机 Codex 安装目录；用户明确同意后再运行安装或同步命令。不要把“源码已更新”表述为“本机 Codex 已安装更新”。
+
 安装仓库内全部 active 技能到本机 Codex：
 
 ```bash
@@ -117,6 +119,18 @@ pnpm experience:search "GitHub CLI PATH"
 
 ```bash
 pnpm experience:new github-cli-path --domain repo --tags "github,windows,path"
+```
+
+创建未完成工作的交接文档：
+
+```bash
+pnpm handoff:new skill-doctor --title "补充诊断规则"
+```
+
+查看某个技能的交接文档：
+
+```bash
+pnpm handoff:list skill-doctor
 ```
 
 检查是否误提交临时文件、大文件或常见密钥格式：

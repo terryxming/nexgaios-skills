@@ -19,6 +19,8 @@ pnpm experience:search "<关键词>"
 | `git status --porcelain` 路径解析异常 | `git status porcelain trim` |
 | 新建 skill 后不知道验证边界 | `skill:new 骨架 业务能力 边界` |
 | 两台电脑协同、pull/push/同步安装目录 | `multi-computer workflow` |
+| 未完成工作换电脑继续 | `handoff 交接 未完成 下一步` |
+| 修改 skill 后是否同步到本机 Codex | `skill install sync 安装目录` |
 
 ## 使用规则
 
