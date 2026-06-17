@@ -16,6 +16,8 @@ const generatedFileNotice = "此文件由 `pnpm skills:docs` 生成。不要手�
 const maxGuardFileBytes = 5 * 1024 * 1024;
 const repositoryGuidePath = path.join(repoRoot, "docs", "repository-guide.md");
 const repositoryGuideMirrorPath = "E:\\Terry LLM-Wiki Obsidian\\raw\\01 - AI Work\\0102 - 项目\\Nexgaios-skills 仓库\\repository-guide.md";
+const experienceRoot = path.join(repoRoot, "docs", "experience");
+const experienceCardsRoot = path.join(experienceRoot, "cards");
 
 const command = process.argv[2] || "help";
 const args = process.argv.slice(3);
@@ -57,6 +59,10 @@ async function main() {
       return prSummaryCommand(args);
     case "guide-sync":
       return guideSyncCommand(args);
+    case "experience-search":
+      return experienceSearchCommand(args);
+    case "experience-new":
+      return experienceNewCommand(args);
     case "release-notes":
       return releaseNotesCommand(args);
     case "version":
@@ -87,6 +93,8 @@ function printHelp() {
   guard [--base <git-range-or-ref>|--all]
   pr-summary [--base <git-range-or-ref>]
   guide-sync [--check]
+  experience-search <query> [--limit <n>]
+  experience-new <slug> [--domain <domain>] [--tags <tag1,tag2>]
   release-notes <skill-id> [--base <git-range-or-ref>]
   version <skill-id>
   info <skill-id> [--field id|domain|version|path|entry]
@@ -458,6 +466,100 @@ function guideSyncCommand(rawArgs) {
 
   fs.copyFileSync(repositoryGuidePath, repositoryGuideMirrorPath);
   console.log(`已同步仓库指南到 Obsidian：${repositoryGuideMirrorPath}`);
+}
+
+function experienceSearchCommand(rawArgs) {
+  const { flags, positionals } = parseOptions(rawArgs);
+  const query = positionals.join(" ").trim();
+  const limit = Number(flags.limit || 5);
+
+  if (!query) {
+    throw new Error("缺少搜索关键词。用法：pnpm experience:search \"关键词\"");
+  }
+  if (!Number.isInteger(limit) || limit < 1) {
+    throw new Error("--limit 必须是正整数");
+  }
+
+  const results = searchExperience(query, limit);
+  if (results.length === 0) {
+    console.log(`没有找到匹配经验：${query}`);
+    return;
+  }
+
+  for (const result of results) {
+    console.log([
+      `- ${relative(result.file)}`,
+      `  标题：${result.title}`,
+      `  标签：${result.tags.length > 0 ? result.tags.join(", ") : "未标注"}`,
+      `  匹配分：${result.score}`,
+      result.snippet ? `  片段：${result.snippet}` : ""
+    ].filter(Boolean).join("\n"));
+  }
+}
+
+function experienceNewCommand(rawArgs) {
+  const { flags, positionals } = parseOptions(rawArgs);
+  const [slug] = positionals;
+  assertSlug(slug, "experience slug");
+
+  const fileName = slug.match(/^\d{4}-\d{2}-\d{2}-/)
+    ? `${slug}.md`
+    : `${today()}-${slug}.md`;
+  const targetPath = path.join(experienceCardsRoot, fileName);
+
+  if (fs.existsSync(targetPath)) {
+    throw new Error(`经验卡片已存在：${relative(targetPath)}`);
+  }
+
+  fs.mkdirSync(experienceCardsRoot, { recursive: true });
+  const tags = String(flags.tags || "")
+    .split(/[,，\s]+/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const domain = String(flags.domain || "general");
+  const title = titleize(slug.replace(/^\d{4}-\d{2}-\d{2}-/, ""));
+
+  const content = `---
+title: ${quoteYaml(title)}
+date: ${today()}
+domain: ${quoteYaml(domain)}
+tags: ${quoteYaml(tags.join(", "))}
+status: active
+---
+
+# ${title}
+
+## 触发场景
+
+写清楚什么情况下应该检索并阅读这条经验。
+
+## 症状
+
+- 记录可观察到的错误、失败日志、异常行为或误判表现。
+
+## 根因
+
+- 记录已经验证过的原因；不能确认时写“未确认”，不要伪装成结论。
+
+## 解法
+
+1. 写可执行步骤。
+2. 写必要命令。
+3. 写验证方式。
+
+## 适用边界
+
+- 说明这条经验适用和不适用的范围。
+
+## 验证记录
+
+- 日期：${today()}
+- 验证命令：
+- 结果：
+`;
+
+  fs.writeFileSync(targetPath, content);
+  console.log(`已创建经验卡片：${relative(targetPath)}`);
 }
 
 function releaseNotesCommand(rawArgs) {
@@ -1233,6 +1335,7 @@ function isSharedToolingPath(file) {
     || normalized === "pnpm-workspace.yaml"
     || normalized === ".gitignore"
     || normalized === ".gitattributes"
+    || normalized === "AGENTS.md"
     || normalized === "README.md"
     || normalized === "skill.cmd"
     || normalized === "skill.ps1"
@@ -1762,6 +1865,126 @@ function ensureRepositoryGuideMirrorExists() {
   if (!fs.statSync(repositoryGuideMirrorPath).isFile()) {
     throw new Error(`Obsidian 镜像路径不是文件：${repositoryGuideMirrorPath}`);
   }
+}
+
+function searchExperience(query, limit) {
+  if (!fs.existsSync(experienceCardsRoot)) {
+    return [];
+  }
+
+  const terms = query.toLowerCase()
+    .split(/[\s,，;；]+/)
+    .map((term) => term.trim())
+    .filter(Boolean);
+  if (terms.length === 0) {
+    return [];
+  }
+
+  return listMarkdownFiles(experienceCardsRoot)
+    .map((file) => scoreExperienceFile(file, terms))
+    .filter((result) => result.score > 0)
+    .sort((left, right) => right.score - left.score || relative(left.file).localeCompare(relative(right.file)))
+    .slice(0, limit);
+}
+
+function listMarkdownFiles(root) {
+  const files = [];
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const fullPath = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listMarkdownFiles(fullPath));
+    } else if (entry.isFile() && entry.name.endsWith(".md")) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
+function scoreExperienceFile(file, terms) {
+  const content = fs.readFileSync(file, "utf8");
+  const metadata = parseExperienceMetadata(content, file);
+  const pathText = relative(file).toLowerCase();
+  const titleText = metadata.title.toLowerCase();
+  const tagText = metadata.tags.join(" ").toLowerCase();
+  const bodyText = content.toLowerCase();
+  let score = 0;
+
+  for (const term of terms) {
+    if (titleText.includes(term)) {
+      score += 12;
+    }
+    if (tagText.includes(term)) {
+      score += 8;
+    }
+    if (pathText.includes(term)) {
+      score += 5;
+    }
+    score += Math.min(countOccurrences(bodyText, term), 8);
+  }
+
+  return {
+    file,
+    title: metadata.title,
+    tags: metadata.tags,
+    score,
+    snippet: experienceSnippet(content, terms)
+  };
+}
+
+function parseExperienceMetadata(content, file) {
+  const metadata = {
+    title: titleize(path.basename(file, ".md").replace(/^\d{4}-\d{2}-\d{2}-/, "")),
+    tags: []
+  };
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) {
+    const heading = content.match(/^#\s+(.+)$/m);
+    if (heading) {
+      metadata.title = heading[1].trim();
+    }
+    return metadata;
+  }
+
+  for (const line of match[1].split(/\r?\n/)) {
+    const [, key, rawValue] = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/) || [];
+    if (!key) {
+      continue;
+    }
+    const value = unquote(rawValue.trim());
+    if (key === "title" && value) {
+      metadata.title = value;
+    }
+    if (key === "tags" && value) {
+      metadata.tags = value.split(",").map((tag) => tag.trim()).filter(Boolean);
+    }
+  }
+
+  return metadata;
+}
+
+function countOccurrences(text, term) {
+  if (!term) {
+    return 0;
+  }
+  let count = 0;
+  let index = text.indexOf(term);
+  while (index !== -1) {
+    count += 1;
+    index = text.indexOf(term, index + term.length);
+  }
+  return count;
+}
+
+function experienceSnippet(content, terms) {
+  const lines = content.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const matched = lines.find((line) => {
+    const lower = line.toLowerCase();
+    return terms.some((term) => lower.includes(term));
+  });
+  if (!matched) {
+    return "";
+  }
+  return matched.length > 160 ? `${matched.slice(0, 157)}...` : matched;
 }
 
 function copyDir(source, target, predicate) {

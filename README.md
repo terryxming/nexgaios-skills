@@ -2,6 +2,8 @@
 
 这是 Nexgaios Codex 技能的统一源码仓库。
 
+Codex 新线程项目指令：[AGENTS.md](AGENTS.md)。
+
 新人先读：[仓库架构与工作指南](docs/repository-guide.md)。
 
 这个仓库按三层边界管理：
@@ -103,6 +105,18 @@ pnpm guide:sync
 
 ```bash
 pnpm guide:check
+```
+
+检索项目经验库：
+
+```bash
+pnpm experience:search "GitHub CLI PATH"
+```
+
+新增经验卡片：
+
+```bash
+pnpm experience:new github-cli-path --domain repo --tags "github,windows,path"
 ```
 
 检查是否误提交临时文件、大文件或常见密钥格式：

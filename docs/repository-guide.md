@@ -42,6 +42,8 @@ nexgaios-skills/
     skill-protocol.md
     skills-overview.md
     repository-guide.md
+    multi-computer-workflow.md
+    experience/
 
   catalog.yaml
   package.json
@@ -163,6 +165,8 @@ pnpm skill:new amazon amazon-review-insight
 - `docs/repository-guide.md`：新人理解仓库的入口文档。
 - `docs/skill-protocol.md`：skill 协议和命令说明。
 - `docs/skills-overview.md`：自动生成的 skill 总览。
+- `docs/multi-computer-workflow.md`：公司电脑和家里电脑之间的协同工作流。
+- `docs/experience/`：失败、踩坑、根因和解法的可检索经验库。
 
 ### `catalog.yaml`
 
@@ -283,6 +287,55 @@ pnpm guide:check
 - 如果 E 盘路径中找不到 `repository-guide.md`，不得自动创建文件。
 - 如果 E 盘路径中找不到该文件，必须先显示询问用户是否要创建或恢复这个文件。
 - 该检查不接入 GitHub Actions，因为 GitHub Actions 无法访问本机 E 盘。
+
+### 3.2 经验库
+
+项目经验存放在：
+
+```text
+docs/experience/
+```
+
+经验库用于沉淀已经验证过的失败、踩坑、根因和解法。它不是聊天流水账。
+
+遇到错误、CI 失败、发布异常、路径问题、跨电脑同步问题、skill 触发或验证问题时，先运行：
+
+```powershell
+pnpm experience:search "关键词"
+```
+
+只读取搜索结果中相关的少量卡片，不要一次性读取整个 `docs/experience/cards/` 目录。
+
+新增经验卡片：
+
+```powershell
+pnpm experience:new <slug> --domain <domain> --tags "<tag1,tag2>"
+```
+
+经验卡片必须包含触发场景、症状、根因、解法、适用边界和验证记录。
+
+### 3.3 双电脑协同
+
+公司电脑和家里电脑之间以 GitHub 仓库作为唯一源码事实源。
+
+详细规则见：
+
+```text
+docs/multi-computer-workflow.md
+```
+
+每台电脑开始工作前：
+
+```powershell
+cd D:\nexgaios-skills
+git status --short --branch
+git fetch origin
+git pull --ff-only
+pnpm install --frozen-lockfile
+pnpm skill:sync
+```
+
+不要把 `C:\Users\EDY\.codex\skills` 当作源码目录。它只是当前电脑的 Codex 安装目录。
 
 ### 4. 新建 skill 模板
 
@@ -563,6 +616,7 @@ version: 0.1.4
 
    ```powershell
    pnpm skills:docs
+   pnpm experience:search "当前问题关键词"
    pnpm guide:sync
    pnpm guide:check
    pnpm skills:guard
