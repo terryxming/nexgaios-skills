@@ -2,6 +2,8 @@
 
 这是 Nexgaios Codex 技能的统一源码仓库。
 
+新人先读：[仓库架构与工作指南](docs/repository-guide.md)。
+
 这个仓库按三层边界管理：
 
 - 仓库边界：统一管理脚本、CI、模板和发布规则。
