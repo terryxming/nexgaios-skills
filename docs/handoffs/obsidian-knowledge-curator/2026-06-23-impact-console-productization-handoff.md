@@ -15,7 +15,7 @@ status: draft
 - 当前版本：`0.4.5`
 - 源码路径：`skills/knowledge-management/obsidian-knowledge-curator`
 - 当前分支：`codex/okc-impact-console-handoff`
-- 当前 commit：`f55561b`（提交后已记录；如果看到更新的 amend commit，以分支最新 HEAD 为准）
+- 当前 commit：以本分支最新 HEAD 为准；到公司电脑后运行 `git log -1 --oneline` 查看。
 
 ## 当前目标
 
