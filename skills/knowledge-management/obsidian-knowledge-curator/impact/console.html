@@ -1,0 +1,1561 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skill Impact Console</title>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.0/dist/cytoscape.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6fa;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --surface-strong: #eef2f7;
+      --text: #182230;
+      --muted: #697586;
+      --line: #d7dde8;
+      --line-strong: #aab4c5;
+      --accent: #6657f5;
+      --accent-soft: #f0efff;
+      --ok: #08745e;
+      --ok-soft: #e9f8f3;
+      --warn: #ad6200;
+      --warn-soft: #fff5df;
+      --bad: #ba3b38;
+      --bad-soft: #fff0f0;
+      --pending: #7a4df3;
+      --shadow: 0 10px 26px rgba(16, 24, 40, 0.08);
+      color-scheme: light;
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .metric {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .metric.pass {
+      border-color: rgba(8, 116, 94, 0.28);
+      color: var(--ok);
+      background: var(--ok-soft);
+    }
+
+    .metric.fail {
+      border-color: rgba(186, 59, 56, 0.28);
+      color: var(--bad);
+      background: var(--bad-soft);
+    }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(620px, 1fr) minmax(320px, 390px);
+      gap: 12px;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 750;
+    }
+
+    .panel-caption {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .scroll {
+      overflow: auto;
+      padding: 10px;
+    }
+
+    .queue-group + .queue-group {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .group-title {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .queue-item {
+      width: 100%;
+      margin: 0 0 8px;
+      padding: 9px 10px;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .queue-item:hover,
+    .queue-item.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .queue-item.danger {
+      border-left: 4px solid var(--bad);
+    }
+
+    .queue-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .graph-panel {
+      position: relative;
+      min-height: 0;
+    }
+
+    .graph-toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-soft);
+    }
+
+    .control-row {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .control-row:first-child {
+      align-items: stretch;
+    }
+
+    .control-row:last-child {
+      justify-content: flex-end;
+    }
+
+    .search {
+      width: min(320px, 100%);
+      flex: 1 1 240px;
+      min-height: 32px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .segment {
+      min-height: 26px;
+      padding: 4px 9px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .segment.active {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .select,
+    .tool-button {
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .tool-button:hover,
+    .select:hover,
+    .search:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    #graph {
+      min-height: 0;
+      flex: 1;
+      position: relative;
+      background:
+        linear-gradient(#f9fbfd 23px, transparent 24px),
+        linear-gradient(90deg, #f9fbfd 23px, transparent 24px),
+        #ffffff;
+      background-size: 24px 24px;
+    }
+
+    .graph-stage-label {
+      position: static;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .graph-empty {
+      position: absolute;
+      inset: 118px 0 0;
+      display: none;
+      place-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .graph-empty.show {
+      display: grid;
+    }
+
+    .legend {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      max-width: calc(100% - 28px);
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 20px rgba(16, 24, 40, 0.06);
+      z-index: 3;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--line-strong);
+    }
+
+    .dot.changed { background: var(--warn); }
+    .dot.contract { background: var(--accent); }
+    .dot.pending { background: var(--pending); }
+    .dot.ok { background: var(--ok); }
+    .dot.bad { background: var(--bad); }
+
+    .inspector-body {
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .node-heading {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+      font-weight: 780;
+      overflow-wrap: anywhere;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #fff;
+      font-size: 11px;
+    }
+
+    .chip.pass {
+      border-color: rgba(8, 116, 94, 0.28);
+      color: var(--ok);
+      background: var(--ok-soft);
+    }
+
+    .chip.warn {
+      border-color: rgba(173, 98, 0, 0.28);
+      color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    .chip.fail {
+      border-color: rgba(186, 59, 56, 0.28);
+      color: var(--bad);
+      background: var(--bad-soft);
+    }
+
+    .insight-card {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .insight-card h3 {
+      margin: 0 0 7px;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .insight-card p,
+    .insight-card li {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .insight-card p {
+      margin: 0;
+    }
+
+    .insight-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .empty {
+      padding: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .pulse {
+      animation: pulse 900ms ease-out 1;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: inset 0 0 0 999px rgba(102, 87, 245, 0.08); }
+      to { box-shadow: inset 0 0 0 999px rgba(102, 87, 245, 0); }
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: minmax(260px, 34%) minmax(480px, 1fr);
+        grid-template-rows: minmax(520px, 1fr) minmax(330px, auto);
+      }
+
+      .inspector {
+        grid-column: 1 / 3;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .summary {
+        justify-content: flex-start;
+      }
+
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+      }
+
+      .graph-panel {
+        min-height: 620px;
+      }
+
+      .graph-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .control-row:last-child {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1 id="title">Skill Impact Console</h1>
+        <div class="subtitle" id="subtitle">正在连接实时图谱</div>
+      </div>
+      <div class="summary" id="summary"></div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">影响队列</h2>
+          <span class="panel-caption" id="queueCount">0 items</span>
+        </div>
+        <div class="scroll" id="queue"></div>
+      </aside>
+
+      <section class="panel graph-panel">
+        <div class="graph-toolbar">
+          <div class="control-row">
+            <input class="search" id="searchInput" type="search" placeholder="搜索文件、契约或状态">
+            <div class="segmented" id="viewMode">
+              <button class="segment active" type="button" data-mode="active">影响链路</button>
+              <button class="segment" type="button" data-mode="risk">风险优先</button>
+              <button class="segment" type="button" data-mode="all">全部图谱</button>
+            </div>
+            <select class="select" id="contractFilter" aria-label="契约组"></select>
+            <select class="select" id="relationFilter" aria-label="关系类型">
+              <option value="">全部关系</option>
+              <option value="source">source</option>
+              <option value="witness">witness</option>
+              <option value="mentions">mentions</option>
+              <option value="missing">missing</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <button class="tool-button" id="fitButton" type="button">Fit</button>
+            <button class="tool-button" id="relayoutButton" type="button">重布局</button>
+            <button class="tool-button" id="focusButton" type="button">聚焦选中</button>
+            <button class="tool-button" id="clearButton" type="button">清除</button>
+          </div>
+        </div>
+        <div class="graph-stage-label" id="stageLabel">选择左侧文件，查看一跳影响链路。</div>
+        <div id="graph" aria-label="impact graph"></div>
+        <div class="graph-empty" id="graphEmpty">没有匹配当前筛选的节点。</div>
+        <div class="legend">
+          <span class="legend-item"><span class="dot changed"></span>changed</span>
+          <span class="legend-item"><span class="dot contract"></span>contract</span>
+          <span class="legend-item"><span class="dot pending"></span>pending</span>
+          <span class="legend-item"><span class="dot ok"></span>reviewed</span>
+          <span class="legend-item"><span class="dot bad"></span>risk</span>
+        </div>
+      </section>
+
+      <aside class="panel inspector">
+        <div class="panel-head">
+          <h2 class="panel-title">节点工作台</h2>
+          <span class="panel-caption" id="inspectorMeta">select a node</span>
+        </div>
+        <div class="inspector-body" id="inspector"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const refs = {
+      title: document.getElementById("title"),
+      subtitle: document.getElementById("subtitle"),
+      summary: document.getElementById("summary"),
+      queue: document.getElementById("queue"),
+      queueCount: document.getElementById("queueCount"),
+      graph: document.getElementById("graph"),
+      stageLabel: document.getElementById("stageLabel"),
+      graphEmpty: document.getElementById("graphEmpty"),
+      inspector: document.getElementById("inspector"),
+      inspectorMeta: document.getElementById("inspectorMeta"),
+      search: document.getElementById("searchInput"),
+      viewMode: document.getElementById("viewMode"),
+      contractFilter: document.getElementById("contractFilter"),
+      relationFilter: document.getElementById("relationFilter"),
+      fitButton: document.getElementById("fitButton"),
+      relayoutButton: document.getElementById("relayoutButton"),
+      focusButton: document.getElementById("focusButton"),
+      clearButton: document.getElementById("clearButton")
+    };
+
+    const riskStatuses = new Set(["failing", "broken-reference", "missing", "orphan", "witness-pending", "version-pending"]);
+    const positiveStatuses = new Set(["reviewed", "updated", "clean", "active"]);
+
+    const state = {
+      payload: null,
+      cy: null,
+      selectedNodeId: "",
+      mode: "active",
+      search: "",
+      contract: "",
+      relation: "",
+      positions: new Map(),
+      layoutName: "cose",
+      rerunLayout: false
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;");
+    }
+
+    function labelStatus(status) {
+      return {
+        clean: "clean",
+        changed: "changed",
+        added: "added",
+        modified: "modified",
+        deleted: "deleted",
+        renamed: "renamed",
+        orphan: "orphan",
+        "source-changed": "source changed",
+        "witness-pending": "witness pending",
+        reviewed: "reviewed",
+        updated: "updated",
+        "broken-reference": "broken reference",
+        missing: "missing",
+        active: "active",
+        failing: "failing"
+      }[status] || status;
+    }
+
+    function shortLabel(value, length = 34) {
+      const text = String(value || "");
+      if (text.length <= length) {
+        return text;
+      }
+      const keep = Math.max(8, Math.floor((length - 3) / 2));
+      return `${text.slice(0, keep)}...${text.slice(-keep)}`;
+    }
+
+    function render(payload) {
+      state.payload = payload;
+      if (!state.selectedNodeId) {
+        state.selectedNodeId = autoSelectNodeId();
+      }
+      refs.graph.classList.add("pulse");
+      setTimeout(() => refs.graph.classList.remove("pulse"), 950);
+      renderHeader();
+      renderContracts();
+      renderQueue();
+      renderGraph();
+      renderInspector();
+    }
+
+    function renderHeader() {
+      const payload = state.payload;
+      const pass = payload.summary.status === "passing";
+      refs.title.textContent = `${payload.skill.id} Impact Console`;
+      refs.subtitle.textContent = `${payload.skill.relativeDir} · ${payload.generatedAt}`;
+      refs.summary.innerHTML = [
+        `<span class="metric ${pass ? "pass" : "fail"}">${pass ? "strict passing" : "strict failing"}</span>`,
+        `<span class="metric">changed ${payload.summary.changedFiles}</span>`,
+        `<span class="metric ${payload.summary.failureCount ? "fail" : "pass"}">failures ${payload.summary.failureCount}</span>`,
+        `<span class="metric">contracts ${payload.summary.activeContracts}</span>`,
+        `<span class="metric">tasks ${payload.summary.taskCount || 0}</span>`
+      ].join("");
+    }
+
+    function renderContracts() {
+      const current = refs.contractFilter.value;
+      const options = (state.payload.graph.contracts || [])
+        .map((contract) => `<option value="${escapeHtml(contract.id)}">${escapeHtml(contract.id)}</option>`)
+        .join("");
+      refs.contractFilter.innerHTML = `<option value="">全部契约组</option>${options}`;
+      if ((state.payload.graph.contracts || []).some((contract) => contract.id === current)) {
+        refs.contractFilter.value = current;
+      }
+    }
+
+    function renderQueue() {
+      const tasks = state.payload.tasks || [];
+      const changes = state.payload.changes || [];
+      const taskItems = tasks.map((task) => ({
+          id: task.file ? `file:${toSkillRelative(task.file)}` : "",
+          title: task.kind,
+          meta: `${task.file || ""} · ${task.reason}`,
+          danger: true
+        })).filter(matchesQueueSearch);
+      const changeItems = changes.map((change) => ({
+          id: `file:${change.skillFile}`,
+          title: change.skillFile,
+          meta: change.kind,
+          danger: false
+        })).filter(matchesQueueSearch);
+      const visibleCount = taskItems.length + changeItems.length;
+      const totalCount = tasks.length + changes.length;
+      refs.queueCount.textContent = state.search ? `${visibleCount}/${totalCount} items` : `${totalCount} items`;
+      const taskMarkup = taskItems.length
+        ? taskItems.map(queueButton).join("")
+        : `<div class="empty">${state.search ? "没有匹配当前搜索的待处理项。" : "没有待处理项。"}</div>`;
+      const changeMarkup = changeItems.length
+        ? changeItems.map(queueButton).join("")
+        : `<div class="empty">${state.search ? "没有匹配当前搜索的变更文件。" : "当前没有该 skill 的工作区变更。"}</div>`;
+      refs.queue.innerHTML = `
+        <section class="queue-group">
+          <h3 class="group-title">Action queue</h3>
+          ${taskMarkup}
+        </section>
+        <section class="queue-group">
+          <h3 class="group-title">Changed files</h3>
+          ${changeMarkup}
+        </section>
+      `;
+      refs.queue.querySelectorAll("[data-node]").forEach((button) => {
+        button.addEventListener("click", () => selectNode(button.dataset.node, { center: true, focusMode: true, clearSearch: true }));
+      });
+    }
+
+    function queueButton(item) {
+      const active = item.id && item.id === state.selectedNodeId;
+      return `<button class="queue-item ${item.danger ? "danger" : ""} ${active ? "active" : ""}" data-node="${escapeHtml(item.id)}" type="button">
+        <div class="queue-title">${escapeHtml(item.title)}</div>
+        <div class="queue-meta">${escapeHtml(item.meta)}</div>
+      </button>`;
+    }
+
+    function toSkillRelative(repoFile) {
+      const prefix = `${state.payload.skill.relativeDir}/`;
+      return String(repoFile || "").startsWith(prefix) ? String(repoFile).slice(prefix.length) : repoFile;
+    }
+
+    function currentSearch() {
+      return state.search.trim().toLowerCase();
+    }
+
+    function nodeSearchText(node) {
+      return `${node.label || ""} ${node.kind || ""} ${node.category || ""} ${(node.status || []).join(" ")} ${(node.roles || []).join(" ")}`.toLowerCase();
+    }
+
+    function matchesNodeSearch(node) {
+      const search = currentSearch();
+      return !search || nodeSearchText(node).includes(search);
+    }
+
+    function queueSearchText(item) {
+      return `${item.title || ""} ${item.meta || ""} ${item.id || ""}`.toLowerCase();
+    }
+
+    function matchesQueueSearch(item) {
+      const search = currentSearch();
+      return !search || queueSearchText(item).includes(search);
+    }
+
+    function riskyNodes(nodes = state.payload.graph.nodes || []) {
+      return nodes.filter((node) => (node.status || []).some((status) => riskStatuses.has(status)));
+    }
+
+    function syncSelectionToSearch() {
+      if (!state.search) {
+        return;
+      }
+      const nodes = state.payload.graph.nodes || [];
+      const current = nodes.find((node) => node.id === state.selectedNodeId);
+      if (current && matchesNodeSearch(current)) {
+        return;
+      }
+      const next = nodes.find(matchesNodeSearch);
+      if (next) {
+        state.selectedNodeId = next.id;
+      }
+    }
+
+    function visibleNodeIds() {
+      const graph = state.payload.graph;
+      const nodes = graph.nodes || [];
+      const edges = graph.edges || [];
+      const visible = new Set();
+      const activeContracts = new Set((graph.contracts || []).filter((contract) => contract.active).map((contract) => contract.id));
+      const search = currentSearch();
+      const selectedId = state.selectedNodeId || autoSelectNodeId();
+
+      if (state.mode === "active" && selectedId && !state.search && !state.contract) {
+        visible.add(selectedId);
+        for (const edge of edges) {
+          if (edge.from === selectedId || edge.to === selectedId) {
+            visible.add(edge.from);
+            visible.add(edge.to);
+            if (edge.relation !== "source" && edge.relation !== "witness") {
+              continue;
+            }
+            for (const secondEdge of edges) {
+              if (secondEdge.from === edge.from || secondEdge.to === edge.from || secondEdge.from === edge.to || secondEdge.to === edge.to) {
+                if (secondEdge.relation === "source" || secondEdge.relation === "witness") {
+                  visible.add(secondEdge.from);
+                  visible.add(secondEdge.to);
+                }
+              }
+            }
+          }
+        }
+        return visible;
+      }
+
+      if (state.mode === "risk" && !search && !state.contract && riskyNodes(nodes).length === 0) {
+        return visible;
+      }
+
+      for (const node of nodes) {
+        const statuses = new Set(node.status || []);
+        const nodeContracts = new Set((node.contracts || []).map((contract) => contract.id));
+        const matchesContract = !state.contract
+          || node.id === `contract:${state.contract}`
+          || nodeContracts.has(state.contract);
+        const matchesSearch = matchesNodeSearch(node);
+        let matchesMode = true;
+        if (search) {
+          matchesMode = true;
+        } else if (state.mode === "active") {
+          matchesMode = node.changed
+            || (node.status || []).some((status) => status === "source-changed" || status === "updated" || status === "witness-pending")
+            || (node.kind === "contract" && activeContracts.has(node.label));
+        }
+        if (state.mode === "risk") {
+          matchesMode = [...statuses].some((status) => riskStatuses.has(status))
+            || (node.kind === "contract" && (statuses.has("failing") || activeContracts.has(node.label)));
+        }
+        if (matchesContract && matchesSearch && matchesMode) {
+          visible.add(node.id);
+        }
+      }
+
+      if (visible.size === 0 && state.mode !== "all" && state.mode !== "risk" && !state.search && !state.contract) {
+        for (const node of nodes) {
+          visible.add(node.id);
+        }
+      }
+
+      if (!search) {
+        for (const edge of edges) {
+          if (visible.has(edge.from) || visible.has(edge.to)) {
+            visible.add(edge.from);
+            visible.add(edge.to);
+          }
+        }
+      }
+
+      if (state.selectedNodeId && !search) {
+        visible.add(state.selectedNodeId);
+        for (const edge of edges) {
+          if (edge.from === state.selectedNodeId || edge.to === state.selectedNodeId) {
+            visible.add(edge.from);
+            visible.add(edge.to);
+          }
+        }
+      } else if (state.selectedNodeId && search) {
+        visible.add(state.selectedNodeId);
+      }
+
+      return visible;
+    }
+
+    function autoSelectNodeId() {
+      const nodes = state.payload.graph.nodes || [];
+      const risky = nodes.find((node) => (node.status || []).some((status) => riskStatuses.has(status)));
+      if (risky) {
+        return risky.id;
+      }
+      const changed = nodes.find((node) => node.changed);
+      if (changed) {
+        return changed.id;
+      }
+      return nodes[0] ? nodes[0].id : "";
+    }
+
+    function graphElements() {
+      const graph = state.payload.graph;
+      const visible = visibleNodeIds();
+      const selected = state.selectedNodeId || autoSelectNodeId();
+      const focusMode = state.mode === "active" && !state.search && !state.contract;
+      const focusContracts = focusMode ? selectedFocusContractIds(graph.edges || [], selected) : new Set();
+      const focusPositions = focusMode ? buildFocusPositions(visible) : new Map();
+      const nodes = (graph.nodes || [])
+        .filter((node) => visible.has(node.id))
+        .map((node) => {
+          const position = focusPositions.get(node.id) || state.positions.get(node.id);
+          return {
+            group: "nodes",
+            data: {
+              id: node.id,
+              label: node.label,
+              short: shortLabel(node.label),
+              kind: node.kind,
+              category: node.category || node.kind,
+              statuses: node.status || [],
+              roles: node.roles || [],
+              contracts: node.contracts || []
+            },
+            classes: `${nodeClasses(node)} ${state.search && matchesNodeSearch(node) ? "search-hit" : ""}`.trim(),
+            position: position || undefined
+          };
+        });
+      const edges = (graph.edges || [])
+        .filter((edge) => visible.has(edge.from) && visible.has(edge.to))
+        .filter((edge) => !focusMode || isFocusEdge(edge, selected, focusContracts, graph.edges || []))
+        .filter((edge) => !state.relation || edge.relation === state.relation)
+        .map((edge, index) => ({
+          group: "edges",
+          data: {
+            id: `${edge.from}__${edge.to}__${edge.relation}__${edge.contract || ""}__${index}`,
+            source: edge.from,
+            target: edge.to,
+            relation: edge.relation,
+            contract: edge.contract || "",
+            label: edge.relation
+          },
+          classes: edge.relation
+        }));
+      return [...nodes, ...edges];
+    }
+
+    function selectedFocusContractIds(edges, selected) {
+      const contractIds = new Set();
+      for (const edge of edges) {
+        if (edge.from === selected && edge.to.startsWith("contract:")) {
+          contractIds.add(edge.to);
+        }
+        if (edge.to === selected && edge.from.startsWith("contract:")) {
+          contractIds.add(edge.from);
+        }
+      }
+      if (selected.startsWith("contract:")) {
+        contractIds.add(selected);
+      }
+      return contractIds;
+    }
+
+    function isFocusEdge(edge, selected, contractIds, allEdges) {
+      if (edge.from === selected || edge.to === selected) {
+        if (edge.relation === "mentions") {
+          const other = edge.from === selected ? edge.to : edge.from;
+          const alreadyOnContractPath = allEdges.some((candidate) =>
+            (candidate.relation === "source" || candidate.relation === "witness")
+            && (contractIds.has(candidate.from) || contractIds.has(candidate.to))
+            && (candidate.from === other || candidate.to === other)
+          );
+          return !alreadyOnContractPath;
+        }
+        return true;
+      }
+      if ((edge.relation === "source" || edge.relation === "witness") && (contractIds.has(edge.from) || contractIds.has(edge.to))) {
+        return true;
+      }
+      return false;
+    }
+
+    function buildFocusPositions(visible) {
+      const graph = state.payload.graph;
+      const nodes = new Map((graph.nodes || []).filter((node) => visible.has(node.id)).map((node) => [node.id, node]));
+      const edges = (graph.edges || []).filter((edge) => visible.has(edge.from) && visible.has(edge.to));
+      const selected = state.selectedNodeId || autoSelectNodeId();
+      const contractIds = new Set();
+
+      for (const edge of edges) {
+        if (edge.from === selected && edge.to.startsWith("contract:")) {
+          contractIds.add(edge.to);
+        }
+        if (edge.to === selected && edge.from.startsWith("contract:")) {
+          contractIds.add(edge.from);
+        }
+      }
+      if (selected.startsWith("contract:")) {
+        contractIds.add(selected);
+      }
+
+      const sources = new Set();
+      const witnesses = new Set();
+      const mentions = new Set();
+      const others = new Set(nodes.keys());
+      others.delete(selected);
+
+      for (const contractId of contractIds) {
+        others.delete(contractId);
+        for (const edge of edges) {
+          if (edge.relation === "source" && edge.to === contractId) {
+            sources.add(edge.from);
+            others.delete(edge.from);
+          }
+          if (edge.relation === "witness" && edge.from === contractId) {
+            witnesses.add(edge.to);
+            others.delete(edge.to);
+          }
+        }
+      }
+
+      for (const edge of edges) {
+        if (edge.relation === "mentions" && (edge.from === selected || edge.to === selected)) {
+          const target = edge.from === selected ? edge.to : edge.from;
+          if (contractIds.has(target) || sources.has(target) || witnesses.has(target)) {
+            continue;
+          }
+          mentions.add(target);
+          others.delete(target);
+        }
+      }
+
+      const positions = new Map();
+      sources.delete(selected);
+      witnesses.delete(selected);
+      const spread = (items, x, gap = 118, centerY = 0) => {
+        const list = [...items].filter((id) => nodes.has(id));
+        const start = centerY - ((list.length - 1) * gap) / 2;
+        list.forEach((id, index) => positions.set(id, { x, y: start + index * gap }));
+      };
+
+      if (contractIds.size > 0 || witnesses.size > 0) {
+        positions.set(selected, { x: -380, y: 0 });
+        spread(sources, -380, 132, -190);
+        spread(contractIds, 0, 150);
+        spread(witnesses, 390, 118);
+        spread(mentions, -380, 132, 200);
+        spread(others, 0, 118, 260);
+      } else {
+        positions.set(selected, { x: 0, y: 0 });
+        spread(mentions, 320, 122);
+        spread(others, -320, 122);
+      }
+
+      return positions;
+    }
+
+    function nodeClasses(node) {
+      const classes = [node.kind, node.category || ""];
+      for (const status of node.status || []) {
+        classes.push(status);
+      }
+      if ((node.status || []).some((status) => riskStatuses.has(status))) {
+        classes.push("risk");
+      }
+      if ((node.status || []).some((status) => positiveStatuses.has(status))) {
+        classes.push("positive");
+      }
+      return classes.filter(Boolean).join(" ");
+    }
+
+    function renderGraph() {
+      if (!window.cytoscape) {
+        refs.graphEmpty.textContent = "图谱库还没有加载完成，请确认网络可访问 jsDelivr。";
+        refs.graphEmpty.classList.add("show");
+        return;
+      }
+
+      const elements = graphElements();
+      refs.graphEmpty.textContent = emptyGraphText();
+      refs.graphEmpty.classList.toggle("show", elements.filter((element) => element.group === "nodes").length === 0);
+      refs.stageLabel.textContent = stageDescription(elements);
+
+      if (state.cy) {
+        state.cy.nodes().forEach((node) => state.positions.set(node.id(), node.position()));
+        state.cy.destroy();
+      }
+
+      const hasPreset = elements.some((element) => element.group === "nodes" && element.position) && !state.rerunLayout;
+      const focusLayout = state.mode === "active" && !state.search && !state.contract;
+      state.cy = cytoscape({
+        container: refs.graph,
+        elements,
+        minZoom: 0.18,
+        maxZoom: 2.8,
+        panningEnabled: true,
+        userPanningEnabled: true,
+        zoomingEnabled: true,
+        userZoomingEnabled: true,
+        autoungrabify: false,
+        boxSelectionEnabled: true,
+        selectionType: "single",
+        layout: layoutOptions(hasPreset || focusLayout ? "preset" : layoutForCurrentMode()),
+        style: graphStyle()
+      });
+      window.skillImpactConsole = {
+        cy: state.cy,
+        state,
+        selectNode,
+        clearSelection,
+        setMode
+      };
+      refs.graph.dataset.ready = "true";
+      refs.graph.dataset.nodes = String(state.cy.nodes().length);
+      refs.graph.dataset.edges = String(state.cy.edges().length);
+      refs.graph.dataset.panning = String(state.cy.userPanningEnabled());
+      refs.graph.dataset.zooming = String(state.cy.userZoomingEnabled());
+      refs.graph.dataset.grabbable = String(state.cy.nodes()[0] ? state.cy.nodes()[0].grabbable() : false);
+
+      state.cy.on("tap", "node", (event) => {
+        selectNode(event.target.id(), { center: false, focusMode: focusLayout, clearSearch: false });
+      });
+
+      state.cy.on("tap", (event) => {
+        if (event.target === state.cy) {
+          clearSelection();
+        }
+      });
+
+      state.cy.on("dragfree", "node", (event) => {
+        state.positions.set(event.target.id(), event.target.position());
+      });
+
+      state.rerunLayout = false;
+      applyHighlight();
+      if (focusLayout) {
+        setTimeout(() => state.cy && state.cy.fit(undefined, 72), 120);
+      } else if (!hasPreset) {
+        setTimeout(() => state.cy && state.cy.fit(undefined, 64), 160);
+      }
+    }
+
+    function emptyGraphText() {
+      if (state.mode === "risk" && !state.search && !state.contract && riskyNodes().length === 0) {
+        return "当前没有 pending、missing、orphan 或 failing 节点。";
+      }
+      if (state.search) {
+        return `没有命中“${state.search.trim()}”的节点。`;
+      }
+      return "没有匹配当前筛选的节点。";
+    }
+
+    function stageDescription(elements) {
+      const nodeCount = elements.filter((element) => element.group === "nodes").length;
+      if (state.search) {
+        return `搜索“${state.search.trim()}” · ${nodeCount} 个节点 · 命中节点已加粗描边，点击左侧文件可回到影响链路`;
+      }
+      if (state.mode === "active") {
+        const selected = selectedNodeLabel();
+        return `${selected} 的一跳影响链路 · ${nodeCount} 个节点 · 点击节点可继续切换焦点`;
+      }
+      if (state.mode === "risk") {
+        if (riskyNodes().length === 0 && !state.contract) {
+          return `风险优先视角 · 当前没有未闭环风险 · 可继续查看影响链路或全部图谱`;
+        }
+        return `风险优先视角 · ${nodeCount} 个节点 · 用于定位 orphan、pending 和断裂引用`;
+      }
+      return `全部图谱视角 · ${nodeCount} 个节点 · 可拖拽、缩放、搜索和筛选`;
+    }
+
+    function selectedNodeLabel() {
+      const node = (state.payload.graph.nodes || []).find((item) => item.id === state.selectedNodeId);
+      return node ? node.label : "当前节点";
+    }
+
+    function layoutForCurrentMode() {
+      if (state.search || state.contract) {
+        return "cose";
+      }
+      if (state.mode === "active") {
+        return "preset";
+      }
+      if (state.mode === "risk") {
+        return "concentric";
+      }
+      return "cose";
+    }
+
+    function layoutOptions(name) {
+      if (name === "preset") {
+        return { name: "preset", fit: false };
+      }
+      if (name === "breadthfirst") {
+        return { name: "breadthfirst", directed: true, spacingFactor: 1.25, animate: true, animationDuration: 400, padding: 70 };
+      }
+      if (name === "concentric") {
+        return { name: "concentric", minNodeSpacing: 50, animate: true, animationDuration: 400, padding: 70 };
+      }
+      return {
+        name: "cose",
+        animate: true,
+        animationDuration: 520,
+        refresh: 20,
+        fit: true,
+        padding: 70,
+        nodeRepulsion: 9000,
+        idealEdgeLength: 118,
+        edgeElasticity: 115,
+        gravity: 0.18,
+        numIter: 1400
+      };
+    }
+
+    function graphStyle() {
+      return [
+        {
+          selector: "node",
+          style: {
+            label: "data(short)",
+            "font-family": "Segoe UI, Microsoft YaHei, Arial, sans-serif",
+            "font-size": 12,
+            "font-weight": 600,
+            color: "#263244",
+            "text-wrap": "wrap",
+            "text-max-width": 128,
+            "text-valign": "bottom",
+            "text-margin-y": 8,
+            "text-background-color": "#ffffff",
+            "text-background-opacity": 0.86,
+            "text-background-padding": 3,
+            "text-background-shape": "roundrectangle",
+            width: 42,
+            height: 42,
+            shape: "ellipse",
+            "background-color": "#f8fafc",
+            "border-width": 2,
+            "border-color": "#9aa6b8",
+            "overlay-opacity": 0,
+            "transition-property": "background-color, border-color, opacity, width, height, color",
+            "transition-duration": "180ms"
+          }
+        },
+        { selector: "node.contract", style: { width: 56, height: 56, shape: "round-octagon", "background-color": "#f0efff", "border-color": "#6657f5", color: "#382da5" } },
+        { selector: "node.references", style: { "background-color": "#fff7e8", "border-color": "#d69236" } },
+        { selector: "node.core", style: { "background-color": "#eaf7f2", "border-color": "#1d8f78" } },
+        { selector: "node.impact", style: { "background-color": "#fff6df", "border-color": "#7a4df3" } },
+        { selector: "node.tests, node.scripts", style: { "background-color": "#edf7ff", "border-color": "#3b82b8" } },
+        { selector: "node.changed, node.added, node.modified, node.renamed", style: { "background-color": "#fff4d8", "border-color": "#ad6200", width: 52, height: 52 } },
+        { selector: "node.source-changed, node.witness-pending", style: { "border-color": "#7a4df3", "border-width": 4 } },
+        { selector: "node.reviewed, node.updated", style: { "background-color": "#e9f8f3", "border-color": "#08745e" } },
+        { selector: "node.risk, node.missing, node.broken-reference, node.orphan", style: { "background-color": "#fff0f0", "border-color": "#ba3b38", width: 56, height: 56 } },
+        { selector: "node.search-hit", style: { "background-color": "#fffdf2", "border-color": "#111827", "border-width": 5, "border-style": "double", width: 62, height: 62, color: "#111827", "font-weight": 750 } },
+        { selector: "node.selected-node", style: { "background-color": "#6657f5", "border-color": "#111827", "border-width": 4, width: 76, height: 76, color: "#111827", "font-size": 13, "font-weight": 700, "text-outline-width": 4, "text-outline-color": "#ffffff", "overlay-color": "#6657f5", "overlay-opacity": 0.22, "overlay-padding": 22, "z-index": 999 } },
+        { selector: "node.highlighted", style: { opacity: 1, "z-index": 900, "font-weight": 700 } },
+        { selector: "node.faded", style: { opacity: 0.08, label: "" } },
+        {
+          selector: "edge",
+          style: {
+            width: 1.1,
+            "line-color": "#c4cbd7",
+            "target-arrow-color": "#c4cbd7",
+            "target-arrow-shape": "triangle",
+            "curve-style": "bezier",
+            opacity: 0.28,
+            label: "",
+            "font-size": 8,
+            color: "#697586",
+            "text-background-color": "#fff",
+            "text-background-opacity": 0.8,
+            "text-background-padding": 2
+          }
+        },
+        { selector: "edge.source, edge.witness", style: { "line-color": "#6657f5", "target-arrow-color": "#6657f5", opacity: 0.48 } },
+        { selector: "edge.mentions", style: { "line-color": "#9aa6b8", "target-arrow-color": "#9aa6b8", "line-style": "dotted" } },
+        { selector: "edge.missing", style: { "line-color": "#ba3b38", "target-arrow-color": "#ba3b38", "line-style": "dashed", opacity: 0.9 } },
+        { selector: "edge.highlighted", style: { width: 3.2, opacity: 1, label: "", "z-index": 900 } },
+        { selector: "edge.faded", style: { opacity: 0.04, label: "" } }
+      ];
+    }
+
+    function syncModeButtons() {
+      refs.viewMode.querySelectorAll(".segment").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === state.mode);
+      });
+    }
+
+    function centerNode(id) {
+      if (!state.cy) {
+        return;
+      }
+      const node = state.cy.$id(id);
+      if (node.length) {
+        state.cy.animate({ center: { eles: node }, zoom: Math.max(state.cy.zoom(), 1.15) }, { duration: 260 });
+      }
+    }
+
+    function selectNode(id, options = {}) {
+      if (!id) {
+        return;
+      }
+      if (options.focusMode) {
+        state.mode = "active";
+        state.contract = "";
+        state.relation = "";
+        refs.contractFilter.value = "";
+        refs.relationFilter.value = "";
+        if (options.clearSearch) {
+          state.search = "";
+          refs.search.value = "";
+        }
+        syncModeButtons();
+      }
+      state.selectedNodeId = id;
+      renderQueue();
+      const shouldRenderGraph = options.focusMode
+        || state.mode === "active"
+        || !state.cy
+        || !state.cy.$id(id).length;
+      if (shouldRenderGraph) {
+        state.rerunLayout = false;
+        renderGraph();
+      } else {
+        applyHighlight();
+      }
+      renderInspector();
+      if (options.center && !options.focusMode) {
+        centerNode(id);
+      }
+    }
+
+    function clearSelection() {
+      state.selectedNodeId = "";
+      renderQueue();
+      renderInspector();
+      applyHighlight();
+    }
+
+    function applyHighlight() {
+      if (!state.cy) {
+        return;
+      }
+      state.cy.elements().removeClass("faded highlighted selected-node");
+      if (!state.selectedNodeId) {
+        refs.graph.dataset.highlighted = "0";
+        refs.graph.dataset.faded = "0";
+        return;
+      }
+      const node = state.cy.$id(state.selectedNodeId);
+      if (!node.length) {
+        refs.graph.dataset.highlighted = "0";
+        refs.graph.dataset.faded = "0";
+        return;
+      }
+      if (state.mode === "active" && !state.search && !state.contract) {
+        state.cy.elements().addClass("highlighted");
+        node.addClass("selected-node");
+        node.select();
+        refs.graph.dataset.highlighted = String(state.cy.elements(".highlighted").length);
+        refs.graph.dataset.faded = "0";
+        return;
+      }
+      const neighborhood = node.closedNeighborhood();
+      state.cy.elements().not(neighborhood).addClass("faded");
+      neighborhood.addClass("highlighted");
+      node.addClass("selected-node");
+      node.select();
+      refs.graph.dataset.highlighted = String(state.cy.elements(".highlighted").length);
+      refs.graph.dataset.faded = String(state.cy.elements(".faded").length);
+    }
+
+    function renderInspector() {
+      const graph = state.payload.graph;
+      const nodes = graph.nodes || [];
+      if (state.mode === "risk" && !state.search && !state.contract && riskyNodes(nodes).length === 0) {
+        refs.inspector.innerHTML = `
+          <div class="empty">
+            当前没有 pending、missing、orphan 或 failing 节点。风险优先视角暂时没有需要处理的图谱对象。
+          </div>
+        `;
+        refs.inspectorMeta.textContent = "no risk";
+        return;
+      }
+      const selected = nodes.find((node) => node.id === state.selectedNodeId)
+        || nodes.find((node) => (node.status || []).some((status) => riskStatuses.has(status)))
+        || nodes.find((node) => node.changed)
+        || nodes[0];
+      if (!selected) {
+        refs.inspector.innerHTML = `<div class="empty">暂无节点。</div>`;
+        refs.inspectorMeta.textContent = "empty";
+        return;
+      }
+      state.selectedNodeId = selected.id;
+      refs.inspectorMeta.textContent = selected.kind;
+      const tasks = (state.payload.tasks || []).filter((task) => selected.file && task.file && task.file.endsWith(selected.file));
+      const diagnostics = (state.payload.diagnostics || []).filter((item) => selected.file && item.file && item.file.endsWith(selected.file));
+      const relatedEdges = (graph.edges || []).filter((edge) => edge.from === selected.id || edge.to === selected.id);
+      const contracts = selected.kind === "contract"
+        ? (graph.contracts || []).filter((contract) => `contract:${contract.id}` === selected.id)
+        : (selected.contracts || []).map((contract) => (graph.contracts || []).find((item) => item.id === contract.id)).filter(Boolean);
+      refs.inspector.innerHTML = `
+        <h3 class="node-heading">${escapeHtml(selected.label)}</h3>
+        <div class="chips">${chips(selected.status || [selected.kind])}</div>
+        <article class="insight-card">
+          <h3>为什么被影响</h3>
+          <p>${escapeHtml(explainImpact(selected, contracts, relatedEdges))}</p>
+        </article>
+        <article class="insight-card">
+          <h3>下一步动作</h3>
+          <ul>${listItems(nextActions(selected, tasks, diagnostics))}</ul>
+        </article>
+        <article class="insight-card">
+          <h3>契约</h3>
+          <ul>${listItems(contracts.map(formatContract))}</ul>
+        </article>
+        <article class="insight-card">
+          <h3>关系</h3>
+          <ul>${listItems(relatedEdges.map((edge) => `${edge.relation}: ${edge.from === selected.id ? edge.to : edge.from}`))}</ul>
+        </article>
+      `;
+    }
+
+    function chips(statuses) {
+      return statuses.map((status) => {
+        const cls = riskStatuses.has(status) ? "fail" : positiveStatuses.has(status) ? "pass" : "warn";
+        return `<span class="chip ${cls}">${escapeHtml(labelStatus(status))}</span>`;
+      }).join("");
+    }
+
+    function explainImpact(node, contracts, relatedEdges) {
+      if ((node.status || []).includes("orphan")) {
+        return "这个文件发生了变更，但没有进入任何契约组或自动引用链，未来很容易脱离维护闭环。";
+      }
+      if ((node.status || []).includes("witness-pending")) {
+        return "上游 source 已经变更，这个 witness 需要同步修改或补充审查回执。";
+      }
+      if ((node.status || []).includes("source-changed")) {
+        return "这是本次变更的 source，它会触发一个或多个契约组检查下游 witness。";
+      }
+      if (node.kind === "contract") {
+        return "这个契约组把 source 和 witness 串在一起，用来解释改 A 为什么必须检查 B。";
+      }
+      if (contracts.length > 0) {
+        return `它参与 ${contracts.length} 个契约组，当前有 ${relatedEdges.length} 条可见关系。`;
+      }
+      return "当前节点在引用图中可见，但没有命中风险状态。";
+    }
+
+    function nextActions(node, tasks, diagnostics) {
+      if (tasks.length > 0) {
+        return tasks.map((task) => task.action || task.reason);
+      }
+      if (diagnostics.length > 0) {
+        return diagnostics.map((item) => item.reason);
+      }
+      if ((node.status || []).includes("source-changed")) {
+        return ["沿高亮关系检查下游 witness 是否需要同步更新。"];
+      }
+      if ((node.status || []).includes("updated") || (node.status || []).includes("reviewed")) {
+        return ["该节点已经作为闭环证据参与当前 impact 检查。"];
+      }
+      return ["无需立即处理；可点击相邻节点查看上下游链路。"];
+    }
+
+    function formatContract(contract) {
+      const missing = contract.current && contract.current.missingWitnesses ? contract.current.missingWitnesses : [];
+      return `${contract.id} · ${missing.length ? `pending ${missing.length}` : "closed"}`;
+    }
+
+    function listItems(items) {
+      const filtered = (items || []).filter(Boolean);
+      if (filtered.length === 0) {
+        return `<li>无</li>`;
+      }
+      return filtered.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      syncModeButtons();
+      state.rerunLayout = true;
+      renderGraph();
+      renderInspector();
+    }
+
+    async function loadInitialState() {
+      const response = await fetch("/api/state", { cache: "no-store" });
+      render(await response.json());
+    }
+
+    function connectEvents() {
+      const source = new EventSource("/events");
+      source.addEventListener("graph", (event) => {
+        render(JSON.parse(event.data));
+      });
+      source.onerror = () => {
+        refs.subtitle.textContent = "实时连接重试中";
+      };
+    }
+
+    refs.viewMode.querySelectorAll(".segment").forEach((button) => {
+      button.addEventListener("click", () => setMode(button.dataset.mode));
+    });
+
+    refs.search.addEventListener("input", () => {
+      state.search = refs.search.value;
+      state.rerunLayout = true;
+      syncSelectionToSearch();
+      renderQueue();
+      renderGraph();
+      renderInspector();
+    });
+
+    refs.contractFilter.addEventListener("change", () => {
+      state.contract = refs.contractFilter.value;
+      state.rerunLayout = true;
+      renderGraph();
+      renderInspector();
+    });
+
+    refs.relationFilter.addEventListener("change", () => {
+      state.relation = refs.relationFilter.value;
+      renderGraph();
+      renderInspector();
+    });
+
+    refs.fitButton.addEventListener("click", () => {
+      if (state.cy) {
+        state.cy.fit(undefined, 58);
+      }
+    });
+
+    refs.relayoutButton.addEventListener("click", () => {
+      state.positions.clear();
+      state.rerunLayout = true;
+      renderGraph();
+    });
+
+    refs.focusButton.addEventListener("click", () => {
+      if (state.cy && state.selectedNodeId) {
+        const node = state.cy.$id(state.selectedNodeId);
+        if (node.length) {
+          const neighborhood = node.closedNeighborhood();
+          state.cy.animate({ fit: { eles: neighborhood, padding: 72 } }, { duration: 280 });
+        }
+      }
+    });
+
+    refs.clearButton.addEventListener("click", () => {
+      refs.search.value = "";
+      refs.contractFilter.value = "";
+      refs.relationFilter.value = "";
+      state.search = "";
+      state.contract = "";
+      state.relation = "";
+      clearSelection();
+      state.rerunLayout = true;
+      renderGraph();
+    });
+
+    loadInitialState().then(connectEvents).catch((error) => {
+      refs.inspector.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+    });
+  </script>
+</body>
+</html>

@@ -5,17 +5,19 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { impactCommand, impactWatchCommand } from "./impact-graph.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const skillsRoot = path.join(repoRoot, "skills");
 const templatesRoot = path.join(repoRoot, "templates", "skill");
 const distRoot = path.join(repoRoot, "dist");
+const packageJsonPath = path.join(repoRoot, "package.json");
 const installMarkerFile = ".nexgaios-skill-install.json";
 const generatedFileNotice = "此文件由 `pnpm skills:docs` 生成。不要手动编辑。";
 const maxGuardFileBytes = 5 * 1024 * 1024;
 const repositoryGuidePath = path.join(repoRoot, "docs", "repository-guide.md");
-const repositoryGuideMirrorPath = "E:\\terry-nexgaios-gbrain\\01 - AI Work\\0102 - 项目\\Nexgaios-skills 仓库\\repository-guide.md";
+const repositoryGuideMirrorPath = "E:\\nexgaios-gbrain-kbase\\00 - raw\\01 - AI Work\\0102 - 项目\\Nexgaios-skills 仓库\\repository-guide.md";
 const experienceRoot = path.join(repoRoot, "docs", "experience");
 const experienceCardsRoot = path.join(experienceRoot, "cards");
 const handoffsRoot = path.join(repoRoot, "docs", "handoffs");
@@ -35,6 +37,8 @@ async function main() {
     case "--help":
     case "-h":
       return printHelp();
+    case "env-check":
+      return envCheckCommand(args);
     case "list":
       return listCommand(args);
     case "new":
@@ -57,6 +61,10 @@ async function main() {
       return docsCommand(args);
     case "guard":
       return guardCommand(args);
+    case "impact":
+      return impactCommand(args);
+    case "impact-watch":
+      return impactWatchCommand(args);
     case "pr-summary":
       return prSummaryCommand(args);
     case "guide-sync":
@@ -86,6 +94,7 @@ function printHelp() {
   console.log(`nexgaios 技能命令行工具
 
 命令：
+  env-check [--strict]
   list [--write-catalog]
   new <domain> <skill-id>
   import <domain> <skill-id> --from <path-or-git-url> [--ref <tag-or-branch>] [--version <semver>] [--force]
@@ -97,6 +106,8 @@ function printHelp() {
   ship <skill-id> [--patch|--minor|--major|--no-release] [-m <message>]
   docs [--check]
   guard [--base <git-range-or-ref>|--all]
+  impact <skill-id>|--all [--base <git-range-or-ref>] [--strict] [--visualize] [--format markdown|canvas|json|all] [--output <dir>]
+  impact-watch <skill-id> [--host <host>] [--port <port>]
   pr-summary [--base <git-range-or-ref>]
   guide-sync [--check]
   experience-search <query> [--limit <n>]
@@ -108,6 +119,141 @@ function printHelp() {
   info <skill-id> [--field id|domain|version|path|entry]
   version-changed <skill-id> --base <git-ref>
 `);
+}
+
+function envCheckCommand(rawArgs) {
+  const { flags } = parseOptions(rawArgs);
+  const expectedPackageManager = readExpectedPackageManager();
+  const expectedPnpmVersion = expectedPackageManager.name === "pnpm" ? expectedPackageManager.version : "";
+  const checks = [];
+  const suggestions = new Set();
+
+  const addCheck = (status, name, detail, suggestion = "") => {
+    checks.push({ status, name, detail });
+    if (suggestion) {
+      suggestions.add(suggestion);
+    }
+  };
+
+  const nodeVersion = process.versions.node;
+  if (compareVersions(nodeVersion, "20.0.0") >= 0) {
+    addCheck("ok", "Node.js", `v${nodeVersion}`);
+  } else {
+    addCheck("missing", "Node.js", `当前 v${nodeVersion}，需要 >= 20`, "安装 Node.js 20+ 后重新运行环境检查。");
+  }
+
+  const git = probeCommand("git", ["--version"]);
+  if (git.ok) {
+    addCheck("ok", "Git", firstLine(git.output));
+  } else {
+    addCheck("missing", "Git", "未找到 git 命令", "用户批准后安装 Git，例如：winget install Git.Git");
+  }
+
+  const python = probeCommand("python", ["--version"]);
+  if (python.ok) {
+    addCheck("ok", "Python", firstLine(python.output));
+  } else {
+    addCheck("missing", "Python", "未找到 python 命令", "用户批准后安装 Python 3，并确认 python 在 PATH 中。");
+  }
+
+  if (process.platform === "win32") {
+    const powershell = probeCommand("powershell", ["-NoProfile", "-Command", "$PSVersionTable.PSVersion.ToString()"]);
+    if (powershell.ok) {
+      addCheck("ok", "Windows PowerShell", firstLine(powershell.output));
+    } else {
+      addCheck("missing", "Windows PowerShell", "未找到 powershell 命令", "用户批准后修复 Windows PowerShell 或 PATH。");
+    }
+  }
+
+  const corepack = probeCommand("corepack", ["--version"]);
+  if (corepack.ok) {
+    addCheck("ok", "Corepack", firstLine(corepack.output));
+  } else {
+    addCheck("missing", "Corepack", "未找到 corepack 命令", "用户批准后安装/修复 Node.js，并启用 Corepack。");
+  }
+
+  const pnpm = probeCommand("pnpm", ["--version"]);
+  if (!expectedPnpmVersion) {
+    addCheck("warn", "pnpm", "package.json 未声明 pnpm 版本");
+  } else if (!pnpm.ok) {
+    const corepackPnpm = corepack.ok ? probeCommand("corepack", ["pnpm", "--version"]) : { ok: false, output: "" };
+    const corepackPnpmVersion = firstLine(corepackPnpm.output);
+    if (corepackPnpm.ok && normalizeVersion(corepackPnpmVersion) === normalizeVersion(expectedPnpmVersion)) {
+      addCheck(
+        "warn",
+        "pnpm",
+        `pnpm 命令入口不在 PATH，但 corepack pnpm 可用：${corepackPnpmVersion}`,
+        "无管理员权限时可使用：corepack pnpm <script-or-command>；如需 pnpm 直接命令，用户批准后用管理员权限运行 corepack enable。"
+      );
+    } else {
+      addCheck(
+        "missing",
+        "pnpm",
+        `未找到 pnpm 命令入口，仓库期望 pnpm@${expectedPnpmVersion}`,
+        `用户批准后运行：corepack prepare pnpm@${expectedPnpmVersion} --activate；然后使用 corepack pnpm install --frozen-lockfile`
+      );
+    }
+  } else {
+    const actualPnpmVersion = firstLine(pnpm.output);
+    if (normalizeVersion(actualPnpmVersion) === normalizeVersion(expectedPnpmVersion)) {
+      addCheck("ok", "pnpm", actualPnpmVersion);
+    } else {
+      addCheck(
+        "warn",
+        "pnpm",
+        `当前 ${actualPnpmVersion}，仓库期望 ${expectedPnpmVersion}`,
+        `用户批准后运行：corepack prepare pnpm@${expectedPnpmVersion} --activate`
+      );
+    }
+  }
+
+  const nodeModulesPath = path.join(repoRoot, "node_modules");
+  if (fs.existsSync(nodeModulesPath)) {
+    addCheck("ok", "Workspace dependencies", "node_modules 已存在");
+  } else {
+    addCheck(
+      "missing",
+      "Workspace dependencies",
+      "node_modules 不存在，首次克隆后尚未安装工作区依赖",
+      "用户批准后运行：pnpm install --frozen-lockfile；如果 pnpm 入口不可用，运行 corepack pnpm install --frozen-lockfile"
+    );
+  }
+
+  const gh = probeCommand("gh", ["--version"]);
+  if (gh.ok) {
+    addCheck("ok", "GitHub CLI", firstLine(gh.output));
+  } else {
+    const windowsGhPath = "C:\\Program Files\\GitHub CLI\\gh.exe";
+    if (process.platform === "win32" && fs.existsSync(windowsGhPath)) {
+      addCheck("warn", "GitHub CLI", `gh 不在 PATH，但找到 ${windowsGhPath}`);
+    } else {
+      addCheck("warn", "GitHub CLI", "未找到 gh；只有创建 PR、查看 CI 或发布时需要", "需要 GitHub 工作流时，用户批准后安装并登录 GitHub CLI。");
+    }
+  }
+
+  const missingCount = checks.filter((check) => check.status === "missing").length;
+  const warningCount = checks.filter((check) => check.status === "warn").length;
+
+  console.log("nexgaios-skills 环境检查");
+  console.log("");
+  for (const check of checks) {
+    console.log(`${statusLabel(check.status)} ${check.name}: ${check.detail}`);
+  }
+  console.log("");
+  console.log(`结果：${missingCount} 个缺失项，${warningCount} 个提醒项。`);
+  console.log("本命令只检查环境，不会安装、启用或修改任何工具。");
+
+  if (suggestions.size > 0) {
+    console.log("");
+    console.log("需要先报告用户并等待批准后，才可执行的建议操作：");
+    for (const suggestion of suggestions) {
+      console.log(`- ${suggestion}`);
+    }
+  }
+
+  if (missingCount > 0 || (flags.strict && warningCount > 0)) {
+    process.exitCode = 1;
+  }
 }
 
 function parseOptions(rawArgs) {
@@ -143,6 +289,76 @@ function parseOptions(rawArgs) {
 
 function toCamel(value) {
   return value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function readExpectedPackageManager() {
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    const match = String(packageJson.packageManager || "").match(/^([^@]+)@(.+)$/);
+    if (!match) {
+      return { name: "", version: "" };
+    }
+    return { name: match[1], version: match[2] };
+  } catch {
+    return { name: "", version: "" };
+  }
+}
+
+function probeCommand(commandName, commandArgs) {
+  const commandLine = [commandName, ...commandArgs].map(shellQuote).join(" ");
+  const result = spawnSync(commandLine, [], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: "pipe",
+    shell: true
+  });
+
+  return {
+    ok: result.status === 0,
+    output: `${result.stdout || ""}${result.stderr || ""}`.trim(),
+    error: result.error
+  };
+}
+
+function shellQuote(value) {
+  const text = String(value);
+  if (/^[A-Za-z0-9_./:=@-]+$/.test(text)) {
+    return text;
+  }
+  return `"${text.replace(/"/g, '\\"')}"`;
+}
+
+function firstLine(value) {
+  return String(value || "").split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "可用";
+}
+
+function statusLabel(status) {
+  if (status === "ok") {
+    return "[OK]";
+  }
+  if (status === "warn") {
+    return "[WARN]";
+  }
+  return "[MISSING]";
+}
+
+function normalizeVersion(value) {
+  const match = String(value || "").match(/(\d+)\.(\d+)\.(\d+)/);
+  return match ? `${match[1]}.${match[2]}.${match[3]}` : "";
+}
+
+function compareVersions(left, right) {
+  const leftParts = normalizeVersion(left).split(".").map((part) => Number(part || 0));
+  const rightParts = normalizeVersion(right).split(".").map((part) => Number(part || 0));
+  for (let index = 0; index < 3; index += 1) {
+    if ((leftParts[index] || 0) > (rightParts[index] || 0)) {
+      return 1;
+    }
+    if ((leftParts[index] || 0) < (rightParts[index] || 0)) {
+      return -1;
+    }
+  }
+  return 0;
 }
 
 function listCommand(rawArgs) {
@@ -458,21 +674,22 @@ function guideSyncCommand(rawArgs) {
 
   const sourceContent = fs.readFileSync(repositoryGuidePath, "utf8");
   const mirrorContent = fs.readFileSync(repositoryGuideMirrorPath, "utf8");
+  const mirrorParts = splitMarkdownFrontmatter(mirrorContent);
 
   if (flags.check) {
-    if (normalizeNewlines(sourceContent) !== normalizeNewlines(mirrorContent)) {
+    if (normalizeNewlines(sourceContent) !== normalizeNewlines(mirrorParts.body)) {
       throw new Error(`Obsidian 镜像文件未同步：${repositoryGuideMirrorPath}。请运行 pnpm guide:sync`);
     }
     console.log(`仓库指南与 Obsidian 镜像一致：${repositoryGuideMirrorPath}`);
     return;
   }
 
-  if (normalizeNewlines(sourceContent) === normalizeNewlines(mirrorContent)) {
+  if (normalizeNewlines(sourceContent) === normalizeNewlines(mirrorParts.body)) {
     console.log(`Obsidian 镜像已是最新：${repositoryGuideMirrorPath}`);
     return;
   }
 
-  fs.copyFileSync(repositoryGuidePath, repositoryGuideMirrorPath);
+  fs.writeFileSync(repositoryGuideMirrorPath, `${mirrorParts.frontmatter}${sourceContent}`, "utf8");
   console.log(`已同步仓库指南到 Obsidian：${repositoryGuideMirrorPath}`);
 }
 
@@ -1936,6 +2153,15 @@ function today() {
 
 function normalizeNewlines(value) {
   return value.replace(/\r\n/g, "\n");
+}
+
+function splitMarkdownFrontmatter(content) {
+  const normalized = normalizeNewlines(content);
+  const match = normalized.match(/^(---\n[\s\S]*?\n---\n?)([\s\S]*)$/);
+  if (!match) {
+    return { frontmatter: "", body: content };
+  }
+  return { frontmatter: match[1], body: match[2] };
 }
 
 function markdownEscape(value) {

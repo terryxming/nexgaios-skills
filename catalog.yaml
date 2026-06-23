@@ -10,6 +10,11 @@ skills:
     version: 0.1.3
     path: skills/amazon/lingxing-ad-operation-audit
     status: active
+  - id: obsidian-knowledge-curator
+    domain: knowledge-management
+    version: 0.4.3
+    path: skills/knowledge-management/obsidian-knowledge-curator
+    status: active
   - id: skill-doctor
     domain: skill-governance
     version: 0.1.0

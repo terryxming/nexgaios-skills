@@ -12,6 +12,20 @@
 2. `docs/skill-protocol.md`
 3. `docs/skills-overview.md`
 
+如果这是本机首次拉取仓库，或者发现 `node`、`pnpm`、`python`、`git` 等环境命令不可用，先运行：
+
+```powershell
+node tools/skills/skill-cli.mjs env-check
+```
+
+如果 `node` 本身不可用，运行：
+
+```powershell
+.\skill.ps1 env-check
+```
+
+环境检查只报告缺失项和建议操作。不得自动安装、启用或修改工具；必须先向用户报告缺失项，并等待用户明确批准后再执行安装或修复命令。
+
 如果任务涉及公司电脑和家里电脑协同，阅读：
 
 ```text
@@ -98,6 +112,12 @@ git status --short --branch
 git fetch origin
 git pull --ff-only
 pnpm install --frozen-lockfile
+```
+
+如果环境检查显示 `pnpm` 命令入口不可用，但 `corepack pnpm` 可用，可以在用户批准后使用：
+
+```powershell
+corepack pnpm install --frozen-lockfile
 ```
 
 Codex skill 安装目录使用当前系统用户目录计算，概念路径是：

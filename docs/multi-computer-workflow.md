@@ -21,7 +21,7 @@ $env:USERPROFILE\.codex\skills
 这是每台电脑自己的 Codex skill 安装目录。CLI 实际按当前登录用户的 home 目录计算，等价于 Node.js 的 `os.homedir()` 下的 `.codex\skills`。它由用户明确确认后，通过 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync` 从源码仓库同步生成，不作为源码事实源。
 
 ```text
-E:\terry-nexgaios-gbrain\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+E:\nexgaios-gbrain-kbase\00 - raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
 这是公司电脑和家用电脑当前约定使用的 Obsidian 镜像文件路径。它不是 GitHub 源码仓库的一部分；两台电脑都需要各自保证这个本机路径存在。
@@ -42,6 +42,7 @@ https://github.com/terryxming/nexgaios-skills
 
 ```powershell
 cd D:\nexgaios-skills
+node tools/skills/skill-cli.mjs env-check
 git status --short --branch
 git fetch origin
 git pull --ff-only
@@ -50,6 +51,8 @@ pnpm install --frozen-lockfile
 
 规则：
 
+- 如果环境检查发现缺失项，先向用户报告并等待明确批准；不要自动安装、启用或修改工具。
+- 如果 `pnpm` 命令入口不可用，但环境检查显示 `corepack pnpm` 可用，可以在用户批准后改用 `corepack pnpm install --frozen-lockfile`。
 - 如果 `git status` 显示有本地未提交改动，先判断这些改动是否属于当前任务。
 - 如果本地有未提交改动，不要直接 `git pull` 覆盖。
 - `git pull --ff-only` 只允许快进，避免自动生成不清楚的 merge commit。
@@ -116,6 +119,7 @@ docs/handoffs/<skill-id>/<yyyy-mm-dd>-<slug>.md
 
 ```powershell
 cd D:\nexgaios-skills
+node tools/skills/skill-cli.mjs env-check
 git fetch origin
 git pull --ff-only
 pnpm install --frozen-lockfile
@@ -166,6 +170,7 @@ cd D:\nexgaios-skills
 git fetch origin
 git switch main
 git pull --ff-only
+node tools/skills/skill-cli.mjs env-check
 pnpm install --frozen-lockfile
 ```
 

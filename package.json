@@ -5,6 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
+    "env:check": "node tools/skills/skill-cli.mjs env-check",
     "skill:list": "node tools/skills/skill-cli.mjs list",
     "skill:new": "node tools/skills/skill-cli.mjs new",
     "skill:import": "node tools/skills/skill-cli.mjs import",
@@ -18,6 +19,9 @@
     "skills:docs": "node tools/skills/skill-cli.mjs docs",
     "skills:docs:check": "node tools/skills/skill-cli.mjs docs --check",
     "skills:guard": "node tools/skills/skill-cli.mjs guard",
+    "skill:impact": "node tools/skills/skill-cli.mjs impact",
+    "skill:impact:watch": "node tools/skills/skill-cli.mjs impact-watch",
+    "skills:impact": "node tools/skills/skill-cli.mjs impact --all",
     "skills:pr-summary": "node tools/skills/skill-cli.mjs pr-summary",
     "guide:sync": "node tools/skills/skill-cli.mjs guide-sync",
     "guide:check": "node tools/skills/skill-cli.mjs guide-sync --check",

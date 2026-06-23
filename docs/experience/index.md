@@ -21,7 +21,9 @@ pnpm experience:search "<关键词>"
 | 两台电脑协同、pull/push/同步安装目录 | `multi-computer workflow` |
 | 未完成工作换电脑继续 | `handoff 交接 未完成 下一步` |
 | 修改 skill 后是否同步到本机 Codex | `skill install sync 安装目录` |
+| 首次 clone、环境命令缺失、pnpm/Corepack 未启用 | `env check pnpm corepack approval` |
 | PR 是否会自动合并、CI 通过后的行为 | `pr auto-merge validate` |
+| 修改 skill 后担心漏同步关联文件 | `impact dependency graph hard gate` |
 
 ## 使用规则
 

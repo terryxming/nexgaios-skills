@@ -6,6 +6,27 @@ Codex 新线程项目指令：[AGENTS.md](AGENTS.md)。
 
 新人先读：[仓库架构与工作指南](docs/repository-guide.md)。
 
+## 首次环境检查
+
+首次 clone 或换电脑后，先运行环境检查：
+
+```bash
+node tools/skills/skill-cli.mjs env-check
+```
+
+如果 `node` 本身不可用，在 Windows 下运行：
+
+```bash
+.\skill.ps1 env-check
+```
+
+环境检查只报告缺失项和建议操作，不会自动安装、启用或修改任何工具。发现缺失时，先向用户报告并等待明确批准，再执行类似下面的修复命令：
+
+```bash
+corepack prepare pnpm@11.7.0 --activate
+corepack pnpm install --frozen-lockfile
+```
+
 这个仓库按三层边界管理：
 
 - 仓库边界：统一管理脚本、CI、模板和发布规则。

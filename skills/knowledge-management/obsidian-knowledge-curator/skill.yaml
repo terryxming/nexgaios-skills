@@ -1,0 +1,14 @@
+id: obsidian-knowledge-curator
+domain: knowledge-management
+version: 0.4.5
+entry: SKILL.md
+status: active
+
+validate:
+  command: "python scripts/validate_okc_contract.py"
+
+package:
+  command: ""
+
+release:
+  tag: obsidian-knowledge-curator@0.4.5
