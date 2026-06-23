@@ -21,6 +21,8 @@
     "skills:guard": "node tools/skills/skill-cli.mjs guard",
     "skill:impact": "node tools/skills/skill-cli.mjs impact",
     "skill:impact:watch": "node tools/skills/skill-cli.mjs impact-watch",
+    "okc:impact-console:build": "pnpm --filter @nexgaios/okc-impact-console build",
+    "okc:impact-console:typecheck": "pnpm --filter @nexgaios/okc-impact-console typecheck",
     "skills:impact": "node tools/skills/skill-cli.mjs impact --all",
     "skills:pr-summary": "node tools/skills/skill-cli.mjs pr-summary",
     "guide:sync": "node tools/skills/skill-cli.mjs guide-sync",

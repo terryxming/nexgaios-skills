@@ -60,6 +60,10 @@
 - 修改 `impact.yaml` 覆盖的契约源文件后，关联 witness 文件必须同步修改；若确认无需修改，必须提供 `docs/impact-reviews/obsidian-knowledge-curator/` 下的机器可读审查回执。
 - 修改 `impact/console.html` 或 `impact/README.md` 后，必须同步检查 README、测试矩阵、验证脚本、版本和变更记录。
 - Impact 控制台必须具备商业化图谱交互：拖动画布、滚轮缩放、拖拽节点、点击聚焦邻居、Fit、重布局、搜索和筛选。
+- Impact 控制台图谱手感必须接近 Obsidian 轻量关系图：文件名短标签必须按缩放、hover、搜索和选中状态做 LOD 显示，节点大小必须有明显连接度层次，hover 时突出邻域并强淡化无关节点，历史变更态不能把完整文件地图染成任务看板。
+- Impact 控制台实时拓扑更新必须保持图谱连续性：SSE 新状态不能销毁重建整张 Cytoscape 画布，新增/删除/更新节点和边必须走增量同步，并保留用户当前 pan、zoom 和已有节点位置。
+- Impact 控制台 v0.3 必须表达文件关系图谱基础设施语义：首屏是完整 skill 文件关系图谱，实时修改监控只是叠加层，影响检查在选中文件后以图谱高亮和右侧解释出现，缺口只是同一张图谱上的 strict gate 过滤图层。
+- Agent 修改一个文件时，控制台必须让用户先看清完整文件网络，再在选中文件后看懂它影响哪些相关文件、这些文件为什么相关、是否已修改或已审查、是否仍需处理。
 - 新增 OKC 文件必须进入自动引用图或 `impact.yaml` 契约组；不能成为无人检查的孤儿文件。
 - 母文档路径或文件不存在时不得自动创建，必须先询问用户。
 - Obsidian 美化版必须限定 CSS 作用域，不污染其他笔记。
@@ -79,6 +83,12 @@
 - Skill 源码维护：检查修改规则、reference、样本或测试后，是否同步更新版本、CHANGELOG、测试契约和项目母文档三表。
 - Impact 实时控制台：检查修改入口规则时，控制台是否在 1-2 秒内显示 changed、source-changed、witness-pending 和 strict failure 数量。
 - Impact 图谱交互：检查节点可拖拽、画布可平移缩放、点击节点后只高亮邻居链路，并且搜索/契约/关系筛选不会造成空白误判。
+- Impact 图谱视觉 QA：检查远景标签是否自动减噪、近景标签是否恢复可读、节点大小是否按 degree 拉开层次、普通边是否保持轻量灰阶、hover 是否强淡化无关节点、历史变更态是否只是监控叠加层。
+- Impact 增量更新 QA：模拟新增文件和更新文件，检查 `addedNodes`、`preservedPanZoom`、`localReheat`、`layoutEngine` 等图谱 QA 指标，并确认新节点从相关邻居附近进入、全图不会洗牌。
+- Impact D3 布局 QA：默认布局必须是 D3-force，检查 `d3Ticks`、`d3Running`、`d3Components`、`d3IsolatedNodes`、`d3LargestComponent`、节点间距、主链路聚拢、拖拽释放后的轻量回温，并在工具栏切换 `D3 force` / `CoSE` 比较手感和可回退性。
+- Impact Obsidian-like 视觉 QA：检查默认图谱是否以灰阶低噪声呈现，`labelLod`、`visibleLabels`、`hiddenLabels` 和 `nodeSizeSteps` 是否证明标签 LOD 与尺寸层次生效，状态色是否只是边框/光晕叠加，hover/搜索/选中是否再增强标签和相关边，孤立或弱连接节点是否稳定分布在外围而不是被中心簇吞掉。
+- Impact 边稳定性 QA：模拟新增一个引用 `README.md` 的文件时，应只新增对应文件节点和少量真实关系边，不能因为边 ID 使用数组下标而触发大量边删除/重建。
+- Impact 文件关系图谱基础设施：检查首屏是否显示完整文件图谱，左侧文件索引是否同步搜索和变更状态，右侧文件影响检查是否列出需要检查的相关文件，以及新增无关系文件是否立即显示为未接入节点。
 
 ## 自动验证
 
@@ -86,6 +96,8 @@
 pnpm skill:validate obsidian-knowledge-curator
 pnpm skill:impact obsidian-knowledge-curator --strict
 pnpm skill:impact:watch obsidian-knowledge-curator
+pnpm okc:impact-console:typecheck
+pnpm okc:impact-console:build
 pnpm skills:docs:check
 pnpm skills:guard
 pnpm skills:validate

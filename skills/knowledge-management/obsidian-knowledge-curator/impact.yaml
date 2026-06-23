@@ -2,6 +2,7 @@ version: 1
 review_root: docs/impact-reviews/obsidian-knowledge-curator
 ignored_files:
   - impact/graph.*
+  - impact/assets/*
 
 contracts:
   - id: skill-entry-contract
@@ -103,6 +104,22 @@ contracts:
       - README.md
       - tests/README.md
       - scripts/validate_okc_contract.py
+      - skill.yaml
+      - CHANGELOG.md
+    require:
+      - witness_changed_or_reviewed
+      - version_changed_or_reviewed
+
+  - id: impact-console-frontend-contract
+    description: React/Vite 前端源码变化必须同步构建控制台产物并检查治理说明、测试矩阵和版本记录
+    sources:
+      - impact-console/*
+      - impact-console/src/*
+    witnesses:
+      - impact/console.html
+      - impact/README.md
+      - README.md
+      - tests/README.md
       - skill.yaml
       - CHANGELOG.md
     require:

@@ -11,6 +11,7 @@ const skillsRoot = path.join(repoRoot, "skills");
 const defaultWatchHost = "127.0.0.1";
 const defaultWatchPort = 4319;
 const watchIgnoredDirs = new Set([".git", "node_modules", "__pycache__", ".pytest_cache"]);
+const skillFileIgnoredDirs = new Set([".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache"]);
 const changedIgnoredDirs = new Set([".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache"]);
 const changedIgnoredExtensions = new Set([".pyc", ".pyo", ".log"]);
 
@@ -118,6 +119,11 @@ export async function impactWatchCommand(rawArgs) {
 
     if (requestUrl.pathname === "/" || requestUrl.pathname === "/console.html") {
       sendHtml(response, readConsoleHtml(consolePath));
+      return;
+    }
+
+    if (requestUrl.pathname.startsWith("/assets/")) {
+      sendStaticAsset(response, skill.dir, requestUrl.pathname);
       return;
     }
 
@@ -406,6 +412,7 @@ function decorateConsoleGraph(report, changeEntries) {
         changed: true,
         covered: false,
         category: fileCategory(entry.skillFile),
+        fileBytes: skillFileStats(report.skill.dir, entry.skillFile).bytes,
         roles: [],
         contracts: [],
         status: [entry.kind, "changed", "orphan"]
@@ -574,6 +581,43 @@ function sendJson(response, data) {
   response.end(`${JSON.stringify(data, null, 2)}\n`);
 }
 
+function sendStaticAsset(response, skillDir, pathname) {
+  const decodedPath = decodeURIComponent(pathname.replace(/^\/+/, ""));
+  const normalized = normalizePath(decodedPath);
+  if (!normalized.startsWith("assets/") || normalized.includes("../")) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Not found");
+    return;
+  }
+
+  const assetRoot = path.join(skillDir, "impact", "assets");
+  const assetPath = path.resolve(skillDir, "impact", normalized);
+  if (!assetPath.startsWith(assetRoot) || !fs.existsSync(assetPath) || !fs.statSync(assetPath).isFile()) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Not found");
+    return;
+  }
+
+  response.writeHead(200, {
+    "Content-Type": mimeType(assetPath),
+    "Cache-Control": "no-store"
+  });
+  response.end(fs.readFileSync(assetPath));
+}
+
+function mimeType(filePath) {
+  return {
+    ".css": "text/css; charset=utf-8",
+    ".html": "text/html; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".map": "application/json; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".ico": "image/x-icon"
+  }[path.extname(filePath).toLowerCase()] || "application/octet-stream";
+}
+
 function sendSse(response, event, data) {
   response.write(`event: ${event}\n`);
   response.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -686,6 +730,7 @@ function printImpactReports(reports, context) {
 
 function buildSkillGraph(skill, config) {
   const files = listSkillFiles(skill.dir);
+  const fileStats = new Map(files.map((file) => [file, skillFileStats(skill.dir, file)]));
   const existing = new Set(files);
   const coveredFiles = new Set();
   const brokenReferences = [];
@@ -704,6 +749,10 @@ function buildSkillGraph(skill, config) {
   }
 
   for (const file of files) {
+    if (isIgnored(file, config)) {
+      coveredFiles.add(file);
+      continue;
+    }
     const absolutePath = path.join(skill.dir, file);
     if (!isTextFile(absolutePath)) {
       continue;
@@ -748,7 +797,7 @@ function buildSkillGraph(skill, config) {
 
   coveredFiles.add("impact.yaml");
 
-  return { files, coveredFiles, brokenReferences, edges };
+  return { files, fileStats, coveredFiles, brokenReferences, edges };
 }
 
 function toGraphModel(skill, config, graph, skillChangedFiles) {
@@ -764,6 +813,7 @@ function toGraphModel(skill, config, graph, skillChangedFiles) {
       changed: changed.has(file),
       covered: graph.coveredFiles.has(file),
       category: fileCategory(file),
+      fileBytes: graph.fileStats.get(file)?.bytes || 0,
       roles: []
     });
   }
@@ -793,6 +843,7 @@ function toGraphModel(skill, config, graph, skillChangedFiles) {
       changed: false,
       covered: false,
       category: "missing",
+      fileBytes: 0,
       roles: ["missing"]
     });
   }
@@ -1301,6 +1352,10 @@ function listSkillFiles(skillDir) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
+        const relativeDir = normalizePath(path.relative(skillDir, fullPath));
+        if (relativeDir.split("/").some((part) => skillFileIgnoredDirs.has(part))) {
+          continue;
+        }
         walk(fullPath);
       } else if (entry.isFile()) {
         files.push(normalizePath(path.relative(skillDir, fullPath)));
@@ -1309,6 +1364,14 @@ function listSkillFiles(skillDir) {
   };
   walk(skillDir);
   return files.sort();
+}
+
+function skillFileStats(skillDir, file) {
+  const absolutePath = path.join(skillDir, file);
+  if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
+    return { bytes: 0 };
+  }
+  return { bytes: fs.statSync(absolutePath).size };
 }
 
 function isTextFile(filePath) {

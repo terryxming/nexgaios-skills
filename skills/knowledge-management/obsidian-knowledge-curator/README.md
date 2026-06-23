@@ -22,6 +22,7 @@ scripts/          可执行脚本
 assets/           可复用资产
 tests/            测试样例和夹具
 impact/           impact 实时控制台前端资产
+impact-console/   impact 控制台 React/Vite 前端源码
 CHANGELOG.md      版本变更记录
 impact.yaml       文件级影响链路契约
 ```
@@ -30,6 +31,8 @@ impact.yaml       文件级影响链路契约
 
 ```powershell
 pnpm skill:validate obsidian-knowledge-curator
+pnpm okc:impact-console:typecheck
+pnpm okc:impact-console:build
 pnpm skill:impact obsidian-knowledge-curator --strict
 pnpm skill:impact:watch obsidian-knowledge-curator
 pnpm skill:package obsidian-knowledge-curator --print-path
@@ -62,8 +65,25 @@ pnpm skill:install obsidian-knowledge-curator
 0.4.5 起，控制台升级为 Cytoscape.js 驱动的动态图谱工作台：
 
 - 支持拖动画布、滚轮缩放、拖拽节点、点击节点聚焦邻居、Fit 和重布局。
-- 支持搜索、契约筛选、关系筛选，以及“影响链路 / 风险优先 / 全部图谱”三种产品视角。
+- 支持搜索、契约筛选、关系筛选；早期的多视角模型已在 0.4.7 收敛为单一文件关系图谱。
 - 允许在线加载成熟图谱库，不再把离线静态 HTML 当作产品目标。
+
+0.4.6 起，控制台前端工程化为 `Vite + React + TypeScript + Cytoscape.js`：
+
+- `impact-console/` 保存可维护源码，React 负责面板、筛选和状态，Cytoscape.js 继续负责关系图渲染和交互。
+- `pnpm okc:impact-console:build` 将前端构建到 `impact/console.html`、`impact/assets/console.js` 和 `impact/assets/console.css`，watcher 继续使用同一个本地 URL。
+- 后端 watcher、`/api/state` 和 `/events` 数据协议保持不变，避免把框架迁移和 impact 引擎改造混在一起。
+
+0.4.7 起，控制台产品目标改准为文件关系图谱基础设施试点：
+
+- 第一屏默认显示 skill 内所有文件节点，关系来自真实引用、`impact.yaml` 契约和 missing reference。
+- 左侧是文件索引，按全部文件、变更文件、新增文件和未接入文件辅助定位。
+- 正在修改或刚修改的文件节点会在图谱中高亮；新增文件必须立即进入图谱，无关系时显示为未接入。
+- “影响检查”不是独立视窗；点击或搜索某个文件后，完整图谱直接高亮它的上下游，右侧只解释需要检查的相关文件、相关原因、修改/审查状态和剩余处理动作。
+- “缺口”不是独立视窗；工具栏只提供缺口图层，用同一张图谱过滤 strict gate 会关注的 pending、orphan、missing 和 broken reference。
+- 默认优先尝试 D3-force 物理布局，Cytoscape.js 继续负责图谱渲染和交互；工具栏保留 CoSE 回退，用于持续比较 Obsidian-like 流体手感。
+- D3 布局会按连通分量稳定分群，核心簇、卫星簇和孤立节点各自有位置；默认视觉保持灰阶低噪声，状态色只作为边框、光晕和选中叠加层。
+- 验收口径：Agent 修改一个文件时，用户应先看清完整文件网络，再能快速判断它的上下游依赖是否也需要同步修改。
 
 0.4.2 起新增执行闭环边界：
 
