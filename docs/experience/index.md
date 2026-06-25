@@ -24,6 +24,7 @@ pnpm experience:search "<关键词>"
 | 首次 clone、环境命令缺失、pnpm/Corepack 未启用 | `env check pnpm corepack approval` |
 | PR 是否会自动合并、CI 通过后的行为 | `pr auto-merge validate` |
 | 修改 skill 后担心漏同步关联文件 | `impact dependency graph hard gate` |
+| impact strict 报目录路径引用不存在 | `impact directory reference broken` |
 
 ## 使用规则
 

@@ -1,9 +1,10 @@
 ---
 title: "impact console productization handoff"
 date: 2026-06-23
+updated: 2026-06-24
 skill: "obsidian-knowledge-curator"
 domain: "knowledge-management"
-status: draft
+status: pushed
 ---
 
 # impact console productization handoff
@@ -12,143 +13,204 @@ status: draft
 
 - Skill：`obsidian-knowledge-curator`
 - 业务域：`knowledge-management`
-- 当前版本：`0.4.5`
+- 当前版本：`0.4.7`
 - 源码路径：`skills/knowledge-management/obsidian-knowledge-curator`
 - 当前分支：`codex/okc-impact-console-handoff`
-- 当前 commit：以本分支最新 HEAD 为准；到公司电脑后运行 `git log -1 --oneline` 查看。
+- 当前 commit：`60e48fe77038f887dcb4c3203da87d03114d783e`
+- 已推 tag：`obsidian-knowledge-curator@0.4.7`
+- 远端仓库：`https://github.com/terryxming/nexgaios-skills`
 
-## 当前目标
+## 当前定位
 
-为 `obsidian-knowledge-curator` 试点落地 Skill Impact 机制：
+OKC 现在是 Skill Impact Infrastructure 的试点，不是单纯的事件流工具，也不是普通关系图 demo。
 
-- 用 `impact.yaml` 和动态图谱解决“改了 A，但忘了 B 也要同步维护”的问题。
-- 把影响检查从人工提示升级为可验证的 strict gate。
-- 把图谱从离线静态产物升级为可打开、可搜索、可点击、可实时刷新的前端控制台。
-- 继续把控制台打磨成真正给团队活动使用的产品界面，而不是调试图。
+目标已经收敛为：
+
+- 绘制 skill 内所有文件的关系图谱。
+- 新增 skill 文件时立即进入图谱。
+- Agent 修改或刚修改文件时，在图谱上高亮对应文件。
+- 修改完 A 后，依据真实引用、`impact.yaml` 契约和 missing reference 检查上下游文件是否也需要同步修改或审查。
+- 最终由 `pnpm skill:impact obsidian-knowledge-curator --strict` 做硬闸门。
 
 ## 已完成
 
-- 新增通用 impact 引擎：`tools/skills/impact-graph.mjs`。
-- 在 `tools/skills/skill-cli.mjs` 接入：
-  - `pnpm skill:impact <skill-id> --strict`
-  - `pnpm skills:impact --strict`
-  - `pnpm skill:impact:watch <skill-id>`
-- 在 `package.json` 和 PR workflow 中接入 impact 检查。
-- 为 OKC 新增 `impact.yaml`，覆盖 skill entry、reference system、project memory、visual showcase、validation、impact governance、impact console 等契约组。
-- 为 OKC 新增 `impact/console.html`，通过本地 HTTP server + SSE + Cytoscape.js 展示实时影响图谱。
-- 控制台已做一轮真实 Chrome 交互 QA：
-  - 默认视图改为“一跳影响链路”，source、contract、witness 分区展示。
-  - “风险优先”没有 pending/missing/orphan/failing 时显示空状态。
-  - 搜索联动左侧队列和右侧节点工作台。
-  - 左侧点击文件会清掉搜索并回到该文件的一跳影响链路。
-  - 修复左侧点击后只居中单个节点导致链路挤出画布的问题。
-  - 修复 source/witness/mentions 布局优先级冲突。
-  - 过滤与契约主边重复的 mention 边，减少噪音。
-- 浏览器确认 Cytoscape 实例可用：pan、zoom、drag 都已开启。
-- 经验卡片已记录：`docs/experience/cards/2026-06-23-skill-impact-hard-gate.md`。
-- 已清理浏览器 QA 产生的 `tmp-impact*.png` 临时截图。
+- 将 OKC Impact Console 从单文件原生 HTML 迁移为 `Vite + React + TypeScript + Cytoscape.js + D3-force` 前端工程。
+- 构建产物继续输出到：
+  - `skills/knowledge-management/obsidian-knowledge-curator/impact/console.html`
+  - `skills/knowledge-management/obsidian-knowledge-curator/impact/assets/console.js`
+  - `skills/knowledge-management/obsidian-knowledge-curator/impact/assets/console.css`
+- 默认首屏改为完整 skill 文件关系图谱，而不是任务队列或闭环工作台。
+- 左侧改为文件索引，包含变更文件、新增文件、未接入文件和全部文件。
+- 右侧改为选中文件后的文件影响检查，列出“需要检查的相关文件”。
+- “影响检查”和“缺口视图”已经收敛为同一张图谱上的高亮层/过滤层，不再作为三个割裂视窗。
+- 实时 watcher + SSE 增量更新已落地：
+  - 新文件 add/remove/update 不销毁整张图。
+  - 保留 pan、zoom 和已有节点位置。
+  - 新增文件优先从相关邻居附近进入图谱。
+  - 删除文件后节点和边会移除。
+- 图谱视觉已按 Obsidian-like 手感打磨：
+  - D3-force 默认布局，CoSE 可回退。
+  - 节点大小按 degree 明显拉开层次，文件大小作为辅助。
+  - 标签按 zoom / hover / search / selected 做 LOD。
+  - hover 时强淡化非邻居。
+  - 状态色只作为边框、光晕或选中叠加层，不把完整图谱染成任务看板。
+- 增加 QA dataset 指标：
+  - `labelLod`
+  - `visibleLabels`
+  - `hiddenLabels`
+  - `nodeSizeSteps`
+  - `hoverMuted`
+  - `hoverNeighborNodes`
+  - `d3Components`
+  - `d3LargestComponent`
+  - `addedNodes`
+  - `removedElements`
+  - `localReheat`
+  - `preservedPanZoom`
+- 修复 QA 中发现的问题：
+  - 初始加载不再把历史 changed 文件误判为最近活动。
+  - D3/CoSE 切换按钮补 `data-layout-engine` 和 `aria-pressed`，自动化和可访问性更稳定。
+  - 删除临时文件后 `d3LargestComponent` stale 的问题已修复，现在每次写 dataset 时按当前拓扑重算。
+  - 构建产物 `console.js` 尾随空格已清理，`git diff --check` 通过。
+- 已新增经验卡：
+  - `docs/experience/cards/2026-06-23-impact-directory-reference-broken.md`
 
-## 未完成和下一步
+## 已提交和推送
 
-- 到公司电脑后先拉取并切换本分支，继续从产品体验角度做第二轮 UI/UX：
-  - 检查中文标签字号、节点间距、搜索结果密度是否足够商业化。
-  - 继续优化“全部图谱”视角，它现在更像诊断视图，不应作为主工作流。
-  - 考虑是否把 `impact/console.html` 从单文件原生 HTML 迁移为 `Vite + React + Cytoscape.js`，以便后续组件化、快捷键、命令面板、审查任务流。
-  - 继续设计真正的实时状态：新增/修改/检查中文件时，节点可以出现 processing、changed、needs-review、reviewed 等状态。
-  - 决定是否把成熟后的机制推广到其他 skill 模板和 `pnpm skill:new` 生成骨架。
-- 如果要继续推进到 main，建议先开 Draft PR，而不是直接推 main，避免半成品触发发布链路。
+已提交：
 
-## 当前阻塞或风险
+```text
+60e48fe feat(okc): add impact graph console infrastructure
+```
 
-- 当前分支包含一批较大的仓库级改动和一个完整新增 OKC skill 目录，提交前后都要注意只处理本任务相关文件。
-- `impact/console.html` 目前是原生 HTML/CSS/JS + Cytoscape.js CDN，不是 React/Vue 工程化前端；短期便于 skill 目录内分发，长期复杂产品能力会变重。
-- `skills/knowledge-management/obsidian-knowledge-curator` 是新目录，当前在 git 中仍属于未跟踪目录；本次提交会把它整体纳入版本库。
-- 本次只是源码仓库更新，不代表已经同步到本机 Codex 安装目录。
+已推送：
 
-## 需要继续查看的文件
+```powershell
+git push origin codex/okc-impact-console-handoff
+git push origin obsidian-knowledge-curator@0.4.7
+```
 
-- `skills/knowledge-management/obsidian-knowledge-curator/SKILL.md`
-- `skills/knowledge-management/obsidian-knowledge-curator/impact.yaml`
-- `skills/knowledge-management/obsidian-knowledge-curator/impact/console.html`
-- `skills/knowledge-management/obsidian-knowledge-curator/scripts/validate_okc_contract.py`
-- `tools/skills/impact-graph.mjs`
-- `tools/skills/skill-cli.mjs`
-- `docs/skill-impact-console-prd-v0.1.md`
-- `docs/experience/cards/2026-06-23-skill-impact-hard-gate.md`
+远端 tag 已确认指向：
+
+```text
+60e48fe77038f887dcb4c3203da87d03114d783e refs/tags/obsidian-knowledge-curator@0.4.7
+```
 
 ## 已运行验证
 
-- `node tools/skills/skill-cli.mjs env-check`：通过，Node/Git/Python/pnpm/GitHub CLI 均可用。
-- `pnpm install --frozen-lockfile`：通过，依赖已是最新。
-- `node --check tools\skills\impact-graph.mjs`：通过。
-- `node --check tools\skills\skill-cli.mjs`：通过。
-- `pnpm skill:validate obsidian-knowledge-curator`：通过，`okc contract checks passed`。
-- `pnpm skills:impact --strict`：通过。
-- `pnpm skills:docs:check`：通过。
-- `pnpm skills:validate`：通过。
-- `pnpm skills:guard`：最终通过。
-- `Invoke-WebRequest http://127.0.0.1:4319/api/state`：返回 `200`。
-- Chrome DevTools 浏览器检查：
-  - 打开 `http://127.0.0.1:4319/`。
-  - 点击“风险优先”，无风险时显示空状态。
-  - 搜索 `impact`，左侧队列缩到 `3/23 items`，图谱缩到 10 个节点，右侧工作台切到命中节点。
-  - 点击左侧 `impact/console.html`，回到该文件一跳影响链路。
-  - 浏览器中读取 Cytoscape 状态：`panning=true`、`zooming=true`、节点 `grabbable=true`。
+自动验证：
 
-## 工作区状态
-
-```text
-M .github/workflows/pr-validate.yml
- M AGENTS.md
- M README.md
- M catalog.yaml
- M docs/experience/cards/2026-06-17-repository-guide-obsidian-mirror.md
- M docs/experience/index.md
- M docs/multi-computer-workflow.md
- M docs/repository-guide.md
- M docs/skill-protocol.md
- M docs/skills-overview.md
- M package.json
- M skill.cmd
- M skill.ps1
- M templates/skill/README.md
- M tools/skills/skill-cli.mjs
-?? CONTEXT.md
-?? docs/experience/cards/2026-06-20-env-check-before-install.md
-?? docs/experience/cards/2026-06-23-skill-impact-hard-gate.md
-?? docs/impact-graphs/
-?? docs/impact-reviews/
-?? docs/intelligence-system-v0.1-design-notes.md
-?? docs/skill-impact-console-prd-v0.1.md
-?? skills/knowledge-management/
-?? templates/skill/impact.yaml
-?? tools/skills/impact-graph.mjs
+```powershell
+pnpm okc:impact-console:typecheck
+pnpm okc:impact-console:build
+pnpm skill:validate obsidian-knowledge-curator
+pnpm skill:impact obsidian-knowledge-curator --strict
+pnpm skills:docs:check
+pnpm skills:guard
+pnpm skills:validate
+git diff --check
+git diff --cached --check
 ```
 
-## 下台电脑恢复步骤
+结果：
+
+- 全部通过。
+- `pnpm okc:impact-console:build` 仍有 Vite 单 chunk 超 500KB 提醒，非阻塞。
+
+浏览器真实交互 QA：
+
+- 打开 `http://127.0.0.1:4319/`，控制台加载成功。
+- 初始完整图谱：`51` nodes / `162` edges。
+- 标签 LOD：
+  - 近景 `detail`：`visibleLabels=51`、`hiddenLabels=0`。
+  - 远景 `compact`：`visibleLabels=15`、`hiddenLabels=36`。
+- hover 节点：
+  - 例如 hover 后 `hoverMuted=198`，只突出邻域。
+- 点击节点：
+  - 例如 `activePathEdges=43`、`triggerEdges=7`，舞台文案切到“已高亮上下游关系”。
+- 搜索 `GraphCanvas`：
+  - 左侧索引同步过滤到 `GraphCanvas.tsx`。
+  - 图谱非命中节点退到背景。
+- 图层切换：
+  - 完整图谱 / 只看缺口可切换。
+- 布局切换：
+  - `D3 force` / `CoSE` 可切换，`layoutEngine` dataset 同步变化。
+- Fit、重布局、拖动画布、拖拽节点：
+  - 画布 pan 正常变化。
+  - 拖拽节点释放后 D3 回温，随后停稳。
+- 新增/删除临时文件：
+  - 新增 `impact-console-qa-temp.md` 后：`51/162 -> 52/163`，`addedNodes=1`、`localReheat=true`、`preservedPanZoom=true`。
+  - 删除后回到：`51/162`，`removedElements=2`，`d3LargestComponent=51`。
+- 浏览器 console：
+  - 无 error/warn。
+- 临时 QA 文件已删除，没有残留。
+
+## 回家电脑恢复步骤
 
 ```powershell
 cd <本机 nexgaios-skills 仓库路径>
-git fetch origin
+git fetch origin --tags
 git switch codex/okc-impact-console-handoff
 git pull --ff-only origin codex/okc-impact-console-handoff
 pnpm install --frozen-lockfile
 pnpm handoff:list obsidian-knowledge-curator
 ```
 
-继续工作前，先阅读本交接文档，再打开：
+确认当前 commit：
+
+```powershell
+git log -1 --oneline
+git rev-parse obsidian-knowledge-curator@0.4.7
+```
+
+期望都指向 `60e48fe...`。
+
+启动本地控制台：
 
 ```powershell
 pnpm skill:impact:watch obsidian-knowledge-curator
 ```
 
-然后在浏览器访问本地控制台，继续按真实用户路径测试。
+浏览器打开命令输出的本地地址，通常是：
+
+```text
+http://127.0.0.1:4319/
+```
+
+## 下一步建议
+
+短期不要急着抽 MCP 或通用包。先继续把 OKC 试点打稳：
+
+- 再做一轮产品视角 QA：默认图谱密度、标签显示、节点间距、侧栏信息是否足够高级和好理解。
+- 检查完整图谱是否能承担“影响检查 + 缺口过滤”的全部职责，避免重新退化成多视窗工具。
+- 继续真实模拟 Agent 修改 skill 文件时的场景：
+  - 改 `SKILL.md`
+  - 改 `impact.yaml`
+  - 改 `impact-console/src/components/GraphCanvas.tsx`
+  - 新增一个无引用文件
+  - 新增一个引用 README 的文件
+- 继续思考未来形态：
+  - CLI/engine 是硬底座。
+  - MCP 是 Agent 查询接口。
+  - skill/AGENTS 是行为约束。
+  - UI 是用户理解和监督层。
+
+## 当前工作区注意事项
+
+- 已提交并推送 OKC impact console 相关改动。
+- 当前本机仍有一个非本次任务的未跟踪文件，未提交：
+
+```text
+docs/experience/cards/2026-06-23-lingxing-aws-mcp-protocol-version.md
+```
+
+不要在回家电脑上误以为这是本次 OKC 任务必需文件。
 
 ## 本机 Codex 安装同步状态
 
-本次交接不代表已经同步到本机 Codex 安装目录。
+本次只是源码仓库和 GitHub 分支/tag 更新，不代表已经同步到本机 Codex 安装目录。
 
-如果修改过 `skills/<domain>/<skill-id>/`，完成验证后必须显式询问用户是否要同步到本机 Codex 安装目录；只有用户明确同意后，才运行：
+如果需要把 OKC 同步到当前电脑的 Codex 安装目录，必须用户明确同意后再运行：
 
 ```powershell
 pnpm skill:install obsidian-knowledge-curator

@@ -17,7 +17,7 @@ skills:
     status: active
   - id: obsidian-knowledge-curator
     domain: knowledge-management
-    version: 0.4.5
+    version: 0.4.7
     path: skills/knowledge-management/obsidian-knowledge-curator
     status: active
   - id: skill-doctor
