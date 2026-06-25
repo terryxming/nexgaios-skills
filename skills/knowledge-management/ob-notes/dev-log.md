@@ -40,22 +40,26 @@ last_read:
 | 2026-06-26 | source_url 作为 frontmatter-spec 下的可选字段，不登记为独立规则项 | 它是字段非规则；受控词表粒度是规则项，登记会污染词表，且加字段不该改依赖图 | 把 source_url 登进受控词表——粒度错配，会让 build_depmap 误判图结构变化 |
 | 2026-06-26 | 加可选字段判 MINOR(0.1.0→0.2.0)，非 MAJOR | §5 MAJOR 的统帅定义是"使已有笔记/配置失效"；可选字段不致已有笔记失效，骨架仅多一可选行 | 判 MAJOR 升 1.0.0——过度，且与"加可选字段=MINOR"条直接冲突 |
 | 2026-06-26 | 收编进 nexgaios-skills monorepo：拍平到 `skills/knowledge-management/ob-notes`、补 `skill.yaml`、登记 catalog；**不做 git init**，去掉 per-skill LICENSE（推翻交接文档与上面 MIT 那条的旧假设） | 该目录已在 monorepo 的 git 下，dev-log/CHANGELOG 随父仓库即受版本控制；monorepo 靠 `skill.yaml` 发现 skill，validate 强制 `skills/<domain>/<id>` 布局；同级 skill 均不带 per-skill LICENSE | 在子目录 `git init`——会造成仓库套仓库(嵌套 repo/gitlink)，父仓库反而跟踪不到内容；保留 `ob-notes-repo` 外壳——结构与同级 skill 不一致、CLI 识别不到 |
+| 2026-06-26 | 从前作 obsidian-knowledge-curator(OKC，用户早先 Codex 版)捞取：只移植"编辑智慧"，丢弃"流程机器" | OKC 没做好的是流程重量(预览-确认闭环、母文档 ITER/DEC/TODO 三表、impact 控制台、CSS 视觉)，不是内容经验；ob-notes 重做就是为甩掉这层重量 | 整体合并两 skill / 照搬 OKC 的预览-确认闭环——会把 ob-notes 的"自动化、不打断"哲学破坏掉 |
+| 2026-06-26 | source-fidelity 归 mode-a-research.md，不归 frontmatter-tags.md | 原文结构覆盖是研究型(长文/网页)特有的取舍纪律，不是所有笔记的通用格式；放 research 唯一家最贴职责 | 放 frontmatter-tags——它是全笔记通用格式 SSOT，会把研究型专属逻辑塞进通用层 |
+| 2026-06-26 | anti-patterns / quality-rubric 各立为独立规则项+独立 reference | 坏例库与写盘前自检是可被 SKILL/铁律复用的横切关注；独立成项才能在受控词表里被引用、被 build_depmap 追踪 | 塞进现有模板或 SKILL 正文——无法被多处引用，且会让 SKILL 臃肿、违"细节下沉 references" |
+| 2026-06-26 | quality-rubric(写盘前单篇自检) 与 review-flow(两周全库复盘) 显式划清，不算 MECE 重复 | 时机(写盘前 vs 事后)与对象(单篇 vs 全库)不同，是互补两道闸；已在 maintenance.md §1 注记 | 合成一条"质量"规则——会把两个不同时机的机制糊在一起，迟早矛盾 |
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v0.2.0，已收编进 `nexgaios-skills` monorepo**（位于 `skills/knowledge-management/ob-notes`，配 `skill.yaml`、登记进 `catalog.yaml`，`node tools/skills/skill-cli.mjs validate --all` 全绿——其中 ob-notes 的 validate 即跑 `build_depmap.py`，MECE 通过）。演练暴露的三个待迭代问题已全部解决，均改在唯一家 frontmatter-tags.md，模板骨架联动：
-  1. ✅ 可信度收紧——credibility-spec 区分"信源可信 / 内容已亲验"，加 callout 警示，默认落"待验证"。
-  2. ✅ 双链防死链——linking-convention 加"建链前查存在性"+"尚未建则标 `(待建)`"。
-  3. ✅ source_url——frontmatter-spec 加可选字段，research/practice 骨架已纳入。
-  三个问题按 maintenance.md 流程走完：查影响面(三者唯一家均 frontmatter-tags.md、各依赖文件只引用不复述、无需联动)→ 改 → build_depmap.py 校验通过(26 规则项、依赖图零变化)→ 定版 MINOR → CHANGELOG 记 0.2.0。
+- 现状：**v0.3.0，已收编进 `nexgaios-skills` monorepo**（`skills/knowledge-management/ob-notes`，配 `skill.yaml`、登记 `catalog.yaml`，`validate --all` 全绿；ob-notes 的 validate 即跑 `build_depmap.py`，MECE 通过，**29 个规则项**）。两批工作完成：
+  - **v0.2.0（演练三问题，改在 frontmatter-tags.md 唯一家）**：①可信度收紧(信源可信≠内容已亲验) ②双链防死链((待建)标注) ③新增可选 source_url 字段。
+  - **v0.3.0（从前作 OKC 捞取五件"编辑智慧"，丢弃流程重量）**：新增 3 规则项 + 2 reference——①source-fidelity(研究型原文结构覆盖+来源元数据块，防长文压成观点卡) ②anti-patterns(六类坏例库) ③quality-rubric(写盘前四测自检) ④⑤模板加"适用边界/下次怎么用"段、第一屏升级 30 秒读法。全程按 maintenance.md 流程：登记受控词表 → 改 → build_depmap 查反向索引(新规则项被 SKILL/quality-check 正确依赖) → 验 MECE 通过 → 定版 MINOR。
 - 下一步（按优先级）：
-  1. 与同域同级的 `obsidian-knowledge-curator` 做对比（两者职责边界、是否有重叠或可互补，见文末关联，待做）。
-  2. 观察后续真实沉淀数据：source_url 在实战型是否真有人填、双链 `(待建)` 钩子复盘时是否被消费——数据驱动决定要不要进一步收紧。
-  3. （可选）若日后要独立发布，再补 `skill.yaml` 的 `package.command`（当前留空，与 obsidian-knowledge-curator 一致）。
-- 卡点：无。原"给目录做 git init"一条已作废——目录本就在 monorepo 的 git 下，收编后即受版本控制（见决策表）。
+  1. 观察后续真实沉淀数据：source_url/source-fidelity 覆盖表实战型是否真用、双链 `(待建)` 钩子复盘时是否被消费、quality-rubric 四测是否拦下了水货笔记——数据驱动决定下一轮收紧/增删。
+  2. （可选）OKC 还有未捞的：信息类型 8 分类比 ob-notes 的 Mode 粗分更细(踩坑/决策/复盘/想法/讨论/偏好单列)——若实测 Mode 粗分判不准，再考虑细化 mode-decision。
+  3. （可选）若日后要独立发布，补 `skill.yaml` 的 `package.command`。
+- 卡点：无。
+- 已解决：原"与 OKC 做职责边界对比"一条——结论是 OKC 是本 skill 的**前作**(用户早先 Codex 版，因流程过重而重做)，已从中捞取五件并入 v0.3.0；项目记忆之争(OKC 母文档 vs ob-notes dev-log)以 ob-notes dev-log 为准(本 skill 自身正在用它)。
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：从前作 OKC 捞取五件并入，发 v0.3.0。读穿 OKC 全部 reference，判定"捞编辑智慧、丢流程机器"——并入 source-fidelity/anti-patterns/quality-rubric 三规则项(2 新 reference) + 研究/实战模板增强。受控词表 26→29 项，build_depmap 验 MECE 通过、反向索引确认新规则项被正确依赖。
 - 2026-06-26：收编进 `nexgaios-skills` monorepo——拍平 `ob-notes-repo/ob-notes` → `skills/knowledge-management/ob-notes`，补 `skill.yaml`、重生成 `catalog.yaml` 与分组 README、去掉外壳层 LICENSE，修正 README/CHANGELOG 里 `ob-notes/...` 旧相对路径。`validate --all` 全绿。澄清并作废了交接文档里"给目录做 git init"的旧建议（在 monorepo 子目录 init 会造成嵌套 repo）。
 - 2026-06-26：Claude Code 接手续做，处理演练暴露的三个待迭代问题，发 v0.2.0。按 maintenance.md 修改流程查影响面 → 改 frontmatter-tags.md(唯一家) + research/practice 骨架联动 → build_depmap.py 验 MECE 通过(图无变化) → 记 CHANGELOG 与本 dev-log。
 - 2026-06-26：用 AWS《Agent 记忆模块最佳实践》文章做真实沉淀演练，产出研究型笔记一篇，暴露上述三个待迭代问题。
@@ -74,4 +78,4 @@ last_read:
 
 ## 关联
 - [[ob-notes SKILL]]
-- [[obsidian-knowledge-curator]]  （用户的另一个同类 skill，待对比）
+- [[obsidian-knowledge-curator]]  （**前作**：用户早先的 Codex 版，因流程过重而重做本 skill；v0.3.0 已从中捞取五件编辑智慧并入。未捞部分见"下一步"。）

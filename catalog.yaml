@@ -12,7 +12,7 @@ skills:
     status: active
   - id: ob-notes
     domain: knowledge-management
-    version: 0.2.0
+    version: 0.3.0
     path: skills/knowledge-management/ob-notes
     status: active
   - id: obsidian-knowledge-curator

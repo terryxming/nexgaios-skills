@@ -1,7 +1,7 @@
 ---
 name: mode-a-practice
 metadata:
-  version: 0.2.0
+  version: 0.3.0
   provides: [practice-template]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -72,11 +72,18 @@ last_read:
 {{命令原样}}
 \`\`\`
 
+## 适用边界（可选）
+{{这个解法在什么环境/版本下成立，换了条件可能不灵——避免照搬翻车}}
+
+## 下次怎么用
+- [ ] {{下次先确认触发条件是否相同}}
+- [ ] {{先复核关键路径/文件/版本是否一致}}
+
 ## 踩过的弯路（可选）
 - {{试过但无效的方案，及为何无效}}
 
 ## 关联（可选）
-- [[{{相关笔记}}]]
+- [[{{相关笔记}}]]  {{建链前按 linking-convention 查目标是否存在，未建标 (待建)}}
 ```
 
 ## 命名与冻结

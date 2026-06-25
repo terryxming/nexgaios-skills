@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -47,12 +47,15 @@ metadata:
 | `iron-laws` | 五条铁律本身 | SKILL.md |
 | `trigger-rule` | 触发方式（显式 / 收尾判据） | SKILL.md |
 | `research-template` | 研究型笔记模板与该记/该丢清单 | mode-a-research.md |
+| `source-fidelity` | 源信息留存与原文结构覆盖（长文/网页沉淀防压成观点卡） | mode-a-research.md |
 | `practice-template` | 实战型笔记模板与该记/该丢清单 | mode-a-practice.md |
 | `devlog-template` | 开发日志模板 | mode-b-devlog.md |
 | `devlog-integration` | dev-log 与 CLAUDE.md/AGENTS.md 的打通方式 | mode-b-devlog.md |
 | `jsonl-schema` | capture-log.jsonl 的字段定义 | monitoring.md |
 | `revisit-signal` | read_count/last_read 回访信号的记录机制 | monitoring.md |
 | `review-flow` | 两周复盘的查询与产出 | monitoring.md |
+| `anti-patterns` | 坏例库与改写策略（流水账/空泛/过度提炼/格式炫技/Agent-only/入口硬） | anti-patterns.md |
+| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用四测） | quality-check.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
 | `dependency-spec` | 依赖声明规范（第 3 节） | maintenance.md |
 | `version-rule` | 版本规则（第 5 节） | maintenance.md |
@@ -60,6 +63,11 @@ metadata:
 | `ssot-registry` | 本归属表（第 1 节） | maintenance.md |
 
 注：`frontmatter-spec` 定义"笔记里有哪些 frontmatter 字段"；`revisit-signal` 定义"read_count 何时如何 +1"。前者定义字段存在，后者定义字段的更新行为——职责不同，不算重复。
+
+注：以下三对易混，特此划清（均不算 MECE 重复）：
+- `quality-rubric`（写盘前对**单篇**自检"现在写得好不好"）vs `review-flow`（两周一次对**全库**事后复盘"将来有没有被用上"）——时机与粒度不同。
+- `source-fidelity`（针对**外部来源**：源材料别被压没）vs `anti-patterns`（针对**所有笔记**的通用坏例）——前者管保真、后者管通病，互补不重叠。
+- `anti-patterns` 只给坏例与改写方向，**不重新定义**可信度/日期/双链等规则；命中处一律按各自唯一家（如 credibility-spec）处理。
 
 <a id="2"></a>
 ## 2. 受控词表
