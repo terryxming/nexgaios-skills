@@ -47,18 +47,21 @@ last_read:
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v0.3.0，已收编进 `nexgaios-skills` monorepo**（`skills/knowledge-management/ob-notes`，配 `skill.yaml`、登记 `catalog.yaml`，`validate --all` 全绿；ob-notes 的 validate 即跑 `build_depmap.py`，MECE 通过，**29 个规则项**）。两批工作完成：
+- 现状：**v0.3.0，已收编进 monorepo 并推送 GitHub**（`origin/codex/okc-impact-console-handoff`）。`validate --all` 全绿，MECE 通过，**29 个规则项**。三批工作完成：
   - **v0.2.0（演练三问题，改在 frontmatter-tags.md 唯一家）**：①可信度收紧(信源可信≠内容已亲验) ②双链防死链((待建)标注) ③新增可选 source_url 字段。
-  - **v0.3.0（从前作 OKC 捞取五件"编辑智慧"，丢弃流程重量）**：新增 3 规则项 + 2 reference——①source-fidelity(研究型原文结构覆盖+来源元数据块，防长文压成观点卡) ②anti-patterns(六类坏例库) ③quality-rubric(写盘前四测自检) ④⑤模板加"适用边界/下次怎么用"段、第一屏升级 30 秒读法。全程按 maintenance.md 流程：登记受控词表 → 改 → build_depmap 查反向索引(新规则项被 SKILL/quality-check 正确依赖) → 验 MECE 通过 → 定版 MINOR。
+  - **v0.3.0（从前作 OKC 捞取五件"编辑智慧"，丢弃流程重量）**：新增 3 规则项 + 2 reference——①source-fidelity(研究型原文结构覆盖+来源元数据块，防长文压成观点卡) ②anti-patterns(六类坏例库) ③quality-rubric(写盘前四测自检) ④⑤模板加"适用边界/下次怎么用"段、第一屏升级 30 秒读法。全程按 maintenance.md 流程走完。
+  - **首次真实 dogfood（验证 v0.3.0 有效）**：拿当初栽过跟头的同一篇 AWS 记忆文章重跑——配好 kb_root、沉淀成研究型笔记 `agent-memory.md` 落知识库 inbox。三特性真实写盘验证通过：可信度全部正确落"待验证"(老坑没再踩)、source-fidelity 覆盖表生效未压成观点卡、第一屏/适用边界/下次怎么用按新模板出。监控层(`_meta`)按用户选择**暂缓未建**。
 - 下一步（按优先级）：
-  1. 观察后续真实沉淀数据：source_url/source-fidelity 覆盖表实战型是否真用、双链 `(待建)` 钩子复盘时是否被消费、quality-rubric 四测是否拦下了水货笔记——数据驱动决定下一轮收紧/增删。
-  2. （可选）OKC 还有未捞的：信息类型 8 分类比 ob-notes 的 Mode 粗分更细(踩坑/决策/复盘/想法/讨论/偏好单列)——若实测 Mode 粗分判不准，再考虑细化 mode-decision。
+  1. 继续观察真实沉淀数据（现有 1 篇 `agent-memory.md`）；攒多了再看 source-fidelity/可信度纪律是否稳定。监控层(`_meta`)等"规律沉淀 + 确认会复盘"时再一句话启用。
+  2. （可选）OKC 未捞的信息类型 8 分类比 Mode 粗分更细——若实测 Mode 判不准，再考虑细化 mode-decision。
   3. （可选）若日后要独立发布，补 `skill.yaml` 的 `package.command`。
 - 卡点：无。
-- 已解决：原"与 OKC 做职责边界对比"一条——结论是 OKC 是本 skill 的**前作**(用户早先 Codex 版，因流程过重而重做)，已从中捞取五件并入 v0.3.0；项目记忆之争(OKC 母文档 vs ob-notes dev-log)以 ob-notes dev-log 为准(本 skill 自身正在用它)。
+- **续做提示（给明天到公司的你/agent）**：skill 代码全在 git、已推 GitHub，公司机器 `git pull` 即续。注意三点：① dogfood 那篇笔记与 kb_root 配置在**个人本机**（`D:\nexgaios-kbase` / `C:\Users\terry\.config\ob-notes\config.json`），公司机器上没有——不影响 skill 开发，只是 dogfood 不可复现；② git 身份是本仓库 local 配的 `terryxming`，换机器要重设或用公司全局配置；③ 本分支是 feature/handoff 分支，尚未并 main、未开 PR。
+- 已解决：原"与 OKC 做职责边界对比"——结论是 OKC 是本 skill 的**前作**(用户早先 Codex 版，因流程过重而重做)，已捞五件并入 v0.3.0；项目记忆之争以 ob-notes dev-log 为准。
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：首次真实沉淀 dogfood + 推送 GitHub。配 kb_root（本机）→ 把 AWS 记忆文章沉淀成研究型笔记落 inbox，v0.3.0 三特性真实写盘验证通过；监控层按用户选择暂缓。本地两个 commit(v0.2.0/v0.3.0) + 本条 dev-log 更新推送 `origin`，交接明天到公司续做。
 - 2026-06-26：从前作 OKC 捞取五件并入，发 v0.3.0。读穿 OKC 全部 reference，判定"捞编辑智慧、丢流程机器"——并入 source-fidelity/anti-patterns/quality-rubric 三规则项(2 新 reference) + 研究/实战模板增强。受控词表 26→29 项，build_depmap 验 MECE 通过、反向索引确认新规则项被正确依赖。
 - 2026-06-26：收编进 `nexgaios-skills` monorepo——拍平 `ob-notes-repo/ob-notes` → `skills/knowledge-management/ob-notes`，补 `skill.yaml`、重生成 `catalog.yaml` 与分组 README、去掉外壳层 LICENSE，修正 README/CHANGELOG 里 `ob-notes/...` 旧相对路径。`validate --all` 全绿。澄清并作废了交接文档里"给目录做 git init"的旧建议（在 monorepo 子目录 init 会造成嵌套 repo）。
 - 2026-06-26：Claude Code 接手续做，处理演练暴露的三个待迭代问题，发 v0.2.0。按 maintenance.md 修改流程查影响面 → 改 frontmatter-tags.md(唯一家) + research/practice 骨架联动 → build_depmap.py 验 MECE 通过(图无变化) → 记 CHANGELOG 与本 dev-log。
