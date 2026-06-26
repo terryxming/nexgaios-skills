@@ -44,6 +44,7 @@ last_read:
 | 2026-06-26 | source-fidelity 归 mode-a-research.md，不归 frontmatter-tags.md | 原文结构覆盖是研究型(长文/网页)特有的取舍纪律，不是所有笔记的通用格式；放 research 唯一家最贴职责 | 放 frontmatter-tags——它是全笔记通用格式 SSOT，会把研究型专属逻辑塞进通用层 |
 | 2026-06-26 | anti-patterns / quality-rubric 各立为独立规则项+独立 reference | 坏例库与写盘前自检是可被 SKILL/铁律复用的横切关注；独立成项才能在受控词表里被引用、被 build_depmap 追踪 | 塞进现有模板或 SKILL 正文——无法被多处引用，且会让 SKILL 臃肿、违"细节下沉 references" |
 | 2026-06-26 | quality-rubric(写盘前单篇自检) 与 review-flow(两周全库复盘) 显式划清，不算 MECE 重复 | 时机(写盘前 vs 事后)与对象(单篇 vs 全库)不同，是互补两道闸；已在 maintenance.md §1 注记 | 合成一条"质量"规则——会把两个不同时机的机制糊在一起，迟早矛盾 |
+| 2026-06-26 | mode-decision 维持粗分、不向 OKC 的 8 分类细化；misfit 一律在模板层修、不在 mode 层；细化触发从"判不准"改为可量化闸 | mode-decision 实管两条**正交轴**——落点(去 inbox / 跟项目，本就只有 2~3 个目的地，粗分正确)与结构(该长啥样)；OKC 8 分类管的是结构轴，把它塞进落点判定＝把已甩掉的 OKC 流程重量请回来。且类别越多＝每次判断负担越大＝误分类越多，与 `anti-patterns` 的"过度结构化"自相矛盾——细化有**正确性成本**，非仅维护成本。`[推测]` 真会先撑爆粗分的是现在无家可归的三类(偏好/想法/讨论)，其中"偏好"最可能先破、且它缺的或是**落点**而非模板(性质近 agent 行为记忆) | 直接采纳"3桶→8类"细化——重新引入判断负担与误分类、违 anti-patterns；用模糊的"判不准"当触发——永远主观、无法收敛 |
 
 ## 当前状态 / 下一步（覆盖更新）
 
@@ -53,14 +54,18 @@ last_read:
   - **首次真实 dogfood（验证 v0.3.0 有效）**：拿当初栽过跟头的同一篇 AWS 记忆文章重跑——配好 kb_root、沉淀成研究型笔记 `agent-memory.md` 落知识库 inbox。三特性真实写盘验证通过：可信度全部正确落"待验证"(老坑没再踩)、source-fidelity 覆盖表生效未压成观点卡、第一屏/适用边界/下次怎么用按新模板出。监控层(`_meta`)按用户选择**暂缓未建**。
 - 下一步（按优先级）：
   1. 继续观察真实沉淀数据（现有 1 篇 `agent-memory.md`）；攒多了再看 source-fidelity/可信度纪律是否稳定。监控层(`_meta`)等"规律沉淀 + 确认会复盘"时再一句话启用。
-  2. （可选）OKC 未捞的信息类型 8 分类比 Mode 粗分更细——若实测 Mode 判不准，再考虑细化 mode-decision。
+  2. **mode-decision 维持粗分、不细化**（2026-06-26 判定，见决策表）——落点轴粗分本就正确，结构需求改走**模板层**而非 mode 层。可量化触发闸：攒够约 10–15 篇真实笔记后，若"一篇硬塞两件事 / 模板大段留空 / 落点纠结"达可观比例，或某类(最可能是偏好/想法/讨论)反复无家可归，才在模板层加 1~2 个、不动 mode；否则不动。
   3. （可选）若日后要独立发布，补 `skill.yaml` 的 `package.command`。
 - 卡点：无。
-- **续做提示（给明天到公司的你/agent）**：skill 代码全在 git、已推 GitHub，公司机器 `git pull` 即续。注意三点：① dogfood 那篇笔记与 kb_root 配置在**个人本机**（`D:\nexgaios-kbase` / `C:\Users\terry\.config\ob-notes\config.json`），公司机器上没有——不影响 skill 开发，只是 dogfood 不可复现；② git 身份是本仓库 local 配的 `terryxming`，换机器要重设或用公司全局配置；③ 本分支是 feature/handoff 分支，尚未并 main、未开 PR。
+- **续做提示（给接手的你/agent）**：skill 代码全在 git、已推 GitHub，换机器 `git pull` 即续。注意：
+  - ① ~~dogfood 那篇笔记与 kb_root 配置在**个人本机**，公司机器上没有、dogfood 不可复现~~ → **2026-06-26 公司机实测更正**：该公司机(用户 EDY)上 `D:\nexgaios-kbase`(含 dogfood 笔记 `agent-memory.md`)与完整 kbase 均在；已补建 `~/.config/ob-notes/config.json` 指向它，**dogfood 在此机可复现**。注意 `config.json` 是 per-machine、不随仓库走——换到无此库或未配 kb_root 的机器仍需另配(读取顺序见 preflight.md)。
+  - ② git 身份：本机经查 local 未配、**global 即 `terryxming` / terry.xming@gmail.com**，署名正确；只有换到 global 非此身份的机器才需重设。
+  - ③ 本分支是 feature/handoff 分支，尚未并 main、未开 PR。
 - 已解决：原"与 OKC 做职责边界对比"——结论是 OKC 是本 skill 的**前作**(用户早先 Codex 版，因流程过重而重做)，已捞五件并入 v0.3.0；项目记忆之争以 ob-notes dev-log 为准。
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：公司机首日续做。核对环境——git 身份(global 即 terryxming)、kb_root、dogfood 笔记(`agent-memory.md`)经查均在本机 `D:\nexgaios-kbase`，补建 `~/.config/ob-notes/config.json` 指向它(故旧续做提示①"公司机没有库/笔记"实测不成立)。就 mode-decision 是否细化形成判断并记入决策表：维持粗分、misfit 走模板层、定可量化触发闸。
 - 2026-06-26：首次真实沉淀 dogfood + 推送 GitHub。配 kb_root（本机）→ 把 AWS 记忆文章沉淀成研究型笔记落 inbox，v0.3.0 三特性真实写盘验证通过；监控层按用户选择暂缓。本地两个 commit(v0.2.0/v0.3.0) + 本条 dev-log 更新推送 `origin`，交接明天到公司续做。
 - 2026-06-26：从前作 OKC 捞取五件并入，发 v0.3.0。读穿 OKC 全部 reference，判定"捞编辑智慧、丢流程机器"——并入 source-fidelity/anti-patterns/quality-rubric 三规则项(2 新 reference) + 研究/实战模板增强。受控词表 26→29 项，build_depmap 验 MECE 通过、反向索引确认新规则项被正确依赖。
 - 2026-06-26：收编进 `nexgaios-skills` monorepo——拍平 `ob-notes-repo/ob-notes` → `skills/knowledge-management/ob-notes`，补 `skill.yaml`、重生成 `catalog.yaml` 与分组 README、去掉外壳层 LICENSE，修正 README/CHANGELOG 里 `ob-notes/...` 旧相对路径。`validate --all` 全绿。澄清并作废了交接文档里"给目录做 git init"的旧建议（在 monorepo 子目录 init 会造成嵌套 repo）。
