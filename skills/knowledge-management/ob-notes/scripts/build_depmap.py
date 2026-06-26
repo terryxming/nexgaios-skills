@@ -146,7 +146,10 @@ def write_map(nodes, definer):
         deps = dependents.get(r, [])
         deps_str = ", ".join(f"`{d}`" for d in deps) if deps else "—"
         L.append(f"| `{r}` | `{home}` | {deps_str} |")
-    OUTPUT.write_text("\n".join(L) + "\n", encoding="utf-8")
+    # 显式用 LF 写出，避免 Windows 上 write_text 默认把 \n 转成 \r\n、
+    # 导致每次校验都把 dependency-map.md 弄脏（与本脚本"纯只读"契约相悖）。
+    with open(OUTPUT, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(L) + "\n")
 
 
 if __name__ == "__main__":

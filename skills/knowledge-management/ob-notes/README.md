@@ -18,7 +18,9 @@
 
 ## 安装
 
-将 `ob-notes/` 目录放入你的 agent 的 skills 目录：
+本 skill 是 `nexgaios-skills` monorepo 的一部分，位于 `skills/knowledge-management/ob-notes`，仓库通过各 skill 的 `skill.yaml` 自动发现，无需手动安装。
+
+若要独立取用到自己的 agent，把本目录复制进 agent 的 skills 目录即可：
 
 - Claude Code / Claude.ai：放入 skills 插件目录后即可按描述自动触发。
 - 其它兼容工具：参照各自的 skill 加载方式。

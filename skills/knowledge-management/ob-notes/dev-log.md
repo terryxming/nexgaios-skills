@@ -65,6 +65,7 @@ last_read:
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：质量梳理 + 修 F1 行尾 bug。系统读完全部 16 文件、跑两层校验(build_depmap 与 monorepo validate 均通过、29 规则项 MECE 全绿)。结论：设计强、验证薄(仅 1 篇 dogfood)。修 `build_depmap.py` 跨平台行尾 bug(F1，见踩坑) + README 对齐 monorepo(F5)；按"维护者-only、对外零影响"判定不升版本、不动 CHANGELOG。F2(验证薄)归入下一步第 1 条、F3(revisit-signal 依赖 agent 自觉)留作监控层激活前的已知最弱环。
 - 2026-06-26：公司机首日续做。核对环境——git 身份(global 即 terryxming)、kb_root、dogfood 笔记(`agent-memory.md`)经查均在本机 `D:\nexgaios-kbase`，补建 `~/.config/ob-notes/config.json` 指向它(故旧续做提示①"公司机没有库/笔记"实测不成立)。就 mode-decision 是否细化形成判断并记入决策表：维持粗分、misfit 走模板层、定可量化触发闸。
 - 2026-06-26：首次真实沉淀 dogfood + 推送 GitHub。配 kb_root（本机）→ 把 AWS 记忆文章沉淀成研究型笔记落 inbox，v0.3.0 三特性真实写盘验证通过；监控层按用户选择暂缓。本地两个 commit(v0.2.0/v0.3.0) + 本条 dev-log 更新推送 `origin`，交接明天到公司续做。
 - 2026-06-26：从前作 OKC 捞取五件并入，发 v0.3.0。读穿 OKC 全部 reference，判定"捞编辑智慧、丢流程机器"——并入 source-fidelity/anti-patterns/quality-rubric 三规则项(2 新 reference) + 研究/实战模板增强。受控词表 26→29 项，build_depmap 验 MECE 通过、反向索引确认新规则项被正确依赖。
@@ -83,6 +84,7 @@ last_read:
 - 2026-06-26 最终自检发现 preflight.md 含私人路径 nexgaios-kbase `[已验证]` — 根因：举例时写了真实私人路径，发布包不应含 — 解法：`sed -i 's/nexgaios-kbase/my-kbase/g'`，全包复查无残留。
 - 2026-06-26 受控词表在代码里存了副本，构成双写隐患 `[已验证]` — 根因：脚本要可执行需要词表，初版硬编码在 CONTROLLED_VOCAB — 解法：改为运行时从 maintenance.md 第1节归属表正则解析，代码内零副本；脚本因此新增 depends_on: ssot-registry。
 - 2026-06-26 sed 命令里用 `${PIPESTATUS[0]}` 在 sh 下报 "Bad substitution" `[已验证]` — 根因：PIPESTATUS 是 bash 特性、当前 shell 是 sh — 解法：改用独立命令分别取退出码，避免依赖 bash 专有语法。
+- 2026-06-26 `build_depmap.py` 在 Windows 上每次跑校验都把 `dependency-map.md` 标成 modified(`git diff --ignore-all-space` 实为零内容差异) `[已验证]` — 根因：`Path.write_text` 默认 `newline=None`，写盘时把 `\n` 转成平台 `os.linesep`(Windows 即 `\r\n`)，与仓库 LF 版本不符，使"纯只读、仅生成 dependency-map"的脚本反而污染工作区、有误提交 CRLF 翻转之险 — 解法：改用 `open(OUTPUT, "w", encoding="utf-8", newline="\n")` 显式锁 LF(不用 `write_text` 的 `newline=` 参数，那要 Py3.10+)；连跑两次后 git status 干净，验收通过。
 
 ## 关联
 - [[ob-notes SKILL]]
