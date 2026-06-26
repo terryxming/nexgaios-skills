@@ -11,17 +11,17 @@
 |---|---|---|
 | `CHANGELOG.md` | — | — |
 | `README.md` | — | — |
-| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, jsonl-schema, revisit-signal, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric |
+| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, jsonl-schema, revisit-signal, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule |
 | `dev-log.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
-| `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule | — |
+| `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule | — |
 | `references/maintenance.md` | controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry | — |
 | `references/mode-a-practice.md` | practice-template | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
-| `references/mode-a-research.md` | research-template, source-fidelity | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
+| `references/mode-a-research.md` | research-template, source-fidelity, mastery-lens | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
 | `references/mode-b-devlog.md` | devlog-template, devlog-integration | credibility-spec, frontmatter-spec, datestamp-rule, landing-rule |
 | `references/monitoring.md` | jsonl-schema, revisit-signal, review-flow | kb-root, frontmatter-spec, concurrency-safe, credibility-spec |
 | `references/preflight.md` | kb-root, landing-rule, preflight-flow, path-normalize, concurrency-safe | — |
-| `references/quality-check.md` | quality-rubric | credibility-spec, source-fidelity |
+| `references/quality-check.md` | quality-rubric | credibility-spec, source-fidelity, mastery-lens |
 | `scripts/build_depmap.py` | — | dependency-spec, controlled-vocab, ssot-registry |
 
 ## 按规则项（反向索引）
@@ -41,8 +41,10 @@
 | `jsonl-schema` | `references/monitoring.md` | `SKILL.md` |
 | `kb-root` | `references/preflight.md` | `references/monitoring.md`, `SKILL.md` |
 | `landing-rule` | `references/preflight.md` | `references/mode-b-devlog.md`, `SKILL.md` |
+| `layout-rule` | `references/frontmatter-tags.md` | `SKILL.md` |
 | `linking-convention` | `references/frontmatter-tags.md` | `references/mode-a-practice.md`, `references/mode-a-research.md` |
 | `maintenance-flow` | `references/maintenance.md` | `SKILL.md` |
+| `mastery-lens` | `references/mode-a-research.md` | `references/quality-check.md`, `SKILL.md` |
 | `mode-decision` | `SKILL.md` | — |
 | `naming-rule` | `references/frontmatter-tags.md` | `references/mode-a-practice.md`, `references/mode-a-research.md` |
 | `path-normalize` | `references/preflight.md` | — |

@@ -45,10 +45,11 @@ last_read:
 | 2026-06-26 | anti-patterns / quality-rubric 各立为独立规则项+独立 reference | 坏例库与写盘前自检是可被 SKILL/铁律复用的横切关注；独立成项才能在受控词表里被引用、被 build_depmap 追踪 | 塞进现有模板或 SKILL 正文——无法被多处引用，且会让 SKILL 臃肿、违"细节下沉 references" |
 | 2026-06-26 | quality-rubric(写盘前单篇自检) 与 review-flow(两周全库复盘) 显式划清，不算 MECE 重复 | 时机(写盘前 vs 事后)与对象(单篇 vs 全库)不同，是互补两道闸；已在 maintenance.md §1 注记 | 合成一条"质量"规则——会把两个不同时机的机制糊在一起，迟早矛盾 |
 | 2026-06-26 | mode-decision 维持粗分、不向 OKC 的 8 分类细化；misfit 一律在模板层修、不在 mode 层；细化触发从"判不准"改为可量化闸 | mode-decision 实管两条**正交轴**——落点(去 inbox / 跟项目，本就只有 2~3 个目的地，粗分正确)与结构(该长啥样)；OKC 8 分类管的是结构轴，把它塞进落点判定＝把已甩掉的 OKC 流程重量请回来。且类别越多＝每次判断负担越大＝误分类越多，与 `anti-patterns` 的"过度结构化"自相矛盾——细化有**正确性成本**，非仅维护成本。`[推测]` 真会先撑爆粗分的是现在无家可归的三类(偏好/想法/讨论)，其中"偏好"最可能先破、且它缺的或是**落点**而非模板(性质近 agent 行为记忆) | 直接采纳"3桶→8类"细化——重新引入判断负担与误分类、违 anti-patterns；用模糊的"判不准"当触发——永远主观、无法收敛 |
+| 2026-06-26 | 研究型笔记引入"掌握"目标：学习闭环落为 `mastery-lens`(写作纪律) + `quality-rubric` 掌握测试，**严禁做成"## 复述/## 迁移"等章节**；排版另立 `layout-rule`，但呈现层(字体/配色/间距)划归 Obsidian 主题/CSS、库级、不进 skill | 框架做成章节＝方法论上台面，会诱发"为填空而填空"的伪掌握、并把整合的理解切碎(失灵魂)；掌握只能从行文功力透出。呈现层堆 markdown 解决不了，且 CSS 是库级、与"跨 agent 通用"的 skill 定位冲突 | 七阶段做成固定章节模板(否：失灵魂)；靠"充分利用 markdown 语法"求美观(否：即格式炫技)；把 CSS 视觉塞进 skill(否：库级、不可移植) |
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v0.3.0，已收编进 monorepo 并推送 GitHub**（`origin/codex/okc-impact-console-handoff`）。`validate --all` 全绿，MECE 通过，**29 个规则项**。三批工作完成：
+- 现状：**v0.4.0**（本地已成型，待提交）。`validate --all` 全绿，MECE 通过，**31 个规则项**。v0.4.0 新增"掌握视角"(mastery-lens) + 排版规约(layout-rule) + quality-rubric 掌握测试，把笔记从"记录"推向"驱动掌握"；并以 AWS dogfood 笔记反复打磨出"由浅入深 + 掌握靠行文功力不靠章节框架 + 版式克制"的样板。早前三批工作：
   - **v0.2.0（演练三问题，改在 frontmatter-tags.md 唯一家）**：①可信度收紧(信源可信≠内容已亲验) ②双链防死链((待建)标注) ③新增可选 source_url 字段。
   - **v0.3.0（从前作 OKC 捞取五件"编辑智慧"，丢弃流程重量）**：新增 3 规则项 + 2 reference——①source-fidelity(研究型原文结构覆盖+来源元数据块，防长文压成观点卡) ②anti-patterns(六类坏例库) ③quality-rubric(写盘前四测自检) ④⑤模板加"适用边界/下次怎么用"段、第一屏升级 30 秒读法。全程按 maintenance.md 流程走完。
   - **首次真实 dogfood（验证 v0.3.0 有效）**：拿当初栽过跟头的同一篇 AWS 记忆文章重跑——配好 kb_root、沉淀成研究型笔记 `agent-memory.md` 落知识库 inbox。三特性真实写盘验证通过：可信度全部正确落"待验证"(老坑没再踩)、source-fidelity 覆盖表生效未压成观点卡、第一屏/适用边界/下次怎么用按新模板出。监控层(`_meta`)按用户选择**暂缓未建**。
@@ -65,6 +66,7 @@ last_read:
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：格式/信息设计深挖 + 回灌 v0.4.0。以 AWS dogfood 笔记反复打磨样板，否掉两条弯路(决策工具式倒排序、充分利用语法/做成章节框架)，确立"研究型笔记=由浅入深的学习材料、掌握靠行文功力而非章节、版式克制"；落为 `mastery-lens` + `layout-rule` 两规则项 + `quality-rubric` 掌握测试(均 MINOR、不动模板结构，规则项 29→31)，走完 §6。呈现层(Obsidian 主题/CSS，库级)列为下一步单独处理(用户要的"先1后2"之2)。
 - 2026-06-26：质量梳理 + 修 F1 行尾 bug。系统读完全部 16 文件、跑两层校验(build_depmap 与 monorepo validate 均通过、29 规则项 MECE 全绿)。结论：设计强、验证薄(仅 1 篇 dogfood)。修 `build_depmap.py` 跨平台行尾 bug(F1，见踩坑) + README 对齐 monorepo(F5)；按"维护者-only、对外零影响"判定不升版本、不动 CHANGELOG。F2(验证薄)归入下一步第 1 条、F3(revisit-signal 依赖 agent 自觉)留作监控层激活前的已知最弱环。
 - 2026-06-26：公司机首日续做。核对环境——git 身份(global 即 terryxming)、kb_root、dogfood 笔记(`agent-memory.md`)经查均在本机 `D:\nexgaios-kbase`，补建 `~/.config/ob-notes/config.json` 指向它(故旧续做提示①"公司机没有库/笔记"实测不成立)。就 mode-decision 是否细化形成判断并记入决策表：维持粗分、misfit 走模板层、定可量化触发闸。
 - 2026-06-26：首次真实沉淀 dogfood + 推送 GitHub。配 kb_root（本机）→ 把 AWS 记忆文章沉淀成研究型笔记落 inbox，v0.3.0 三特性真实写盘验证通过；监控层按用户选择暂缓。本地两个 commit(v0.2.0/v0.3.0) + 本条 dev-log 更新推送 `origin`，交接明天到公司续做。

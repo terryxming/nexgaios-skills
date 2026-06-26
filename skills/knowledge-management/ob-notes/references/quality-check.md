@@ -1,9 +1,9 @@
 ---
 name: quality-check
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   provides: [quality-rubric]
-  depends_on: [credibility-spec, source-fidelity]
+  depends_on: [credibility-spec, source-fidelity, mastery-lens]
 ---
 
 # 写盘前质量自检 — 四测
@@ -36,6 +36,14 @@ metadata:
 
 失败信号：看完不知道如何行动；只能回忆历史。
 
+## 5. 掌握测试（治"只记录、未掌握"）—— 仅研究型 / living 笔记
+
+读起来像作者**真的掌握了**，还是只是把资料复述了一遍？掌握的标志：讲得清（三五句能教会外行）、判得明（说得出边界与偏见）、用得上、迁得动（看得出能用到别处）。
+
+失败信号：通篇是"原文说了 A、B、C"的转述，没有作者自己的消化、判断与迁移；读完只多了信息，没多出"会用"。
+
+注：本测试只对研究型 / 持续生长笔记适用；它考的是"掌握的功力有没有透出来"，**不要求笔记里有"复述""迁移"等章节**（方法论不上台面，见 `mode-a-research.md` 的 mastery-lens）。
+
 ## 最低合格线
 
-一篇正式落盘至少满足：30 秒阅读测试过、信号噪音测试过、证据测试过；若材料是网页/长文/报告，还要过 `mode-a-research.md` 的 source-fidelity（原文结构覆盖）。任一不过，先重写再写盘。
+一篇正式落盘至少满足：30 秒阅读测试过、信号噪音测试过、证据测试过；若材料是网页/长文/报告，还要过 `mode-a-research.md` 的 source-fidelity（原文结构覆盖）；研究型 / 持续生长笔记还要过掌握测试。任一不过，先重写再写盘。
