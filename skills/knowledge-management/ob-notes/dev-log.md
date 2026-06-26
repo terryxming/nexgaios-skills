@@ -55,19 +55,21 @@ last_read:
   - **v0.2.0（演练三问题，改在 frontmatter-tags.md 唯一家）**：①可信度收紧(信源可信≠内容已亲验) ②双链防死链((待建)标注) ③新增可选 source_url 字段。
   - **v0.3.0（从前作 OKC 捞取五件"编辑智慧"，丢弃流程重量）**：新增 3 规则项 + 2 reference——①source-fidelity(研究型原文结构覆盖+来源元数据块，防长文压成观点卡) ②anti-patterns(六类坏例库) ③quality-rubric(写盘前四测自检) ④⑤模板加"适用边界/下次怎么用"段、第一屏升级 30 秒读法。全程按 maintenance.md 流程走完。
   - **首次真实 dogfood（验证 v0.3.0 有效）**：拿当初栽过跟头的同一篇 AWS 记忆文章重跑——配好 kb_root、沉淀成研究型笔记 `agent-memory.md` 落知识库 inbox。三特性真实写盘验证通过：可信度全部正确落"待验证"(老坑没再踩)、source-fidelity 覆盖表生效未压成观点卡、第一屏/适用边界/下次怎么用按新模板出。监控层(`_meta`)按用户选择**暂缓未建**。
-- 下一步（按优先级）：
-  1. 继续观察真实沉淀数据（现有 1 篇 `agent-memory.md`）；攒多了再看 source-fidelity/可信度纪律是否稳定。监控层(`_meta`)等"规律沉淀 + 确认会复盘"时再一句话启用。
-  2. **mode-decision 维持粗分、不细化**（2026-06-26 判定，见决策表）——落点轴粗分本就正确，结构需求改走**模板层**而非 mode 层。可量化触发闸：攒够约 10–15 篇真实笔记后，若"一篇硬塞两件事 / 模板大段留空 / 落点纠结"达可观比例，或某类(最可能是偏好/想法/讨论)反复无家可归，才在模板层加 1~2 个、不动 mode；否则不动。
-  3. （可选）若日后要独立发布，补 `skill.yaml` 的 `package.command`。
+- 下一步：
+  1. 继续观察真实沉淀数据（现 1 篇 `Agent 记忆模块最佳实践（AWS）.md`，旧 `agent-memory.md` 已删）；攒多了看 source-fidelity / 可信度 / mastery-lens 纪律是否稳定。监控层(`_meta`)等"规律沉淀 + 确认会复盘"时再一句话启用。
+  - （原下一步的 mode-decision、package.command 两项已闭环，见"已解决"。）
 - 卡点：无。
-- **续做提示（给接手的你/agent）**：skill 代码全在 git、已推 GitHub，换机器 `git pull` 即续。注意：
-  - ① ~~dogfood 那篇笔记与 kb_root 配置在**个人本机**，公司机器上没有、dogfood 不可复现~~ → **2026-06-26 公司机实测更正**：该公司机(用户 EDY)上 `D:\nexgaios-kbase`(含 dogfood 笔记 `agent-memory.md`)与完整 kbase 均在；已补建 `~/.config/ob-notes/config.json` 指向它，**dogfood 在此机可复现**。注意 `config.json` 是 per-machine、不随仓库走——换到无此库或未配 kb_root 的机器仍需另配(读取顺序见 preflight.md)。
-  - ② git 身份：本机经查 local 未配、**global 即 `terryxming` / terry.xming@gmail.com**，署名正确；只有换到 global 非此身份的机器才需重设。
-  - ③ 本分支是 feature/handoff 分支，尚未并 main、未开 PR。
-- 已解决：原"与 OKC 做职责边界对比"——结论是 OKC 是本 skill 的**前作**(用户早先 Codex 版，因流程过重而重做)，已捞五件并入 v0.3.0；项目记忆之争以 ob-notes dev-log 为准。
+- **续做提示（给接手的你/agent）**：skill 全在 git、已推 GitHub，`git pull` 即续（环境 / 身份均已就绪，见"已解决"）。换到新机器仍需自配 `~/.config/ob-notes/config.json` 指向你的 kbase（读取顺序见 preflight.md）。**唯一较大的开放项**：本分支尚未并 main、未开 PR——且它**驮着整个 OKC impact console 产线**（非仅 ob-notes），并 main 是跨范围决策，需单独评估，不宜随 ob-notes 顺手并。
+- 已解决：
+  - 原"与 OKC 做职责边界对比"——OKC 是本 skill 的**前作**(用户早先 Codex 版，流程过重而重做)，已捞五件并入 v0.3.0；项目记忆之争以 ob-notes dev-log 为准。
+  - **mode-decision 是否细化**——判定维持粗分、misfit 走模板层、定可量化触发闸（见决策表 2026-06-26）；触发条件挂在上方"继续观察数据"。
+  - **dogfood / kb_root 环境**——公司机实测 kbase 与 dogfood 笔记均在 `D:\nexgaios-kbase`，已补建 `config.json` 指向它，dogfood 可复现。
+  - **git 身份**——global 即 terryxming，署名正确，无需重设。
+  - **package.command 是否要补**——查同级 skill：全 monorepo 每个 `package.command` 都空，属统一约定（打包不在 per-skill 层），无需补、结案。
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-06-26：盘点 dev-log 待办并闭环。删去旧模板 dogfood `agent-memory.md`（由终态 `Agent 记忆模块最佳实践（AWS）.md` 取代、去掉"样板"标签）；关掉 mode-decision（已决）、kb_root 环境、git 身份、package.command（查证全 monorepo 皆空、属约定）四项，移入"已解决"；剩"观察沉淀数据"开着，"并 main / PR"留作跨范围单独决策（本分支还驮 OKC console）。
 - 2026-06-26：发 v0.6.0（漂移根因治理 MINOR）。审计追到根因 = 内容反范式（同一事实多份拷贝→更新异常），且 SSOT 原只覆盖"规则定义"、没延伸到"派生事实"层。治理：归属表 / SKILL 引用清单的计数与名单去重（改引用 / 去数，顺修一处已漂坏例名单）、quality-check §1 改测产出、maintenance 立"SSOT 管派生事实"原则 ＋ §6 加提及扫描。评估后否决配置式哨兵 lint（过度工程、看护残渣、同源漏洞）。无新规则项、图结构不变。
 - 2026-06-26：发 v0.5.1（口径校正 PATCH）。迭代审计揪出旧口径残留并修正：多处"四测"→实为五测（掌握测试已并入）、实战命名 / 双链 / 监控示例 slug→标题式、anti-patterns 第一屏字段对齐新 30 秒读法、30 秒读法"边界"与正文"适用边界"消歧；SKILL 引用清单补全 layout-rule / mastery-lens。无行为变化、图结构不变。
 - 2026-06-26：发 v0.5.0（破坏性）。以 dogfood 笔记打磨出终态样板后回灌：naming-rule 改"文件名=显示标题"、研究/实战模板去 H1、30 秒读法字段升级（是什么/解决什么/最重要结论/怎么用/前置/边界）、frontmatter-spec 写清三处标题关系；并在库里落一个极简阅读型 CSS snippet（呈现层、库级、不进 skill）。build_depmap 验 MECE 通过（无新规则项、图结构不变）。
