@@ -1,7 +1,7 @@
 ---
 name: quality-check
 metadata:
-  version: 0.2.0
+  version: 0.3.0
   provides: [quality-rubric]
   depends_on: [credibility-spec, source-fidelity, mastery-lens]
 ---
@@ -14,7 +14,7 @@ metadata:
 
 ## 1. 30 秒阅读测试（治"没重点"）
 
-第一屏（summary callout）必须让人在 30 秒内拿到：**这是什么 / 为什么值得留 / 最重要结论 / 以后何时用 / 可信或适用边界**。
+第一屏（summary callout）必须让人在 30 秒内拿到：**是什么 / 解决什么问题 / 最重要结论 / 怎么用 / 前置（要看懂得先会什么）/ 边界（能做什么、做不了什么）**。
 
 失败信号：开头先解释文档怎么读、编号体系或内部流程；读完第一屏还不知道收获是什么。
 

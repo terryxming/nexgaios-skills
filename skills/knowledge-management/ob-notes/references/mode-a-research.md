@@ -1,7 +1,7 @@
 ---
 name: mode-a-research
 metadata:
-  version: 0.4.0
+  version: 0.5.0
   provides: [research-template, source-fidelity, mastery-lens]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -38,7 +38,7 @@ metadata:
 
 ## 笔记骨架
 
-研究型笔记套这个可生长的骨架。各块按需出现，但"一句话结论"和"正文"是必备：
+研究型笔记套这个可生长的骨架。各块按需出现，但 30 秒读法和正文是必备。**文件名即标题，正文不写 H1**（见 frontmatter-tags 的 naming-rule、frontmatter-spec）：
 
 ```markdown
 ---
@@ -52,13 +52,13 @@ read_count: 0
 last_read:
 ---
 
-# {{主题名}}
-
 > [!summary] 30 秒读法
-> - 这是什么：{{一句话核心}}
-> - 为什么值得留：{{复用价值}}
-> - 最重要结论：{{当前判断}} `[可信度]`
-> - 可信 / 适用边界：{{在什么范围内成立}}
+> - **是什么**：{{这篇讲的东西}}
+> - **解决什么**：{{针对什么问题}}
+> - **最重要结论**：{{单条最该带走的判断}} `[可信度]`
+> - **怎么用**：{{怎么落地复用}}
+> - **前置**：{{要看懂这篇得先掌握 / 学会什么；没有真前置就省}}
+> - **边界**：{{这东西能做什么、做不了什么——能力边界，非可信度}}
 
 ## 是什么
 {{本质定义、关键区分。每条结论标可信度，如 `[已验证]`}}

@@ -1,7 +1,7 @@
 ---
 name: mode-a-practice
 metadata:
-  version: 0.3.0
+  version: 0.4.0
   provides: [practice-template]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -38,6 +38,8 @@ metadata:
 
 ## 笔记骨架
 
+文件名即标题（问题简述 + 日期），正文不写 H1（见 frontmatter-tags 的 naming-rule）。
+
 ```markdown
 ---
 title: {{问题简述，如 Claude plan mode 在 Win 2.1.3 失效}}
@@ -49,8 +51,6 @@ tags: [类型/实战, 可信/已验证, 状态/稳定]
 read_count: 0
 last_read:
 ---
-
-# {{问题简述}}
 
 > [!summary] 一句话
 > {{现象 + 解法各一句，让你扫一眼就知道是不是要找的}}
