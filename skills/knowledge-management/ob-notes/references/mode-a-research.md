@@ -1,7 +1,7 @@
 ---
 name: mode-a-research
 metadata:
-  version: 0.5.0
+  version: 0.5.1
   provides: [research-template, source-fidelity, mastery-lens]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -58,7 +58,7 @@ last_read:
 > - **最重要结论**：{{单条最该带走的判断}} `[可信度]`
 > - **怎么用**：{{怎么落地复用}}
 > - **前置**：{{要看懂这篇得先掌握 / 学会什么；没有真前置就省}}
-> - **边界**：{{这东西能做什么、做不了什么——能力边界，非可信度}}
+> - **边界**：{{能做什么、做不了什么（能力速览，非可信度）；适用范围的细化见正文「适用边界」}}
 
 ## 是什么
 {{本质定义、关键区分。每条结论标可信度，如 `[已验证]`}}

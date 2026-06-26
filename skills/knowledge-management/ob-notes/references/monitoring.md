@@ -1,7 +1,7 @@
 ---
 name: monitoring
 metadata:
-  version: 0.1.0
+  version: 0.1.1
   provides: [jsonl-schema, revisit-signal, review-flow]
   depends_on: [kb-root, frontmatter-spec, concurrency-safe, credibility-spec]
 ---
@@ -24,7 +24,7 @@ metadata:
 每次执行沉淀后，向 `{kb_root}/_meta/capture-log.jsonl` 追加一条单行 JSON（追加方式见 preflight.md 的 concurrency-safe）。字段刻意精简——只留能驱动某个具体迭代决策的：
 
 ```json
-{"ts":"2026-06-25T14:30:00+08:00","mode":"A","trigger":"explicit","type":"研究型","template":"research","action":"append","credibility":{"已验证":2,"待验证":3,"推测":0},"target":"{kb_root}/00 - raw/00 - inbox/loop-engineering.md"}
+{"ts":"2026-06-25T14:30:00+08:00","mode":"A","trigger":"explicit","type":"研究型","template":"research","action":"append","credibility":{"已验证":2,"待验证":3,"推测":0},"target":"{kb_root}/00 - raw/00 - inbox/Loop Engineering 是什么.md"}
 ```
 
 | 字段 | 含义 | 能驱动的迭代决策 |

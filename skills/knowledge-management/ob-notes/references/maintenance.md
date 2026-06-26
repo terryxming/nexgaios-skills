@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 0.3.0
+  version: 0.4.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -28,13 +28,15 @@ metadata:
 
 **核心原则（MECE）**：每一条规则只在一个文件里定义（该文件在 frontmatter 的 `provides` 中声明它）。所有其它文件只能**引用**该规则，不得复述其内容。复述 = 多处维护 = 迟早矛盾。
 
+**这条原则同样适用于"派生事实"**——计数（几测 / 几类）、清单（坏例名单）、示例（命名样例）也不得在多处手抄：可派生的别写死（能引用就引用、能生成就生成，如自动生成的 `dependency-map.md`）；必须就地的用引用而非复述；消不掉的教学拷贝，改约定时按第 6 节做"提及扫描"。**漂移几乎都发生在这一层**——尤其本归属表的"含义"列、SKILL 引用清单这类"天生在转述别处"的地方，要格外警惕。
+
 下表是全部规则项的唯一归属。改某条规则，只改它的"唯一家"；然后按第 6 节检查依赖它的文件是否需要联动。
 
 | 规则项（标识符） | 含义 | 唯一家 |
 |---|---|---|
 | `kb-root` | 知识库根路径配置变量 `{kb_root}` 的定义与读取顺序 | preflight.md |
 | `landing-rule` | 各 Mode 的落点路径规则 | preflight.md |
-| `preflight-flow` | 写盘前的环境校验五步 | preflight.md |
+| `preflight-flow` | 写盘前的环境校验流程 | preflight.md |
 | `path-normalize` | 跨 OS 路径形态归一 | preflight.md |
 | `concurrency-safe` | jsonl 并发写安全做法 | preflight.md |
 | `credibility-spec` | 可信度三档的定义与标记格式 | frontmatter-tags.md |
@@ -45,7 +47,7 @@ metadata:
 | `datestamp-rule` | 追加带日期、过时标注、不覆盖历史 | frontmatter-tags.md |
 | `layout-rule` | 排版规约（markdown 元素用途与克制，反炫技） | frontmatter-tags.md |
 | `mode-decision` | Mode A/B 及子类型的判定逻辑与实例 | SKILL.md |
-| `iron-laws` | 五条铁律本身 | SKILL.md |
+| `iron-laws` | 铁律本身 | SKILL.md |
 | `trigger-rule` | 触发方式（显式 / 收尾判据） | SKILL.md |
 | `research-template` | 研究型笔记模板与该记/该丢清单 | mode-a-research.md |
 | `source-fidelity` | 源信息留存与原文结构覆盖（长文/网页沉淀防压成观点卡） | mode-a-research.md |
@@ -56,8 +58,8 @@ metadata:
 | `jsonl-schema` | capture-log.jsonl 的字段定义 | monitoring.md |
 | `revisit-signal` | read_count/last_read 回访信号的记录机制 | monitoring.md |
 | `review-flow` | 两周复盘的查询与产出 | monitoring.md |
-| `anti-patterns` | 坏例库与改写策略（流水账/空泛/过度提炼/格式炫技/Agent-only/入口硬） | anti-patterns.md |
-| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用四测） | quality-check.md |
+| `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
+| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 研究型掌握测试） | quality-check.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
 | `dependency-spec` | 依赖声明规范（第 3 节） | maintenance.md |
 | `version-rule` | 版本规则（第 5 节） | maintenance.md |
@@ -147,7 +149,7 @@ CHANGELOG.md（仓库根，给人看，不进 agent 上下文）记录 skill 对
 
 1. **定位唯一家**：在第 1 节归属表确认要改的规则项的唯一家，只在唯一家修改；其它文件若复述了该规则，说明已违反 SSOT，就地改为引用。
 2. **更新声明**：若改动新增/删除了依赖关系，更新相关文件的 `provides`/`depends_on`；若新增规则项，先在受控词表登记。
-3. **跑脚本查影响面**：运行 `python scripts/build_depmap.py`。依据输出的反向索引，找出"依赖了被改规则项"的所有文件，逐一确认是否需要联动修改——这一步替代人脑记忆，防止"改了 A 忘了 B"。
+3. **跑脚本查影响面 ＋ 提及扫描**：先运行 `python scripts/build_depmap.py`，依据反向索引找出"依赖了被改规则项"的文件逐一联动。**但脚本只看结构依赖，看不到散文里的复述 / 计数 / 示例**——所以再手动 grep 被改规则的**名字 ＋ 它的派生事实**（计数、名单、示例）across 全库（排除 CHANGELOG / dev-log 这类历史），把散落的旧口径一并改掉。两步合起来替代人脑记忆，防"改了 A 忘了 B"。
 4. **校验门禁**：脚本若报错（重复定义/悬空依赖/未登记标识符），先解决再继续，不得带病提交。
 5. **定版本**：按第 5 节判定本次属 MAJOR/MINOR/PATCH，更新涉及文件的 `version` 与 SKILL.md 的对外版本，写 CHANGELOG。
 6. **记 dev-log**：将本次改动的决策与踩坑追加到 ob-notes 自己的 dev-log。

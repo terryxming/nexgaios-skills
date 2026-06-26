@@ -1,7 +1,7 @@
 ---
 name: mode-a-practice
 metadata:
-  version: 0.4.0
+  version: 0.4.1
   provides: [practice-template]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -88,7 +88,7 @@ last_read:
 
 ## 命名与冻结
 
-- 按 naming-rule：主题 + 日期，如 `claude-plan-mode-2026-06-25.md`，写完冻结。
+- 按 naming-rule：问题标题 + 日期，如 `Claude plan mode 在 Win 2.1.3 失效 2026-06-25.md`，写完冻结。
 - 实战型通常一次成形、不追加。若同一问题日后有新解法/新情况，优先**新建一条带新日期的笔记**，并与旧的双链关联，而非改写旧记录——保留"当时确实这么解的"事实。
 - 例外：若只是订正旧笔记里的明确错误，按 datestamp-rule 留痕修正。
 
