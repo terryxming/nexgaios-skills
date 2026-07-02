@@ -29,7 +29,7 @@ docs/repository-guide.md
 E 盘镜像路径：
 
 ```text
-E:\terry-nexgaios-gbrain\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
+E:\nexgaios-gbrain-kbase\00 - raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
 ## 解法
@@ -42,6 +42,8 @@ pnpm guide:check
 ```
 
 如果 `pnpm guide:check` 提示 E 盘文件不存在，不能自动创建文件，必须先询问用户是否创建或恢复。
+
+如果 E 盘镜像文件已有 YAML frontmatter，`guide-sync` 应保留 frontmatter，只同步仓库指南正文。
 
 ## 适用边界
 

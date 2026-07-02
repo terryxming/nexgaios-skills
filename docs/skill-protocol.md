@@ -45,6 +45,7 @@ source:
 Windows 下可以使用仓库包装脚本：
 
 ```powershell
+.\skill.cmd env-check
 .\skill.cmd validate lingxing-ad-operation-audit
 .\skill.cmd ship lingxing-ad-operation-audit --patch -m "优化审计报告"
 ```
@@ -52,9 +53,12 @@ Windows 下可以使用仓库包装脚本：
 也可以使用推荐的 pnpm 入口：
 
 ```powershell
+pnpm env:check
 pnpm skill:validate lingxing-ad-operation-audit
 pnpm skill:ship lingxing-ad-operation-audit --patch -m "优化审计报告"
 ```
+
+首次 clone 或换电脑时，优先直接运行 `node tools/skills/skill-cli.mjs env-check`。如果检查发现缺失项，必须先报告用户并等待明确批准后，才执行安装、启用或依赖安装命令。
 
 导入已有技能：
 
@@ -124,6 +128,51 @@ pnpm skills:docs
 - `skills/<domain>/README.md`
 
 这些文档只记录仓库内稳定信息，不记录本机安装状态。原因是本机安装状态属于机器状态，在 Windows 本机和 GitHub Actions Linux runner 上不一致。
+
+## Impact 影响链路检查
+
+试点中的 skill 可以在根目录提供 `impact.yaml`，用于声明文件级契约组。契约组由 `sources` 和 `witnesses` 组成：修改 source 文件后，相关 witness 文件必须同步修改，或者在 `docs/impact-reviews/<skill-id>/` 下提供机器可读审查回执说明无需修改。
+
+本地检查：
+
+```powershell
+pnpm skill:impact <skill-id> --strict
+```
+
+PR 检查：
+
+```powershell
+pnpm skills:impact --base origin/main...HEAD --strict
+```
+
+生成用户可读关系图谱：
+
+```powershell
+pnpm skill:impact <skill-id> --visualize --format all
+```
+
+默认输出到对应 skill 的 `impact/graph.*`：
+
+- `graph.md`：Markdown + Mermaid 图。
+- `graph.canvas`：Obsidian JSON Canvas 图。
+- `graph.json`：机器可读图谱数据。
+
+需要仓库级集中导出时，显式指定 `--output docs/impact-graphs`。
+
+OKC 试点提供实时控制台：
+
+```powershell
+pnpm skill:impact:watch obsidian-knowledge-curator
+```
+
+实时控制台前端资产位于 skill 自身的 `impact/` 目录。它是 strict impact 检查的实时解释层，不替代 CI 硬闸门。
+
+规则：
+
+- 新增文件必须进入自动引用图或 `impact.yaml` 契约组，不能成为无人检查的孤儿文件。
+- 修改契约源文件时，witness 文件未修改且无审查回执会导致 strict 检查失败。
+- `deferred` 回执不通过 strict 检查；必须改成 `updated`、`no-change-needed` 或 `not-applicable`。
+- OKC 是首个试点；机制稳定后，新建 skill 模板和既有 active skill 逐步接入。
 
 ## PR 说明与发布说明
 

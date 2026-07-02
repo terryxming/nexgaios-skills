@@ -1,5 +1,6 @@
 packages:
   - "skills/*/*"
+  - "skills/*/*/impact-console"
   - "tools/*"
 allowBuilds:
   esbuild: true

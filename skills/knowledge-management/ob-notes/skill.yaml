@@ -1,0 +1,14 @@
+id: ob-notes
+domain: knowledge-management
+version: 0.7.0
+entry: SKILL.md
+status: active
+
+validate:
+  command: "python scripts/build_depmap.py"
+
+package:
+  command: ""
+
+release:
+  tag: ob-notes@0.7.0
