@@ -1,0 +1,27 @@
+# ── 机器/设备特有，绝不入库（跨设备协作铁律：仓库保持可移植）──
+settings.local.json
+.claude/settings.local.json
+*.local.json
+.env
+.env.*
+
+# ── 语言运行时产物 ──
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.uv/
+node_modules/
+.pnpm-store/
+
+# ── 临时/草稿 ──
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+scratch/
+tmp/
+
+# ── 评测运行产物（用例入库，运行结果不入库）──
+evals/**/runs/
+evals/**/.cache/
