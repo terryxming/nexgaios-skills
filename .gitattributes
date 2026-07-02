@@ -1,0 +1,15 @@
+# 跨设备一致性:仓库内文本一律 LF，杜绝两台 Windows 间的 CRLF 幽灵 diff，
+# 并保证 tools/sync-standards.py 的漂移校验（--check）稳定。
+* text=auto eol=lf
+
+*.py   text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+
+# 二进制资源不做行尾转换
+*.png binary
+*.jpg binary
+*.pdf binary
+*.ico binary
