@@ -15,16 +15,17 @@ D:\nexgaios-skills
 如果另一台电脑的本地克隆路径不同，使用那台电脑的实际仓库路径；不要把某台电脑的绝对路径当作跨电脑通用事实。
 
 ```text
-$env:USERPROFILE\.codex\skills
+$env:USERPROFILE\.claude\skills   # Claude Code
+$env:USERPROFILE\.codex\skills    # Codex
 ```
 
-这是每台电脑自己的 Codex skill 安装目录。CLI 实际按当前登录用户的 home 目录计算，等价于 Node.js 的 `os.homedir()` 下的 `.codex\skills`。它由用户明确确认后，通过 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync` 从源码仓库同步生成，不作为源码事实源。
+这是每台电脑自己的运行时 skill 安装目录。CLI 实际按当前登录用户的 home 目录计算（Node.js 的 `os.homedir()`）。它由用户明确确认后，通过 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync` 从源码仓库按 `targets` 同步生成，不作为源码事实源。
 
 ```text
 E:\nexgaios-gbrain-kbase\00 - raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
-这是公司电脑和家用电脑当前约定使用的 Obsidian 镜像文件路径。它不是 GitHub 源码仓库的一部分；两台电脑都需要各自保证这个本机路径存在。
+这是约定的 Obsidian 镜像文件路径，属于可选配置（当前只在公司电脑维护）。它不是 GitHub 源码仓库的一部分；镜像文件不存在的机器上，`guide:sync` 和 `guide:check` 会提示并跳过。
 
 ## 唯一源码事实源
 
@@ -34,7 +35,7 @@ GitHub 仓库是唯一源码事实源：
 https://github.com/terryxming/nexgaios-skills
 ```
 
-不要把某台电脑的 Codex skill 安装目录当作源码源头。
+不要把某台电脑的运行时 skill 安装目录当作源码源头。
 
 ## 每次开始工作前
 
@@ -56,7 +57,7 @@ pnpm install --frozen-lockfile
 - 如果 `git status` 显示有本地未提交改动，先判断这些改动是否属于当前任务。
 - 如果本地有未提交改动，不要直接 `git pull` 覆盖。
 - `git pull --ff-only` 只允许快进，避免自动生成不清楚的 merge commit。
-- 开始工作前不默认同步到本机 Codex 安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
+- 开始工作前不默认同步到本机安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
 
 ## 开发过程中
 
@@ -74,7 +75,7 @@ skills/<domain>/<skill-id>/
 
 修改仓库工具、模板或文档时，明确它不是某个 skill 的发布变更。
 
-每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。用户明确同意后，优先同步单个 skill：
+每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机运行时安装目录。用户明确同意后，优先同步单个 skill：
 
 ```powershell
 pnpm skill:install <skill-id>
@@ -86,7 +87,7 @@ pnpm skill:install <skill-id>
 pnpm skill:sync
 ```
 
-不得把“源码已更新”表述为“本机 Codex 已安装更新”。
+不得把“源码已更新”表述为“本机已安装更新”。
 
 ## 未完成工作交接
 
@@ -111,7 +112,7 @@ docs/handoffs/<skill-id>/<yyyy-mm-dd>-<slug>.md
 - 阻塞或风险。
 - 需要继续查看的文件。
 - 已运行的验证命令和结果。
-- 是否已经同步到本机 Codex 安装目录。
+- 是否已经同步到本机运行时安装目录。
 
 交接文档必须随当前分支提交并推送到 GitHub，否则另一台电脑无法续接。
 
@@ -146,7 +147,7 @@ pnpm guide:sync
 pnpm guide:check
 ```
 
-如果当前电脑找不到 E 盘 Obsidian 镜像文件，必须先询问用户是否创建或恢复，不得自动创建。
+如果当前电脑找不到 E 盘 Obsidian 镜像文件，命令会提示并跳过；不得自动创建镜像文件。
 
 ## 提交和同步到另一台电脑
 
@@ -174,7 +175,7 @@ node tools/skills/skill-cli.mjs env-check
 pnpm install --frozen-lockfile
 ```
 
-如果需要把仓库中的 skill 安装到当前电脑的 Codex，再明确询问用户；用户确认后运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
+如果需要把仓库中的 skill 安装到当前电脑的运行时（Claude Code / Codex），再明确询问用户；用户确认后运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
 
 ## 冲突处理原则
 

@@ -1,16 +1,16 @@
 # nexgaios-skills 仓库架构与工作指南
 
-这份文档用于说明 `nexgaios-skills` 仓库的定位、架构、职责边界、自动化能力，以及你应该怎样从这个仓库开始维护 Codex skill。
+这份文档用于说明 `nexgaios-skills` 仓库的定位、架构、职责边界、自动化能力，以及你应该怎样从这个仓库开始维护 agent skill。
 
 ## 一句话定位
 
-`D:\nexgaios-skills` 是 Codex skill 的统一源码仓库。
+`D:\nexgaios-skills` 是 Nexgaios agent skills 的统一源码仓库，面向多运行时（Claude Code / Codex）通用。
 
 这是当前电脑的本地仓库路径。另一台电脑可以使用自己的本地克隆路径，源码事实源仍然是 GitHub 仓库。
 
-`$env:USERPROFILE\.codex\skills` 是本机 Codex 实际读取和运行 skill 的安装目录。CLI 实际按当前系统用户的 home 目录计算，不能写死某一台电脑的用户名。
+本机运行时安装目录按当前系统用户的 home 目录计算（不能写死某一台电脑的用户名）：`$env:USERPROFILE\.claude\skills`（Claude Code）和 `$env:USERPROFILE\.codex\skills`（Codex）。
 
-日常开发应该在 `D:\nexgaios-skills` 中进行。开发、验证、提交、发布完成后，必须显式询问用户是否要同步到本机 Codex 安装目录；只有用户明确同意后，才执行同步命令。
+日常开发应该在 `D:\nexgaios-skills` 中进行。开发、验证、提交、发布完成后，必须显式询问用户是否要同步到本机运行时安装目录；只有用户明确同意后，才执行同步命令。
 
 ## 核心设计原则
 
@@ -122,7 +122,7 @@ status: active
 
 ### `SKILL.md`
 
-`SKILL.md` 是 Codex 实际读取的 skill 入口文件。
+`SKILL.md` 是各 agent 运行时（Claude Code / Codex）实际读取的 skill 入口文件，遵循 Agent Skills 通用格式。
 
 它应该说明：
 
@@ -285,10 +285,10 @@ CLI 实际按当前系统用户的 home 目录计算目标路径（Node.js 的 `
 
 规则：
 
-- 每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。
+- 每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机运行时安装目录。
 - 用户明确同意同步单个 skill 时，优先运行 `pnpm skill:install <skill-id>`。
 - 用户明确要求同步全部 active skill 时，才运行 `pnpm skill:sync`。
-- 不得把“源码已更新”表述为“本机 Codex 已安装更新”。
+- 不得把“源码已更新”表述为“本机已安装更新”。
 - `skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除其他来源的 skill。
 
 如果要删除曾由本仓库安装、但当前仓库已经不存在的旧 skill，显式执行：
@@ -331,7 +331,7 @@ skills/product-design/README.md
 E:\nexgaios-gbrain-kbase\00 - raw\01 - AI Work\0102 - 项目\Nexgaios-skills 仓库\repository-guide.md
 ```
 
-当仓库内 `docs/repository-guide.md` 发生变化时，必须同步维护这份 E 盘文件。
+镜像是可选配置，只在配置了 E 盘知识库的机器（公司机）上维护。当仓库内 `docs/repository-guide.md` 发生变化时，在这类机器上同步这份 E 盘文件；未配置镜像的机器上命令会提示并跳过。
 
 同步命令：
 
@@ -348,10 +348,9 @@ pnpm guide:check
 硬性规则：
 
 - `docs/repository-guide.md` 是源文件。
-- E 盘路径是本机 Obsidian 镜像文件。
+- E 盘路径是本机 Obsidian 镜像文件，属于可选配置。
 - 如果 E 盘镜像文件已有 YAML frontmatter，同步时必须保留 frontmatter，只更新指南正文。
-- 如果 E 盘路径中找不到 `repository-guide.md`，不得自动创建文件。
-- 如果 E 盘路径中找不到该文件，必须先显示询问用户是否要创建或恢复这个文件。
+- 镜像文件不存在时，`guide:sync` 和 `guide:check` 提示并跳过，不报错、不自动创建；如需启用镜像，先与用户确认。
 - 该检查不接入 GitHub Actions，因为 GitHub Actions 无法访问本机 E 盘。
 
 ### 5. 经验库
@@ -409,9 +408,9 @@ pnpm install --frozen-lockfile
 corepack pnpm install --frozen-lockfile
 ```
 
-不要把某台电脑的 Codex skill 安装目录当作源码目录。安装目录概念路径是 `$env:USERPROFILE\.codex\skills`，它只是当前电脑的 Codex 安装目录。
+不要把某台电脑的运行时安装目录当作源码目录。安装目录概念路径是 `$env:USERPROFILE\.claude\skills`（Claude Code）和 `$env:USERPROFILE\.codex\skills`（Codex），它们只是当前电脑的安装目录。
 
-开始工作前不默认同步到本机 Codex 安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
+开始工作前不默认同步到本机安装目录。需要刷新本机已安装 skill 时，先明确询问用户；用户确认后再运行 `pnpm skill:install <skill-id>` 或 `pnpm skill:sync`。
 
 ### 7. 未完成工作交接
 
@@ -442,7 +441,7 @@ pnpm handoff:list <skill-id>
 - 阻塞或风险。
 - 需要继续查看的文件。
 - 已运行的验证命令和结果。
-- 是否已经同步到本机 Codex 安装目录。
+- 是否已经同步到本机运行时安装目录。
 
 交接文档必须随当前分支提交并推送到 GitHub。否则另一台电脑拉取仓库后，无法可靠知道下一步要做什么。
 
@@ -573,7 +572,7 @@ node tools/skills/skill-cli.mjs release-notes <skill-id> --base <before-sha>...H
 - 仓库数量越来越多。
 - 模板和脚本无法统一维护。
 - 每个仓库都要单独配置 CI。
-- Codex 本机安装目录和源码目录容易混在一起。
+- 运行时本机安装目录和源码目录容易混在一起。
 - 很难一眼看清有哪些 skill、版本是多少、是否已纳入发布流程。
 
 当前 monorepo 方案的价值是：
@@ -583,7 +582,7 @@ node tools/skills/skill-cli.mjs release-notes <skill-id> --base <before-sha>...H
 - 每个 skill 独立发布。
 - 共享工具、模板、CI 可以统一维护。
 - 旧 skill 可以逐个迁移，不需要一次性完成。
-- 本机 Codex 安装目录和源码仓库职责分离。
+- 本机运行时安装目录和源码仓库职责分离。
 
 ## 日常工作流
 
@@ -620,7 +619,7 @@ skills/amazon/lingxing-ad-operation-audit/
 pnpm skill:validate lingxing-ad-operation-audit
 ```
 
-如果需要同步到本机 Codex，先询问用户。用户确认后，优先同步当前修改的单个 skill：
+如果需要同步到本机运行时，先询问用户。用户确认后，优先同步当前修改的单个 skill：
 
 ```powershell
 pnpm skill:install lingxing-ad-operation-audit
@@ -735,7 +734,7 @@ version: 0.1.4
    pnpm skill:validate <skill-id>
    ```
 
-6. 询问用户是否要同步到本机 Codex；用户确认后执行：
+6. 询问用户是否要同步到本机运行时；用户确认后执行：
 
    ```powershell
    pnpm skill:install <skill-id>

@@ -2,7 +2,7 @@
 
 这是 Nexgaios agent skills 的统一源码仓库，面向多运行时（Claude Code / Codex）通用。
 
-Codex 新线程项目指令：[AGENTS.md](AGENTS.md)。
+Agent 项目指令：[AGENTS.md](AGENTS.md)（Claude Code 从 [CLAUDE.md](CLAUDE.md) 引用同一份）。
 
 新人先读：[仓库架构与工作指南](docs/repository-guide.md)。
 

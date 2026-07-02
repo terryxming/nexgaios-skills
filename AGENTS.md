@@ -1,6 +1,6 @@
 # AGENTS.md
 
-本仓库是 `nexgaios-skills`，用于统一维护 Nexgaios Codex skills。
+本仓库是 `nexgaios-skills`，用于统一维护 Nexgaios agent skills，面向多运行时（Claude Code / Codex）通用。Claude Code 从 `CLAUDE.md` 引用本文件，两个运行时共用同一份指令。
 
 默认使用中文与用户交流。
 
@@ -55,7 +55,7 @@ pnpm handoff:list <skill-id>
 - GitHub CLI、PR、release、tag、权限、登录异常。
 - Git 状态、分支、合并、路径解析异常。
 - `docs/repository-guide.md` 和 Obsidian 镜像不一致。
-- 两台电脑同步、Codex skill 安装目录、E 盘路径问题。
+- 两台电脑同步、运行时 skill 安装目录、E 盘路径问题。
 - 未完成工作交接、换电脑续工、handoff 文档问题。
 - skill 新建、迁移、发布、验证边界不清楚。
 
@@ -91,14 +91,14 @@ pnpm skills:guard
 pnpm skills:validate
 ```
 
-如果修改了 `docs/repository-guide.md`，必须同步本机 Obsidian 镜像：
+如果修改了 `docs/repository-guide.md`，在配置了 Obsidian 镜像的机器（公司机）上运行：
 
 ```powershell
 pnpm guide:sync
 pnpm guide:check
 ```
 
-如果 E 盘 Obsidian 镜像文件不存在，必须先询问用户是否创建或恢复；在用户确认前，不得自动创建该文件。
+镜像是可选配置：镜像文件不存在时命令会提示并跳过，不报错。不得自动创建镜像文件；如需启用镜像，先与用户确认。
 
 ## 双电脑协同规则
 
@@ -120,13 +120,14 @@ pnpm install --frozen-lockfile
 corepack pnpm install --frozen-lockfile
 ```
 
-Codex skill 安装目录使用当前系统用户目录计算，概念路径是：
+运行时 skill 安装目录使用当前系统用户目录计算，概念路径是：
 
 ```powershell
-$env:USERPROFILE\.codex\skills
+$env:USERPROFILE\.claude\skills   # Claude Code
+$env:USERPROFILE\.codex\skills    # Codex
 ```
 
-不要把某台电脑的 Codex skill 安装目录当作源码目录。它只是当前电脑的安装目录，不是源码事实源。
+不要把某台电脑的运行时安装目录当作源码目录。它只是当前电脑的安装目录，不是源码事实源。
 
 如果未完成工作需要换电脑继续，必须创建或更新交接文档，并把交接文档随当前分支提交、推送到 GitHub：
 
@@ -134,11 +135,11 @@ $env:USERPROFILE\.codex\skills
 pnpm handoff:new <skill-id> --title "<交接标题>"
 ```
 
-## 本机 Codex 安装同步规则
+## 本机运行时安装同步规则
 
-每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机 Codex 安装目录。
+每次修改 `skills/<domain>/<skill-id>/` 后，最终回复前必须显式询问用户是否要同步到本机运行时安装目录。
 
-只有用户明确回复需要同步时，才运行：
+只有用户明确回复需要同步时，才运行（默认按 skill.yaml 的 `targets` 分发，可用 `--runtime claude|codex|all` 限定）：
 
 ```powershell
 pnpm skill:install <skill-id>
@@ -150,7 +151,7 @@ pnpm skill:install <skill-id>
 pnpm skill:sync
 ```
 
-不得把“已修改源码仓库”等同于“已同步到本机 Codex 安装目录”。
+不得把“已修改源码仓库”等同于“已同步到本机安装目录”。
 
 ## 新建 skill 的验证边界
 
