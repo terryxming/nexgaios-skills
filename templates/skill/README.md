@@ -20,15 +20,12 @@ scripts/          可执行脚本
 assets/           可复用资产
 tests/            测试样例和夹具
 CHANGELOG.md      版本变更记录
-impact.yaml       文件级影响链路契约
 ```
 
 ## 开发命令
 
 ```powershell
 pnpm skill:validate {{skill_id}}
-pnpm skill:impact {{skill_id}} --strict
-pnpm skill:impact {{skill_id}} --visualize --format all
 pnpm skill:package {{skill_id}} --print-path
 ```
 

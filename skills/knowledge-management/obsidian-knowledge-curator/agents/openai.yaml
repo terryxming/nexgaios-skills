@@ -1,4 +1,0 @@
-interface:
-  display_name: "Obsidian 知识策展"
-  short_description: "整理 Obsidian 笔记、母文档、美化版和 skill 维护闭环"
-  default_prompt: "使用 $obsidian-knowledge-curator 帮我把这段有价值的信息整理成适合 Obsidian 沉淀的 Markdown 笔记，或维护/美化项目母文档；如果修改 skill 规则、样本或测试，请同步检查项目母文档。先给预览，不要直接写入。"

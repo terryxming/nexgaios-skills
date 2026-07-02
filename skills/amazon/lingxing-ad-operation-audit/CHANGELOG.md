@@ -1,5 +1,17 @@
 # 更新日志
 
+## v0.2.0 - 2026-07-02
+
+### 破坏性变更
+
+- 移除内置 MCP 客户端取数层：删除 `scripts/export_ad_operation_logs.ts`、`scripts/export_ad_performance_context.ts`、`scripts/run_report.ps1`、`.env.example` 和 `package.json`（含 `@modelcontextprotocol/sdk` 依赖）。
+- 取数改由 agent 会话中已连接的领星只读 MCP 工具完成；MCP server 独立维护在同级仓库 `nexgaios-lingxing`。
+- skill 职责收敛为：审计规范（`SKILL.md` + `references/data-contract.md`）加 HTML 报告生成器（`scripts/build_ad_operation_report.py`）。
+
+### 待验证
+
+- 新取数流程（MCP 工具取数 → data-contract JSON → 报告）尚未完整实测；首次使用时按 SKILL.md 交付前验证一节逐项核对。
+
 ## v0.1.3 - 2026-06-17
 
 ### 新增
