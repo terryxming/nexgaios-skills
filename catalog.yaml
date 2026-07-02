@@ -1,10 +1,5 @@
 # 此文件由 `pnpm skill:list --write-catalog` 生成。
 skills:
-  - id: apple-hig-web-design
-    domain: product-design
-    version: 1.1.0
-    path: skills/product-design/apple-hig-web-design
-    status: active
   - id: lingxing-ad-operation-audit
     domain: amazon
     version: 0.2.0
@@ -14,9 +9,4 @@ skills:
     domain: knowledge-management
     version: 0.7.0
     path: skills/knowledge-management/ob-notes
-    status: active
-  - id: skill-doctor
-    domain: skill-governance
-    version: 0.1.0
-    path: skills/skill-governance/skill-doctor
     status: active

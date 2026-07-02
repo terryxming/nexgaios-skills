@@ -17,7 +17,7 @@
 这个仓库采用四条边界：
 
 - 仓库统一管理：统一维护脚本、模板、文档、CI 和发布规则。
-- 业务域只分类：`amazon`、`product-design` 等目录只负责分类，不负责发布。
+- 业务域只分类：`amazon`、`knowledge-management` 等目录只负责分类，不负责发布。
 - skill 独立版本：每个 skill 在自己的 `skill.yaml` 中维护版本号。
 - skill 独立发布：只有某个 skill 的版本号变化，才发布这个 skill。
 
@@ -37,10 +37,6 @@ nexgaios-skills/
       lingxing-ad-operation-audit/
     knowledge-management/
       ob-notes/
-    product-design/
-      apple-hig-web-design/
-    skill-governance/
-      skill-doctor/
 
   tools/
     skills/
@@ -91,7 +87,7 @@ skills/<domain>/<skill-id>/
 
 ```text
 skills/amazon/lingxing-ad-operation-audit/
-skills/product-design/apple-hig-web-design/
+skills/knowledge-management/ob-notes/
 ```
 
 其中：
@@ -245,7 +241,7 @@ pnpm skill:import amazon some-skill --from D:\old-skill-path
 从 GitHub 仓库或 tag 导入：
 
 ```powershell
-pnpm skill:import product-design apple-hig-web-design --from https://github.com/terryxming/apple-hig-web-design --ref v1.1
+pnpm skill:import <domain> <skill-id> --from <GitHub URL> --ref <tag>
 ```
 
 导入命令会：
@@ -316,7 +312,7 @@ pnpm skills:docs:check
 ```text
 docs/skills-overview.md
 skills/amazon/README.md
-skills/product-design/README.md
+skills/knowledge-management/README.md
 ```
 
 这些文档只记录仓库内稳定信息，不记录本机安装状态。
@@ -648,7 +644,7 @@ pnpm skill:import amazon old-skill-id --from D:\old-skill-path
 从 GitHub tag 导入：
 
 ```powershell
-pnpm skill:import product-design apple-hig-web-design --from https://github.com/terryxming/apple-hig-web-design --ref v1.1
+pnpm skill:import <domain> <skill-id> --from <GitHub URL> --ref <tag>
 ```
 
 ### 只改文档或工具，不发布 skill
@@ -758,8 +754,6 @@ version: 0.1.4
 ```text
 skills/amazon/lingxing-ad-operation-audit
 skills/knowledge-management/ob-notes
-skills/product-design/apple-hig-web-design
-skills/skill-governance/skill-doctor
 ```
 
 后续迁移剩余 skill，本质上就是继续增加：
