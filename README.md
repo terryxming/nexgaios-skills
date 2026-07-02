@@ -30,7 +30,7 @@ corepack pnpm install --frozen-lockfile
 这个仓库按三层边界管理：
 
 - 仓库边界：统一管理脚本、CI、模板和发布规则。
-- 业务域边界：只用于分类，例如 `amazon`、`product-design`。
+- 业务域边界：只用于分类，例如 `amazon`、`knowledge-management`。
 - 发布边界：永远是单个技能目录。
 
 ## 目录结构
@@ -65,13 +65,13 @@ pnpm skill:new amazon amazon-review-insight
 从本地目录或 GitHub 仓库导入技能：
 
 ```bash
-pnpm skill:import product-design apple-hig-web-design --from https://github.com/terryxming/apple-hig-web-design --ref v1.1
+pnpm skill:import <domain> <skill-id> --from <本地目录或 GitHub URL> [--ref <tag/branch>]
 ```
 
 如果目标技能已存在，需要显式追加 `--force` 才会覆盖：
 
 ```bash
-pnpm skill:import product-design apple-hig-web-design --from D:\skills\apple-hig-web-design --version 1.1.0 --force
+pnpm skill:import <domain> <skill-id> --from <本地目录> --version <semver> --force
 ```
 
 列出所有技能：
@@ -150,13 +150,13 @@ pnpm experience:new github-cli-path --domain repo --tags "github,windows,path"
 创建未完成工作的交接文档：
 
 ```bash
-pnpm handoff:new skill-doctor --title "补充诊断规则"
+pnpm handoff:new ob-notes --title "补充触发规则"
 ```
 
 查看某个技能的交接文档：
 
 ```bash
-pnpm handoff:list skill-doctor
+pnpm handoff:list ob-notes
 ```
 
 检查是否误提交临时文件、大文件或常见密钥格式：

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Apple HIG 前端视觉改造"
-  short_description: "基于 Apple HIG 的前端 UI/UX 打磨"
-  default_prompt: "使用 $apple-hig-web-design 先按我指定的视口范围诊断页面，并输出带版本号的 Apple HIG 视觉改造方案，待我确认后再执行。"

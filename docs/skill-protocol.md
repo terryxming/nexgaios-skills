@@ -39,9 +39,9 @@ release:
 
 ```yaml
 source:
-  repository: "https://github.com/terryxming/apple-hig-web-design"
-  ref: "v1.1"
-  commit: "4115b523cb0649b7a595d478abb4dfeffec5162f"
+  repository: "https://github.com/<owner>/<skill-repo>"
+  ref: "v1.0"
+  commit: "<导入时的 commit sha>"
 ```
 
 规则：
