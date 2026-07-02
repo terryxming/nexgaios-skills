@@ -7,9 +7,9 @@ description: 当需要做只读的领星广告操作日志审计时使用此 ski
 
 ## 概览
 
-这个 skill 用于通过已部署的只读 LingXing MCP 服务生成广告操作日志审计报告。典型需求包括：“拉取近 90 天广告操作日志，看看广告调整了什么变量，改前改后是什么，以及调整前后效果有没有变好”。
+这个 skill 用于基于只读领星 MCP 的数据生成广告操作日志审计报告。典型需求包括：“拉取近 90 天广告操作日志，看看广告调整了什么变量，改前改后是什么，以及调整前后效果有没有变好”。
 
-必须走 MCP endpoint 和 Key 鉴权路径。除非 MCP 服务不可用且用户明确同意降级，否则不要直接调用领星 OpenAPI。
+取数一律通过 agent 会话中已连接的领星只读 MCP 工具完成（MCP server 源码维护在同级仓库 `nexgaios-lingxing`）。除非 MCP 服务不可用且用户明确同意降级，否则不要直接调用领星 OpenAPI。
 
 ## 工作流程
 
@@ -17,13 +17,13 @@ description: 当需要做只读的领星广告操作日志审计时使用此 ski
    - 店铺 SID 和国家/站点，例如香港奥卡-US 对应 `sid=7481`、`country=US`。
    - 日期范围。用户说“近 90 天”时，默认使用最近 90 个自然日。
    - 可选筛选条件：`sponsored_type`、`operate_type`、`campaign_query`、`variable_code`、`user_query`、`change_type`。
-2. 用 `scripts/export_ad_operation_logs.ts` 导出广告操作日志。
-   - 从 skill 根目录或已安装 skill 目录运行，确保 `.env` 和 `node_modules` 可用。
-   - 使用已部署的 `lingxing_ad_operation_log_scan` 工具。
-   - 输出 JSON 放在 `artifacts/` 下，不要打印或持久化完整 MCP Key。
-3. 用 `scripts/export_ad_performance_context.ts` 导出可选效果层数据。
-   - v0.1.3 默认覆盖 SP 广告活动报表和 SP 关键词报表。
-   - 拉取操作日志日期范围内的广告日报，供报告比较每次变量变化前后的稳定区间。
+2. 通过领星只读 MCP 工具导出广告操作日志。
+   - 调用操作日志扫描工具（如 `lingxing_ad_operation_log_scan`），按报告范围分页拉全，不要静默截断。
+   - 把结果整理为 `references/data-contract.md` 定义的 JSON envelope，落盘到 `artifacts/` 下。
+   - 不要在文件、日志或报告中留下任何 Key 或凭证。
+3. 通过 MCP 工具导出可选效果层数据。
+   - 默认覆盖 SP 广告活动报表和 SP 关键词报表，拉取操作日志日期范围内的广告日报。
+   - 按 `references/data-contract.md` 的效果层契约落盘第二个 JSON，供报告比较每次变量变化前后的稳定区间。
    - 报告会按同一个广告对象和同一个变量，比较相邻稳定区间；操作当天默认排除，因为日报无法表达日内改动。
 4. 用 `scripts/build_ad_operation_report.py` 生成报告。
    - 生成一个内嵌数据的单文件 HTML。
@@ -33,26 +33,16 @@ description: 当需要做只读的领星广告操作日志审计时使用此 ski
    - 确认总记录数、广告活动数、操作人数、变量 code 数非零，除非源数据确实为空。
    - 打开或检查 HTML，确认筛选器、悬浮提示、双月日期选择器、广告活动趋势图、行级效果窗口和表格都能正常渲染。
 
-## 默认导出命令
+## 取数落盘约定
 
-为了可复现，优先使用明确日期：
+为了可复现，取数时优先使用明确日期范围，落盘 JSON 按店铺和日期命名，放在 `artifacts/lingxing-ad-operation-audit/data/` 下，例如：
 
-```powershell
-$env:LINGXING_AD_AUDIT_SID="7481"
-$env:LINGXING_AD_AUDIT_COUNTRY="US"
-$env:LINGXING_AD_AUDIT_START_DATE="2026-03-19"
-$env:LINGXING_AD_AUDIT_END_DATE="2026-06-16"
-$env:LINGXING_AD_AUDIT_OUTPUT="artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-90d.json"
-npx tsx scripts/export_ad_operation_logs.ts
+```text
+artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-90d.json
+artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-performance-context.json
 ```
 
-## 默认效果层导出命令
-
-```powershell
-$env:LINGXING_AD_IMPACT_INPUT="artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-90d.json"
-$env:LINGXING_AD_IMPACT_OUTPUT="artifacts/lingxing-ad-operation-audit/data/hk-aoka-us-performance-context.json"
-npx tsx scripts/export_ad_performance_context.ts
-```
+两个文件的字段结构必须符合 `references/data-contract.md`。
 
 ## 默认报告生成命令
 

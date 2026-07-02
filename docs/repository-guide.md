@@ -35,6 +35,8 @@ nexgaios-skills/
   skills/
     amazon/
       lingxing-ad-operation-audit/
+    knowledge-management/
+      ob-notes/
     product-design/
       apple-hig-web-design/
     skill-governance/
@@ -57,10 +59,6 @@ nexgaios-skills/
       index.md
       README.md
     handoffs/
-      README.md
-    impact-graphs/
-      README.md
-    impact-reviews/
       README.md
     skill-protocol.md
     skills-overview.md
@@ -190,8 +188,6 @@ pnpm skill:new amazon amazon-review-insight
 - `docs/multi-computer-workflow.md`：公司电脑和家里电脑之间的协同工作流。
 - `docs/experience/`：失败、踩坑、根因和解法的可检索经验库。
 - `docs/handoffs/`：未完成 skill 开发或维护工作的交接文档。
-- `docs/impact-graphs/`：impact 机制的可选仓库级关系图谱导出；默认可视化资产优先放在对应 skill 的 `impact/` 目录。
-- `docs/impact-reviews/`：impact 硬检查的机器可读审查回执。
 
 ### `catalog.yaml`
 
@@ -323,57 +319,6 @@ skills/product-design/README.md
 这些文档只记录仓库内稳定信息，不记录本机安装状态。
 
 原因是本机安装状态是机器状态，Windows 本机和 GitHub Actions Linux runner 上不一致。
-
-### 3.5 Impact 影响链路硬检查
-
-试点中的 skill 可以在根目录提供：
-
-```text
-impact.yaml
-```
-
-`impact.yaml` 把文件组织成契约组：`sources` 是会触发影响检查的文件，`witnesses` 是必须同步修改或审查的关联文件。
-
-本地检查：
-
-```powershell
-pnpm skill:impact <skill-id> --strict
-```
-
-PR 检查：
-
-```powershell
-pnpm skills:impact --base origin/main...HEAD --strict
-```
-
-生成用户可读关系图谱：
-
-```powershell
-pnpm skill:impact <skill-id> --visualize --format all
-```
-
-默认输出到对应 skill 的 `impact/graph.*`，其中 `.md` 适合阅读，`.canvas` 适合在 Obsidian Canvas 中打开，`.json` 适合调试和二次加工。
-
-如果需要仓库级集中导出，可以显式指定：
-
-```powershell
-pnpm skill:impact <skill-id> --visualize --format all --output docs/impact-graphs
-```
-
-启动 OKC 试点的实时控制台：
-
-```powershell
-pnpm skill:impact:watch obsidian-knowledge-curator
-```
-
-实时控制台前端资产放在 skill 自身的 `impact/` 目录中。控制台只展示当前变更、契约链路、断裂引用、孤儿文件和待处理 witness；最终硬闸门仍然是 strict impact 检查。
-
-硬规则：
-
-- 新增文件必须进入自动引用图或 `impact.yaml` 契约组。
-- 修改契约 source 后，关联 witness 未修改且没有审查回执时，strict 检查失败。
-- 审查回执放在 `docs/impact-reviews/<skill-id>/`，用于记录“已检查但无需修改”的机器可读理由。
-- `obsidian-knowledge-curator` 是首个试点；机制稳定后，既有 skill 和新建 skill 逐步接入。
 
 ### 4. Obsidian 镜像文档
 
@@ -513,7 +458,6 @@ SKILL.md
 skill.yaml
 README.md
 CHANGELOG.md
-impact.yaml
 references/
 scripts/
 assets/
@@ -529,7 +473,7 @@ tests/
 它能证明的事项是：
 
 - skill 目录位于 `skills/<domain>/<skill-id>/`。
-- `skill.yaml`、`SKILL.md`、`README.md`、`CHANGELOG.md`、`impact.yaml` 已生成。
+- `skill.yaml`、`SKILL.md`、`README.md`、`CHANGELOG.md` 已生成。
 - `references/`、`scripts/`、`assets/`、`tests/` 目录说明已生成。
 - `catalog.yaml` 可以识别这个 skill。
 - `pnpm skill:validate <skill-id>` 能验证基础协议，例如必填字段、版本号格式、入口文件存在和目录位置正确。
@@ -802,7 +746,6 @@ version: 0.1.4
    pnpm guide:sync
    pnpm guide:check
    pnpm skills:guard
-   pnpm skills:impact --base origin/main...HEAD --strict
    pnpm skills:validate
    ```
 
@@ -812,7 +755,9 @@ version: 0.1.4
 
 ```text
 skills/amazon/lingxing-ad-operation-audit
+skills/knowledge-management/ob-notes
 skills/product-design/apple-hig-web-design
+skills/skill-governance/skill-doctor
 ```
 
 后续迁移剩余 skill，本质上就是继续增加：

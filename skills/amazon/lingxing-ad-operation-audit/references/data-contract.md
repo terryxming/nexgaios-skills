@@ -1,6 +1,6 @@
 # 数据契约
 
-导出脚本会调用 `lingxing_ad_operation_log_scan`，并预期 MCP 返回一个文本内容，文本中包含如下 JSON envelope：
+取数方（agent 通过领星只读 MCP 工具）调用 `lingxing_ad_operation_log_scan`，并预期 MCP 返回一个文本内容，文本中包含如下 JSON envelope。落盘 JSON 必须符合这个契约，报告生成脚本按它消费数据：
 
 ```json
 {
@@ -50,7 +50,7 @@
 
 ## 效果层上下文
 
-`export_ad_performance_context.ts` 会生成可选的第二个 JSON 文件：
+效果层导出会生成可选的第二个 JSON 文件，契约如下：
 
 ```json
 {

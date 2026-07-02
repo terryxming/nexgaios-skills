@@ -44,9 +44,6 @@ jobs:
       - name: 防误传检查
         run: pnpm skills:guard --base "origin/${{ github.base_ref }}...HEAD"
 
-      - name: 影响链路硬检查
-        run: pnpm skills:impact --base "origin/${{ github.base_ref }}...HEAD" --strict
-
       - name: 验证变更技能
         shell: bash
         run: |

@@ -5,7 +5,6 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { impactCommand, impactWatchCommand } from "./impact-graph.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -61,10 +60,6 @@ async function main() {
       return docsCommand(args);
     case "guard":
       return guardCommand(args);
-    case "impact":
-      return impactCommand(args);
-    case "impact-watch":
-      return impactWatchCommand(args);
     case "pr-summary":
       return prSummaryCommand(args);
     case "guide-sync":
@@ -106,8 +101,6 @@ function printHelp() {
   ship <skill-id> [--patch|--minor|--major|--no-release] [-m <message>]
   docs [--check]
   guard [--base <git-range-or-ref>|--all]
-  impact <skill-id>|--all [--base <git-range-or-ref>] [--strict] [--visualize] [--format markdown|canvas|json|all] [--output <dir>]
-  impact-watch <skill-id> [--host <host>] [--port <port>]
   pr-summary [--base <git-range-or-ref>]
   guide-sync [--check]
   experience-search <query> [--limit <n>]

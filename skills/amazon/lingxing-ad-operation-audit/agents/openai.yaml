@@ -6,9 +6,8 @@ interface:
 dependencies:
   tools:
     - type: "mcp"
-      value: "LingXing-Readonly-AWS"
-      description: "已部署的只读领星 MCP 服务"
+      value: "nexgaios-lingxing"
+      description: "自建领星只读 MCP server（源码维护在同级仓库 nexgaios-lingxing）"
       transport: "streamable_http"
-      url: "https://mcp.nexgaios.com/mcp-services/lingxing-mcp"
 policy:
   allow_implicit_invocation: true
