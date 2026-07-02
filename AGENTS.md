@@ -2,6 +2,8 @@
 
 本仓库是 `nexgaios-skills`，用于统一维护 Nexgaios agent skills，面向多运行时（Claude Code / Codex）通用。Claude Code 从 `CLAUDE.md` 引用本文件，两个运行时共用同一份指令。
 
+仓库通用工程纪律维护在 `CLAUDE.md` 的「通用工程纪律」一节，对 Claude Code 与 Codex 同样适用；开始任何修改前先读一遍。
+
 默认使用中文与用户交流。
 
 ## 新线程启动规则
