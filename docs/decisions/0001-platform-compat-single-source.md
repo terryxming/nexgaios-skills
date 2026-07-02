@@ -23,7 +23,7 @@
 ## 影响
 
 - `skills/` 只写一种格式;`tools/build` 只做分发打包。
-- lint 集成官方 `skills-ref validate`,再叠加自建质量检查(见 `standards/skill-engineering.zh.md` §B)。
+- lint 集成官方 `skills-ref validate`,再叠加自建质量检查(见 CLAUDE.md/AGENTS.md《私有工程纪律》§E)。
 - 新增第三家平台时,只加分发 adapter,不动 skill 源。
 
 ## 存疑 / 待验证

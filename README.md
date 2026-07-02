@@ -18,9 +18,8 @@
 | 目录 | 用途 |
 |---|---|
 | `skills/` | 每个 skill 一个目录（唯一事实源） |
-| `standards/` | 工程纪律：通用层 + 私有层（单一事实源） |
 | `templates/` | 脚手架模板 |
-| `tools/` | 确定性脚本：lint / build / eval / release / sync / handoff |
+| `tools/` | 确定性脚本：lint / build / eval / release / 漂移校验 / handoff |
 | `dist/claude/`、`dist/codex/` | 构建产物，按平台分，**永不手改** |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
 | `journal/` | 跨设备交接文档（handoff） |
@@ -34,7 +33,7 @@
 
 ## 工程纪律
 
-见 [`standards/`](standards/)。通用纪律 + 私有纪律两层，并已内联进 [`CLAUDE.md`](CLAUDE.md) 与 [`AGENTS.md`](AGENTS.md) 常驻上下文。任何 agent 在本仓库干活都受其约束。
+通用纪律 + 私有纪律两层，全文内联进 [`CLAUDE.md`](CLAUDE.md) 与 [`AGENTS.md`](AGENTS.md) 常驻上下文（两份的"共享段"逐字节一致，由 [`tools/check-discipline-drift.py`](tools/check-discipline-drift.py) 校验；改一份须同步另一份）。任何 agent 在本仓库干活都受其约束。
 
 ## 跨设备协作
 
