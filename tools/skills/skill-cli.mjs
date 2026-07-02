@@ -728,6 +728,10 @@ function prSummaryCommand(rawArgs) {
 
 function guideSyncCommand(rawArgs) {
   const { flags } = parseOptions(rawArgs);
+  if (!fs.existsSync(repositoryGuideMirrorPath)) {
+    console.log(`本机未配置 Obsidian 镜像（${repositoryGuideMirrorPath} 不存在），跳过 guide ${flags.check ? "检查" : "同步"}。`);
+    return;
+  }
   ensureRepositoryGuideMirrorExists();
 
   const sourceContent = fs.readFileSync(repositoryGuidePath, "utf8");
@@ -2290,7 +2294,7 @@ function ensureRepositoryGuideMirrorExists() {
   }
 
   if (!fs.existsSync(repositoryGuideMirrorPath)) {
-    throw new Error(`未找到 Obsidian 镜像文件：${repositoryGuideMirrorPath}。必须先显示询问用户：是否要创建或恢复这个文件；在用户确认前，不要自动创建 E 盘镜像文件。`);
+    throw new Error(`未找到 Obsidian 镜像文件：${repositoryGuideMirrorPath}。镜像是可选配置；不要自动创建，如需启用请先与用户确认。`);
   }
 
   if (!fs.statSync(repositoryGuideMirrorPath).isFile()) {
