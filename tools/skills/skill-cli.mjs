@@ -96,7 +96,7 @@ function printHelp() {
   changed [--base <git-range-or-ref>]
   validate <skill-id>|--all
   install <skill-id>|--all [--target <path>] [--prune]
-  sync [--target <path>] [--prune]
+  sync [--runtime claude|codex|all] [--target <path>] [--prune]
   package <skill-id> [--print-path]
   ship <skill-id> [--patch|--minor|--major|--no-release] [-m <message>]
   docs [--check]
@@ -479,24 +479,89 @@ function validateCommand(rawArgs) {
   }
 }
 
+function getRuntimeRoots() {
+  return {
+    claude: path.join(os.homedir(), ".claude", "skills"),
+    codex: path.join(os.homedir(), ".codex", "skills")
+  };
+}
+
+function skillTargets(skill) {
+  const runtimeRoots = getRuntimeRoots();
+  const raw = skill.targets;
+  if (raw === undefined || raw === null || raw === "") {
+    return ["codex"];
+  }
+
+  const items = String(raw)
+    .replace(/^\[|\]$/g, "")
+    .split(",")
+    .map((item) => unquote(item.trim()))
+    .filter(Boolean);
+  const unknown = items.filter((item) => !runtimeRoots[item]);
+  if (unknown.length > 0) {
+    throw new Error(`${skill.id} 的 targets 含未知运行时：${unknown.join(", ")}。支持：${Object.keys(runtimeRoots).join("、")}`);
+  }
+  if (items.length === 0) {
+    throw new Error(`${skill.id} 的 targets 不能为空。支持：${Object.keys(runtimeRoots).join("、")}`);
+  }
+  return items;
+}
+
+function resolveRuntimes(flagRuntime) {
+  const runtimeRoots = getRuntimeRoots();
+  if (!flagRuntime || flagRuntime === "all") {
+    return Object.keys(runtimeRoots);
+  }
+  if (!runtimeRoots[flagRuntime]) {
+    throw new Error(`未知 runtime "${flagRuntime}"。支持：${Object.keys(runtimeRoots).join("、")}、all`);
+  }
+  return [flagRuntime];
+}
+
 function installCommand(rawArgs) {
   const { flags, positionals } = parseOptions(rawArgs);
   const [skillId] = positionals;
-  const targetRoot = path.resolve(flags.target || path.join(os.homedir(), ".codex", "skills"));
+
+  if (flags.target) {
+    const targetRoot = path.resolve(flags.target);
+    if (flags.all) {
+      installSkills(activeSkills(loadSkills()), targetRoot, { prune: Boolean(flags.prune) });
+      return;
+    }
+    installOneSkill(findSkill(skillId), targetRoot);
+    return;
+  }
 
   if (flags.all) {
-    installSkills(activeSkills(loadSkills()), targetRoot, { prune: Boolean(flags.prune) });
+    syncToRuntimes(activeSkills(loadSkills()), flags);
     return;
   }
 
   const skill = findSkill(skillId);
-  installOneSkill(skill, targetRoot);
+  const runtimes = resolveRuntimes(flags.runtime).filter((runtime) => skillTargets(skill).includes(runtime));
+  if (runtimes.length === 0) {
+    throw new Error(`${skill.id} 的 targets（${skillTargets(skill).join("、")}）不包含请求的 runtime "${flags.runtime}"。`);
+  }
+  for (const runtime of runtimes) {
+    installOneSkill(skill, getRuntimeRoots()[runtime]);
+  }
 }
 
 function syncCommand(rawArgs) {
   const { flags } = parseOptions(rawArgs);
-  const targetRoot = path.resolve(flags.target || path.join(os.homedir(), ".codex", "skills"));
-  installSkills(activeSkills(loadSkills()), targetRoot, { prune: Boolean(flags.prune) });
+  if (flags.target) {
+    installSkills(activeSkills(loadSkills()), path.resolve(flags.target), { prune: Boolean(flags.prune) });
+    return;
+  }
+  syncToRuntimes(activeSkills(loadSkills()), flags);
+}
+
+function syncToRuntimes(skills, flags) {
+  for (const runtime of resolveRuntimes(flags.runtime)) {
+    const runtimeSkills = skills.filter((skill) => skillTargets(skill).includes(runtime));
+    installSkills(runtimeSkills, getRuntimeRoots()[runtime], { prune: Boolean(flags.prune) });
+  }
 }
 
 function packageCommand(rawArgs) {
@@ -932,6 +997,38 @@ function validateSkill(skill) {
   const entryPath = path.join(skill.dir, skill.entry);
   if (!fs.existsSync(entryPath)) {
     throw new Error(`${skill.id} 的入口文件不存在：${relative(entryPath)}`);
+  }
+
+  skillTargets(skill);
+  validateEntryFrontmatter(skill);
+}
+
+function universalFrontmatterFields() {
+  return new Set(["name", "description", "metadata"]);
+}
+
+function validateEntryFrontmatter(skill) {
+  const entryPath = path.join(skill.dir, skill.entry);
+  const content = fs.readFileSync(entryPath, "utf8");
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) {
+    throw new Error(`${skill.id} 的 ${skill.entry} 缺少 YAML frontmatter（至少包含 name 和 description）`);
+  }
+
+  const frontmatter = parseYamlLoose(match[1]);
+  for (const field of ["name", "description"]) {
+    if (!frontmatter[field]) {
+      throw new Error(`${skill.id} 的 ${skill.entry} frontmatter 缺少 ${field}`);
+    }
+  }
+
+  if (frontmatter.name !== skill.id) {
+    throw new Error(`${skill.id} 的 ${skill.entry} frontmatter name 是 "${frontmatter.name}"，必须与 skill id 一致`);
+  }
+
+  const extras = Object.keys(frontmatter).filter((key) => !universalFrontmatterFields().has(key));
+  if (extras.length > 0) {
+    throw new Error(`${skill.id} 的 ${skill.entry} frontmatter 含非通用顶层字段：${extras.join(", ")}。跨 runtime 顶层只允许 name、description、metadata；运行时特有信息放进 metadata。`);
   }
 }
 

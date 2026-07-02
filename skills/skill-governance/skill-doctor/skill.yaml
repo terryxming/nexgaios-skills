@@ -3,6 +3,7 @@ domain: skill-governance
 version: 0.1.0
 entry: SKILL.md
 status: active
+targets: [claude, codex]
 
 validate:
   command: "python scripts/inspect_skill.py . --fail-on-error --quiet"

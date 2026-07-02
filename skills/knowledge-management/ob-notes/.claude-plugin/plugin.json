@@ -1,0 +1,8 @@
+{
+  "name": "ob-notes",
+  "description": "把对话中的高价值信息（决策 / 踩坑 / 知识点 / 方案取舍 / 研究结论 / 项目进展）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库或项目目录。",
+  "author": {
+    "name": "terryxming",
+    "email": "terry.mxming@gmail.com"
+  }
+}

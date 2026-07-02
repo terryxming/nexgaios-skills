@@ -1,6 +1,6 @@
 # nexgaios-skills
 
-这是 Nexgaios Codex 技能的统一源码仓库。
+这是 Nexgaios agent skills 的统一源码仓库，面向多运行时（Claude Code / Codex）通用。
 
 Codex 新线程项目指令：[AGENTS.md](AGENTS.md)。
 
@@ -86,25 +86,30 @@ pnpm skill:list
 pnpm skill:validate lingxing-ad-operation-audit
 ```
 
-安装到本地 Codex 运行目录：
+安装到本机运行时目录（按 skill.yaml 的 `targets` 分发）：
 
 ```bash
-pnpm skill:install lingxing-ad-operation-audit
+pnpm skill:install lingxing-ad-operation-audit                    # 安装到该 skill 声明的所有运行时
+pnpm skill:install lingxing-ad-operation-audit --runtime claude   # 只安装到 Claude Code（~/.claude/skills）
+pnpm skill:install lingxing-ad-operation-audit --runtime codex    # 只安装到 Codex（~/.codex/skills）
 ```
 
-修改 `skills/<domain>/<skill-id>/` 后，需要先询问用户是否同步到本机 Codex 安装目录；用户明确同意后再运行安装或同步命令。不要把“源码已更新”表述为“本机 Codex 已安装更新”。
+修改 `skills/<domain>/<skill-id>/` 后，需要先询问用户是否同步到本机安装目录；用户明确同意后再运行安装或同步命令。不要把“源码已更新”表述为“本机已安装更新”。
 
-安装仓库内全部 active 技能到本机 Codex：
+安装仓库内全部 active 技能到本机运行时：
 
 ```bash
-pnpm skill:sync
+pnpm skill:sync                    # 每个 skill 按自己的 targets 分发
+pnpm skill:sync --runtime claude   # 只同步 Claude Code 一侧
 ```
 
-`skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除本机 Codex 里的其他 skill。如果要删除曾由本仓库安装、但当前仓库已经不存在的旧 skill，显式使用：
+`skill:sync` 默认只覆盖本仓库中同名 skill 的安装目录，不删除运行时目录里的其他 skill。如果要删除曾由本仓库安装、但当前仓库已经不存在的旧 skill，显式使用：
 
 ```bash
 pnpm skill:sync --prune
 ```
+
+Claude Code 一侧还可以走插件市场通道：仓库根的 `.claude-plugin/marketplace.json` 是私有插件源清单，当前发布 `ob-notes`（在 Claude Code 中把本仓库添加为 marketplace 即可安装）。
 
 重新生成技能总览和业务域 README：
 

@@ -1,0 +1,16 @@
+{
+  "name": "nexgaios-skills",
+  "owner": {
+    "name": "terryxming",
+    "email": "terry.mxming@gmail.com"
+  },
+  "description": "Nexgaios 私有 skill 插件源。当前仅发布 ob-notes（其余 skill 不对外发布）。",
+  "plugins": [
+    {
+      "name": "ob-notes",
+      "source": "./skills/knowledge-management/ob-notes",
+      "description": "对话价值沉淀 skill：把决策 / 踩坑 / 知识点 / 研究结论 / 项目进展按统一规范写成 Obsidian 或项目 Markdown 笔记。",
+      "category": "knowledge-management"
+    }
+  ]
+}
