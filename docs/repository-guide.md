@@ -256,29 +256,32 @@ pnpm skill:import product-design apple-hig-web-design --from https://github.com/
 - 更新 `catalog.yaml`。
 - 做基础验证。
 
-### 2. 同步到本机 Codex
+### 2. 同步到本机运行时（Claude Code / Codex）
 
 同步命令只在用户明确同意时执行。
 
-安装单个 skill：
+安装单个 skill（按该 skill 在 `skill.yaml` 中声明的 `targets` 分发）：
 
 ```powershell
 pnpm skill:install lingxing-ad-operation-audit
+pnpm skill:install lingxing-ad-operation-audit --runtime claude
 ```
 
 同步全部 active skill：
 
 ```powershell
 pnpm skill:sync
+pnpm skill:sync --runtime codex
 ```
 
-同步目标是：
+同步目标按运行时区分：
 
 ```text
-$env:USERPROFILE\.codex\skills
+$env:USERPROFILE\.claude\skills   # Claude Code
+$env:USERPROFILE\.codex\skills    # Codex
 ```
 
-CLI 实际按当前系统用户的 home 目录计算目标路径，等价于 Node.js 的 `os.homedir()` 下的 `.codex\skills`。
+CLI 实际按当前系统用户的 home 目录计算目标路径（Node.js 的 `os.homedir()`）。`targets` 缺省时等价于 `[codex]`。
 
 规则：
 

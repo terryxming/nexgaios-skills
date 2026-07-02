@@ -3,6 +3,7 @@ domain: knowledge-management
 version: 0.7.0
 entry: SKILL.md
 status: active
+targets: [claude, codex]
 
 validate:
   command: "python scripts/build_depmap.py"

@@ -12,6 +12,16 @@ entry: SKILL.md
 status: active
 ```
 
+可选的运行时目标声明：
+
+```yaml
+targets: [claude, codex]
+```
+
+`targets` 声明这个 skill 安装到哪些本机运行时：`claude` 对应 `~/.claude/skills`，`codex` 对应 `~/.codex/skills`。缺省时等价于 `[codex]`。`skill:install` 和 `skill:sync` 默认按 targets 分发，也可用 `--runtime claude|codex|all` 显式指定。
+
+SKILL.md 的 frontmatter 顶层只允许跨运行时通用的 `name`、`description`、`metadata` 三个字段，且 `name` 必须与 skill id 一致；运行时特有信息放进 `metadata`。`skill:validate` 会硬校验这条。
+
 可选命令：
 
 ```yaml
@@ -40,7 +50,8 @@ source:
 - 每次发布只对应一个技能。
 - CI 只在该技能的 `version` 变化时发布它。
 - 共享工具变更可以触发验证，但不会触发技能发布。
-- 复杂技能可以包含 `references/`、`scripts/`、`assets/`、`tests/` 或 MCP 代码。
+- 复杂技能可以包含 `references/`、`scripts/`、`assets/`、`tests/`。
+- MCP server 代码不放在本仓库；skill 通过 agent 会话中已连接的 MCP 工具消费数据（例如领星 MCP 维护在同级仓库 `nexgaios-lingxing`）。
 
 Windows 下可以使用仓库包装脚本：
 

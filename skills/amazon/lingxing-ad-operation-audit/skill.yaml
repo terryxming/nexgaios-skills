@@ -3,6 +3,7 @@ domain: amazon
 version: 0.2.0
 entry: SKILL.md
 status: active
+targets: [claude, codex]
 
 validate:
   command: "python -m py_compile scripts/build_ad_operation_report.py"
