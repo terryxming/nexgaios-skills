@@ -37,4 +37,5 @@
 ## 索引
 
 - [0001 平台兼容与单一事实源](0001-platform-compat-single-source.md)
-- [0002 工程纪律常驻上下文](0002-discipline-always-in-context.md)
+- [0002 工程纪律常驻上下文](0002-discipline-always-in-context.md)（落地方式已被 0003 取代）
+- [0003 工程纪律：双份文件 + 漂移校验](0003-discipline-dual-file-drift-check.md)

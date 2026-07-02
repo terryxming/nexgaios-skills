@@ -1,39 +1,43 @@
-# 交接:2026-07-02 家用电脑 · 骨架搭建
+# 交接:2026-07-02 家用机 · 骨架 + 工程纪律双份化
 
-> 续工前先 `git pull`,读本文件 + `docs/decisions/` 最新篇,再动手。
+> 续工前先 `git pull`,读本文件 + `docs/decisions/` 最新篇,再动手。切机器先跑开发巡检(私有纪律 C1)。
 
-## 本次进度(已完成)
+## 已完成(本次会话)
 
-1. **仓库骨架 + git**:`main` 分支;目录 `skills/ standards/ templates/ tools/ dist/{claude,codex}/ docs/decisions/ journal/ .claude/skills/`;`.gitignore`(隔离机器特有文件);`README.md`。
-2. **工程纪律双层**:
-   - `standards/engineering-discipline-universal.zh.md`——用户通用纪律,**字节级照搬**(15879 字节)。
-   - `standards/skill-engineering.zh.md`——私有纪律(通用→skill 场景映射、硬约束、评测即回归、发布门禁、跨设备)。
-3. **常驻上下文链路**:`tools/sync-standards.py`(纯标准库,`--check` 漂移校验 + 体积护栏)→ 生成 `CLAUDE.md` / `AGENTS.md`(各 ~21.9 KB,含全文纪律)。
-4. **决策记录**:ADR-0001(平台兼容与单一事实源)、ADR-0002(工程纪律常驻上下文),均附官方证据来源。
+1. **仓库骨架 + git + GitHub 远端**:`origin` = https://github.com/terryxming/nexgaios-skills-dev (private),`main` 已推送并跟踪。
+2. **工程纪律 = 双份文件 + 漂移校验(ADR-0003,取代 0002 落地方式)**:
+   - `CLAUDE.md` / `AGENTS.md` 三段式:一分钟速览 + 通用工程纪律(10 条正文照搬,H1 中性化)+ 私有工程纪律(第二人称:A 行为闸门/7 款防幻觉、B 单一源例外、C 巡检+跨设备、D–G 映射/硬约束/评测/发布)+ 平台专属约定(各自维护)。
+   - 共享段逐字节一致,`tools/check-discipline-drift.py` 机械校验 + 128 KiB 体积护栏。
+   - 已拆除 `standards/` 与 `tools/sync-standards.py`(不再走生成)。
+3. **Codex 本机 `project_doc_max_bytes = 131072`(128 KiB)已设**。⚠️ **公司机需同样设置**,巡检会查(`~/.codex/config.toml`)。
+4. **文件名英文化**(路径英文 / 内容中文)。
+5. **决策留痕**:ADR-0001(平台兼容与单一事实源)、ADR-0002(常驻内联,落地方式已被 0003 取代)、ADR-0003(双份 + 校验),均附证据。
 
 ## 已定决策(勿重复调研)
 
-- 平台:仅 Claude Code + Codex;同一 SKILL.md 两家原生兼容,构建层只做分发打包 → ADR-0001。
-- 纪律全文内联 CLAUDE.md/AGENTS.md,由 standards/ 经 sync 生成,永不手改 → ADR-0002。
-- 全面中文化;两台开发机均 Windows;工具链首选 Python 标准库(uv 未装,python 3.14 可直接用)。
+- 平台仅 Claude Code + Codex;同一 SKILL.md 两家原生兼容,构建层只做分发打包 → ADR-0001。
+- 纪律双份文件互为源、就地编辑 + 漂移校验;不再走 `standards/` 生成 → ADR-0003。
+- 全面中文化 = 内容中文,标识符/路径英文 kebab-case。
+- 通用 + 私有纪律全部常驻(1M 窗口够用);平台差异段由当值 agent 维护。
+- 两台开发机均 Windows;工具链 Python 标准库(uv 未装,python 3.14 直用)。
 
 ## 下一步(建议顺序)
 
-1. **创建 GitHub 远程仓库 + 首推**——团队共享/公开分发的前提,也是跨设备同步的通道。
-2. **第一条流水线 skill `/new-skill`**:从 `templates/` 生成 `skills/<name>/` 骨架(SKILL.md + evals/ + metadata),自动带上发布声明模板。
-3. **lint 集成**:接入官方 `skills-ref validate`(需先确认其运行时与安装方式,见未决项)+ 自建检查(name==目录名、description 触发边界、SKILL.md 行数)。
-4. **`/handoff` + `/resume` 做成 `.claude/skills` 里的 skill**(本文件是手写示范,应固化为可复用 skill)。
-5. 评测 runner 骨架(触发评测 + 执行评测两层)。
-6. 分发:`marketplace.json`(Claude 侧)+ Codex 安装脚本。
+1. **议题 4:纪律里"硬约束(可脚本化→进 lint/CI)"vs"软指导(靠自觉)"的分界**——此前约定晚点讨论,决定 `tools/` 要建哪些检查。
+2. 第一条流水线 skill **`/new-skill`**(脚手架)。
+3. lint 接入官方 **`skills-ref validate`**(先确认其运行时/安装方式,见未决项)。
+4. **`/handoff`、`/resume`、`/inspect`(巡检)做成 `.claude/skills`**(本文件与巡检脚本是手写实样,待固化)。
+5. 评测 runner(触发 + 执行两层);分发(`marketplace.json` + Codex 安装脚本)。
+6. CI 接入 `check-discipline-drift.py` + `skills-ref validate`。
 
 ## 未决 / 待实机验证
 
-- **Codex 用户级路径**:官方 `~/.agents/skills` vs 部分教程 `~/.codex/skills`,在装 Codex 的机器跑 `/skills` 实测确认(ADR-0001 存疑项)。
-- **`dist/` 是否入库**:公开 marketplace 从 GitHub 拉取可能要求产物入库;待专门决策(未来 ADR)。
-- **`skills-ref` 运行时**:Python 还是 Go?安装方式?决定 lint 怎么接。
-- **是否装 uv**:目前 python 直跑够用;若工具链统一走 uv,两台机器都要装。
+- **Codex 用户级路径** `~/.agents/skills` vs `~/.codex/skills`,在装 Codex 的机器跑 `/skills` 实证(ADR-0001 存疑项)。
+- **`dist/` 是否入库**(公开 marketplace 从 GitHub 拉取可能要求),待专门 ADR。
+- **`skills-ref` 运行时**(Python / Go?)与安装方式。
+- 是否统一装 uv。
 
 ## 环境备忘
 
-- 家用电脑:Windows 11,`D:\nexgaios-skills-dev`;git 2.53 / python 3.14 / node 24 / pwsh 7.6;**uv 未装**。
-- 尚未创建 GitHub 远程,尚未首次 commit 之外的推送。
+- 家用机 TERRYXMING:Windows 11,`D:\nexgaios-skills-dev`;git 2.53 / python 3.14 / node 24 / pwsh 7.6;**uv 未装**;Codex config 已设 128 KiB。
+- 远端 `origin` = https://github.com/terryxming/nexgaios-skills-dev (private)。
