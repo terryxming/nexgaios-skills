@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: ['**']   # 全分支：skill 改动走分支，分支推送也必须过门禁（ADR-0009）
   pull_request:
     branches: [main]
 
@@ -11,10 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 门禁需要完整历史与 tags（marketplace↔tag 一致性、handoff 联动 diff）
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - name: 安装 skill 级 lint 依赖（skills-ref，桶一）
         run: pip install -r tools/requirements.txt
-      - name: 仓库级 + skill 级 lint（W1 三项 + W2 桶一/桶二）
+      - name: 仓库级 + skill 级 lint（W1 三项 + W2 桶一/桶二 + G④ 一致性）
         run: python tools/lint.py
+      - name: handoff 联动检查（C2 机械兜底，ADR-0009，试行）
+        if: github.event_name == 'push'
+        run: python tools/check-handoff-sync.py ${{ github.event.before }} ${{ github.sha }}

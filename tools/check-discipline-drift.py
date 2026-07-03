@@ -11,7 +11,11 @@ check-discipline-drift.py — 工程纪律双份一致性门禁（对应私有�
 
 零第三方依赖。
 """
+import sys
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows GBK 控制台直跑也能输出中文（同 lint.py）
 
 ROOT = Path(__file__).resolve().parent.parent
 FILES = ["CLAUDE.md", "AGENTS.md"]

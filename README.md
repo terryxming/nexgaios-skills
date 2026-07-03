@@ -18,9 +18,10 @@
 | 目录 | 用途 |
 |---|---|
 | `skills/` | 每个 skill 一个目录（唯一事实源；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
-| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` 门禁）、纪律漂移校验、本地安装脚本 |
+| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` / marketplace↔tag 一致性门禁）、纪律漂移校验、handoff 联动检查、本地安装脚本 |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
-| `journal/` | 跨设备交接文档（handoff） |
+| `docs/lessons-learned.md` | 流水线/平台层经验台账（追加式，含"已固化到哪"列） |
+| `handoff.md` | 唯一交接文档（收工覆盖重写，历史在 git，见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)） |
 | `.claude/skills/` | 评测/运行时暂存区（gitignore 不入库；skill 源一律在 `skills/`） |
 | `.claude-plugin/marketplace.json` | Claude Code marketplace 索引，首个发布项为 `ob-notes` |
 
@@ -28,20 +29,20 @@
 
 - 目标平台：**Claude Code + Codex** 两家。
 - 分发渠道：自用 + 团队共享 + 公开 marketplace + GitHub。
-- **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；Codex 自用可走本地 `tools/install.py` 纯复制完整 skill 目录，Claude Code 自用走 plugin marketplace。内部 skill 未来另立私有仓。
+- **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；自用走本地 `tools/install.py` 纯复制完整 skill 目录到两端用户目录，Claude Code 亦可走 plugin marketplace。内部 skill 未来另立私有仓。
 
-### Codex 本地安装
+### 本地安装（自用）
 
 ```bash
 python tools/install.py --list
 python tools/install.py ob-notes
 ```
 
-`tools/install.py` 默认安装到 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`。
+`tools/install.py` 默认安装到 Claude Code 的 `~/.claude/skills`（用户级 personal skills 目录，对所有项目生效）与 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`；`--dest` 只装到自定义目录。
 
-### Claude Code 安装
+### Claude Code marketplace 安装
 
-Claude Code 使用 plugin marketplace，不写入一个固定的 `~/.claude/skills` 目录。本仓已提供 `.claude-plugin/marketplace.json`：
+本仓提供 `.claude-plugin/marketplace.json`：
 
 ```bash
 claude plugin marketplace add terryxming/nexgaios-skills
@@ -54,4 +55,4 @@ claude plugin install ob-notes@nexgaios-skills
 
 ## 跨设备协作
 
-家用/公司两台 Windows 机器经 git/GitHub 接续开发。铁律：**一切需延续的状态必须进仓库并 push**，git 是唯一同步通道。收工用 `/handoff`，续工用 `/resume`。
+家用/公司两台 Windows 机器经 git/GitHub 接续开发。铁律：**一切需延续的状态必须进仓库并 push**，git 是唯一同步通道。收工覆盖重写 [`handoff.md`](handoff.md)（历史在 git），续工先读它；CI 的 handoff 联动检查做机械兜底（见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)）。
