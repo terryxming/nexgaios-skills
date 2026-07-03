@@ -1,0 +1,44 @@
+{
+  "skill_name": "ob-notes",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "mode-a-practice-exact-details",
+      "prompt": "以下是我们刚才的排障过程，帮我沉淀到知识库：\n\n问题：CI 上 `pip install skills-ref` 后跑 `python tools/lint.py` 报 `UnicodeEncodeError: 'gbk' codec can't encode character '\\u2705' in position 0`，本地却正常。\n排查：确认 CI runner 是 windows-latest；Python 3.13.5；本地 shell 设了 `PYTHONUTF8=1` 而 CI 没设。\n结论：Windows 下 Python 默认跟随 GBK 代码页，打印 emoji/中文即崩；修法是脚本内自配 `sys.stdout.reconfigure(encoding=\"utf-8\")`，比依赖环境变量可靠。已验证：去掉环境变量后脚本仍正常输出，exit 0。",
+      "expected_output": "一篇 Mode A 实战型笔记：判定为实战型；写盘前读过 preflight/frontmatter-tags/mode-a-practice；报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二）；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
+      "files": [],
+      "assertions": [
+        "笔记中逐字保留报错原文 UnicodeEncodeError: 'gbk' codec can't encode character（铁律二，禁止概括成'编码问题'）",
+        "笔记中保留 Python 3.13.5 与 sys.stdout.reconfigure(encoding=\"utf-8\") 确切内容",
+        "每条结论带可信度标记，且本条为已验证档（铁律三）",
+        "frontmatter 含规范要求的字段与三轴 tag（frontmatter-tags 规范）",
+        "落点为 {kb_root} 下 inbox（landing-rule），未写入当前目录"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "mode-b-devlog-append-dated",
+      "prompt": "todo-app 项目今天的任务收尾了：决定弃用 localStorage 改用 IndexedDB（原因：500 条以上列表读写卡顿，实测 1200 条时首屏 2.3s→0.4s）；踩坑：Safari 私密模式下 IndexedDB 配额为 0，需降级处理。项目目录里已有 dev-log.md。帮我更新 dev-log。",
+      "expected_output": "先读已有 dev-log 恢复上下文；按 mode-b-devlog 模板追加一条带日期的记录（铁律四）：决策（IndexedDB 及原因、实测数字 2.3s→0.4s、1200 条）、踩坑（Safari 私密模式配额 0）逐项保留；不覆盖、不重写历史记录。",
+      "files": [],
+      "assertions": [
+        "写入前读取了已有 dev-log.md（铁律五）",
+        "为追加而非覆盖：历史内容原样保留（铁律四）",
+        "新条目带当日日期标注（datestamp-rule）",
+        "实测数字 2.3s→0.4s、1200 条与 Safari 私密模式配额 0 逐字保留（铁律二）"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "iron-law-1-halt-on-unverified-target",
+      "prompt": "把刚才关于 git worktree 并行开发的几条结论沉淀到我的知识库。（运行环境故意不设 OB_NOTES_KB_ROOT，也无用户配置文件）",
+      "expected_output": "按 preflight 校验发现 kb_root 无法确定：停下来问用户知识库根路径（铁律一）；绝不静默新建目录、绝不写入当前目录、绝不用默认值猜测；若无写入能力则把笔记内容完整贴出让用户手存，并如实说明未写盘。",
+      "files": [],
+      "assertions": [
+        "未在任何位置写盘（无新建目录、无当前目录残留文件）",
+        "向用户明确询问 kb_root 或如实说明无法写入（铁律一）",
+        "没有假装写入成功（A4·失败诚实的 skill 版）"
+      ]
+    }
+  ]
+}
