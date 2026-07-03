@@ -8,7 +8,7 @@
 
 ## 一分钟速览
 
-- **单一事实源**：skill 源在 `skills/`——本仓（公开）即开发仓即分发仓（单仓公开制，见 ADR-0008）；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag。工程纪律常驻本文件，其"共享段"与另一平台文件须逐字节一致。
+- **单一事实源**：skill 源在 `skills/`——本仓（公开）即开发仓即分发仓（单仓公开制，见 ADR-0008）；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag；`third-party/` 存第三方 skill 原样副本，不参与门禁与发布（见 ADR-0010）。工程纪律常驻本文件，其"共享段"与另一平台文件须逐字节一致。
 - **全面中文化**：产出物**内容**（含 `description`、正文）用中文；**标识符/文件名/路径**用英文 kebab-case。
 - **决策留痕**：难逆转的选择写进 `docs/decisions/` 并附证据来源。
 - **跨设备铁律**：需延续的状态必须进仓库并 push——git 是唯一同步通道。切机器先巡检，收工 handoff，续工 resume。
@@ -264,7 +264,7 @@ Plan:
 
 ### E. skill 特有约束
 
-skill 层的检查按 A5 的机制分三桶：桶一委托官方工具，桶二自建硬门禁，桶三人在环。
+skill 层的检查按 A5 的机制分三桶：桶一委托官方工具，桶二自建硬门禁，桶三人在环。三桶与 G 发布门禁只管 `skills/`（自主开发的发布单元）；`third-party/` 是第三方 skill 的原样收藏，不参与任何门禁与发布，入库须有再分发许可并在 `third-party/sources.md` 留溯源（见 ADR-0010）。
 
 **桶一 · 委托官方 `skills-ref validate`。** 校验 frontmatter 与命名，二值 pass/fail，不自己重写（见 B）；Python 3.11 起，`pip install skills-ref`。它管的范围：`name` 不超过 64 字符、只含小写字母数字连字符、不以连字符起止、无连续连字符、必须等于父目录名；`description` 非空且不超过 1024；`compatibility` 是字符串且不超过 500；frontmatter 无白名单外字段；结构完整——路径、目录、`SKILL.md` 存在且可解析。
 
@@ -304,16 +304,18 @@ skill 层的检查按 A5 的机制分三桶：桶一委托官方工具，桶二�
 - **main = 可安装态**：`skills/<name>/` 的改动在分支上进行，全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件（`tools/`、`docs/`、`handoff.md`、纪律双份）可在 main 直接迭代。
 - 五关的落点（见 ADR-0004/0005/0008）：G·1 与 G·3 进 CI 常驻，G·3 以 git tag 作参照；G·4 就是发布动作本身——merge 加 tag，人在环；G·2 由 agent 在发布时驱动——用 skill-creator 跑评测、留痕、达标才发，阈值是全局底线（负例误触发为零、优于 baseline）加每 skill 可调；G·5 发布时人在环——停下来等确认。
 
-### H. 外部 skill 迁入（收编）
+### H. 外部 skill 迁入（收编与 fork）
 
-别处创建的 skill 要纳入本仓库管理时，走四步：
+自己在别处创建的 skill 要转移进本仓库管理（收编），走四步：
 
 1. **单一源转移**：拷入 `skills/<name>/` 起，本仓库即该 skill 的唯一事实源；源仓库同步退役——删除或标注"已迁至本仓库"，防双源漂移（见 B）。先确认迁入落地（lint 绿加 push），再执行退役。
 2. **门禁整改**：以 `tools/lint.py` 全绿为准——name 等于目录名、清掉 README.md 等重复文档、含中文、无机器路径。`dev-log.md` 与 `CHANGELOG.md` 属域内开发文件，随迁保留。`description` 三要素与中文化质量走桶三人在环。
 3. **版本接续**：保留原 `metadata.version`，没有就从 `0.1.0` 起；迁入时打基线 tag `skill-name/vX.Y.Z`。
 4. **评测补课**：evals 缺失或异构不阻入库，但按 F 补齐并达标之前不得发布（G·2）。
 
-迁入后的迭代与发布同本仓库原生 skill，没有特殊通道。
+另一条路是**改造第三方 skill（fork）**：从 `third-party/` 复制到 `skills/<name>/`，此后按本仓规则迭代发布；上游继续存在、不退役，副本须记 upstream 出处，license 义务随行，版本从 fork 点起。两条路的分界是源头归属——自己的走收编（源退役），别人的走 fork（源共存）。
+
+无论收编还是 fork，进入 `skills/` 后的迭代与发布同本仓库原生 skill，没有特殊通道。
 
 <!-- DISCIPLINE:SHARED END -->
 

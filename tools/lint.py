@@ -47,12 +47,14 @@ def tracked_paths() -> list[str]:
 
 
 def check_paths() -> None:
-    bad = [p for p in tracked_paths() if any(ord(c) > 127 for c in p)]
+    # third-party/ 豁免：第三方 skill 原样副本，文件名不是本仓标识符（ADR-0010）
+    bad = [p for p in tracked_paths()
+           if not p.startswith("third-party/") and any(ord(c) > 127 for c in p)]
     if bad:
         errors.append("路径含非 ASCII 字符（A3：标识符/路径须英文 kebab-case）：\n    "
                       + "\n    ".join(bad))
     else:
-        print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII")
+        print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII（third-party/ 豁免）")
 
 
 def check_adrs() -> None:
@@ -229,6 +231,10 @@ def check_marketplace() -> None:
         src = entry.get("source")
         if isinstance(src, dict) and src.get("source") == "git-subdir":
             ref, path = src.get("ref"), (src.get("path") or "").rstrip("/")
+            if not path.startswith("skills/"):
+                errors.append(f"marketplace · {name}：path '{path}' 不在 skills/ 下"
+                              f"（third-party/ 不参与分发，ADR-0010）")
+                continue
             if not ref:
                 continue  # 无 ref = 跟默认分支，无 tag 可校
             tag = subprocess.run(["git", "-C", str(ROOT), "tag", "-l", ref],
@@ -246,6 +252,10 @@ def check_marketplace() -> None:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 tag '{ref}' 处 "
                               f"metadata.version={tag_ver} 不一致（G·4 发布一致性）")
         elif isinstance(src, str) and src.startswith("./"):
+            if not src.startswith("./skills/"):
+                errors.append(f"marketplace · {name}：source '{src}' 不在 skills/ 下"
+                              f"（third-party/ 不参与分发，ADR-0010）")
+                continue
             skill_md = ROOT / src.lstrip("./") / "SKILL.md"
             if not skill_md.is_file():
                 errors.append(f"marketplace · {name}：相对路径 {src} 下不存在 SKILL.md")
