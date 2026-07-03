@@ -2,9 +2,9 @@
   { "id": "T1", "category": "显式-直接", "should_trigger": true, "query": "刚才这段关于 pnpm phantom dependency 的讨论挺有价值，帮我沉淀到 obsidian" },
   { "id": "T2", "category": "显式-口语", "should_trigger": true, "query": "把这个坑记一下，下次别再踩了" },
   { "id": "T3", "category": "显式-typo", "should_trigger": true, "query": "把刚才的结论记到obisdian里" },
-  { "id": "T4", "category": "显式-devlog", "should_trigger": true, "query": "这个 bug 的排查过程值得留档，写进项目的 dev-log" },
-  { "id": "T5", "category": "隐式-不点名", "should_trigger": true, "query": "这个结论以后肯定还会用到，别让它跟着对话消失" },
-  { "id": "T6", "category": "隐式-收尾", "should_trigger": true, "query": "todo-app 今天进展不少，把做到哪了和几个关键决定保存一下，下次接着干" },
+  { "id": "T4", "category": "显式-实战入库", "should_trigger": true, "query": "这个 bug 的排查过程值得长期复用，整理成一篇 Obsidian 实战笔记" },
+  { "id": "T5", "category": "长期保存-不点名", "should_trigger": true, "query": "这个结论以后肯定还会用到，别让它跟着对话消失" },
+  { "id": "T6", "category": "情境-项目决策入库", "should_trigger": true, "query": "todo-app 今天定了 IndexedDB 取代 localStorage 的关键决策，整理成 Obsidian 笔记，下次做同类离线存储方案时要用" },
   { "id": "T7", "category": "情境-实战", "should_trigger": true, "query": "我们刚查清 Windows 下 Python GBK 控制台打 emoji 崩溃的根因，把排查过程和最终解法存一下，以后肯定还有人踩" },
   { "id": "T8", "category": "情境-研究", "should_trigger": true, "query": "这一下午把 RAG chunking 策略研究得差不多了，整理成一篇能长期参考的笔记放知识库" },
   { "id": "T9", "category": "情境-复用", "should_trigger": true, "query": "帮我把刚才竞品分析的结论保存起来，下个月做规划要用" },
@@ -18,5 +18,6 @@
   { "id": "F7", "category": "负-模板生成", "should_trigger": false, "query": "帮我做一个会议纪要的 markdown 模板" },
   { "id": "F8", "category": "负-收束非项目", "should_trigger": false, "query": "这个话题先放一放，咱们聊点别的" },
   { "id": "F9", "category": "负-写入代码", "should_trigger": false, "query": "把我们讨论的这几条改进意见写进代码注释里" },
-  { "id": "F10", "category": "负-obsidian求助", "should_trigger": false, "query": "obsidian 的 dataview 插件查询语法怎么写？" }
+  { "id": "F10", "category": "负-obsidian求助", "should_trigger": false, "query": "obsidian 的 dataview 插件查询语法怎么写？" },
+  { "id": "F11", "category": "负-devlog", "should_trigger": false, "query": "这个 bug 的排查过程值得留档，写进项目的 dev-log" }
 ]

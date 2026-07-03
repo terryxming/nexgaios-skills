@@ -1,7 +1,7 @@
 ---
 name: anti-patterns
 metadata:
-  version: 0.1.2
+  version: 0.1.3
   provides: [anti-patterns]
   depends_on: [credibility-spec]
 ---
@@ -56,7 +56,7 @@ metadata:
 
 > 坏：全篇都是"下个 agent 应读取 X、执行 Y、检查 Z"，用户看不到故事线与判断依据。
 
-为什么坏：笔记只服务机器续作，人不愿读，也就不会回访。
+为什么坏：笔记只服务机器续作，人不愿读，也就不会复用。
 
 改写：**第一屏写给人看**（是什么 / 解决什么 / 最重要结论）；给 agent 的操作指令降级到"下次怎么用 / 恢复入口"。判断依据要留，不能只留指令。
 

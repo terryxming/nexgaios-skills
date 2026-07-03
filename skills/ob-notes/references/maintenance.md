@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 0.4.1
+  version: 1.0.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -35,29 +35,23 @@ metadata:
 | 规则项（标识符） | 含义 | 唯一家 |
 |---|---|---|
 | `kb-root` | 知识库根路径配置变量 `{kb_root}` 的定义与读取顺序 | preflight.md |
-| `landing-rule` | 各 Mode 的落点路径规则 | preflight.md |
+| `landing-rule` | Obsidian 入口落点路径规则 | preflight.md |
 | `preflight-flow` | 写盘前的环境校验流程 | preflight.md |
 | `path-normalize` | 跨 OS 路径形态归一 | preflight.md |
-| `concurrency-safe` | jsonl 并发写安全做法 | preflight.md |
 | `credibility-spec` | 可信度三档的定义与标记格式 | frontmatter-tags.md |
 | `tag-system` | 三轴 tag 体系 | frontmatter-tags.md |
-| `frontmatter-spec` | 笔记 frontmatter 字段规范（含 read_count/last_read/updated 等） | frontmatter-tags.md |
+| `frontmatter-spec` | 笔记 frontmatter 字段规范 | frontmatter-tags.md |
 | `linking-convention` | 双链与 callout 使用约定 | frontmatter-tags.md |
 | `naming-rule` | 笔记文件命名规则 | frontmatter-tags.md |
 | `datestamp-rule` | 追加带日期、过时标注、不覆盖历史 | frontmatter-tags.md |
 | `layout-rule` | 排版规约（markdown 元素用途与克制，反炫技） | frontmatter-tags.md |
-| `mode-decision` | Mode A/B 及子类型的判定逻辑与实例 | SKILL.md |
+| `mode-decision` | 研究型 / 实战型笔记的判定逻辑与实例 | SKILL.md |
 | `iron-laws` | 铁律本身 | SKILL.md |
-| `trigger-rule` | 触发方式（显式 / 收尾判据） | SKILL.md |
+| `trigger-rule` | 触发方式与边界排除 | SKILL.md |
 | `research-template` | 研究型笔记模板与该记/该丢清单 | mode-a-research.md |
 | `source-fidelity` | 源信息留存与原文结构覆盖（长文/网页沉淀防压成观点卡） | mode-a-research.md |
 | `mastery-lens` | 学习闭环写作纪律（写前自问 ＋ 让掌握从字里行间透出，不做章节） | mode-a-research.md |
 | `practice-template` | 实战型笔记模板与该记/该丢清单 | mode-a-practice.md |
-| `devlog-template` | 开发日志模板 | mode-b-devlog.md |
-| `devlog-integration` | dev-log 与 CLAUDE.md/AGENTS.md 的打通方式 | mode-b-devlog.md |
-| `jsonl-schema` | capture-log.jsonl 的字段定义 | monitoring.md |
-| `revisit-signal` | read_count/last_read 回访信号的记录机制 | monitoring.md |
-| `review-flow` | 两周复盘的查询与产出 | monitoring.md |
 | `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
 | `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 研究型掌握测试） | quality-check.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
@@ -66,10 +60,7 @@ metadata:
 | `maintenance-flow` | 修改流程（第 6 节） | maintenance.md |
 | `ssot-registry` | 本归属表（第 1 节） | maintenance.md |
 
-注：`frontmatter-spec` 定义"笔记里有哪些 frontmatter 字段"；`revisit-signal` 定义"read_count 何时如何 +1"。前者定义字段存在，后者定义字段的更新行为——职责不同，不算重复。
-
 注：以下几对易混，特此划清（均不算 MECE 重复）：
-- `quality-rubric`（写盘前对**单篇**自检"现在写得好不好"）vs `review-flow`（两周一次对**全库**事后复盘"将来有没有被用上"）——时机与粒度不同。
 - `source-fidelity`（针对**外部来源**：源材料别被压没）vs `anti-patterns`（针对**所有笔记**的通用坏例）——前者管保真、后者管通病，互补不重叠。
 - `anti-patterns` 只给坏例与改写方向，**不重新定义**可信度/日期/双链等规则；命中处一律按各自唯一家（如 credibility-spec）处理。
 - `mastery-lens`（研究型**写作时**的思考纪律：写前自问、让掌握从字里行间透出）vs `quality-rubric` 的掌握测试（**写盘前**检验掌握有没有透出来）——前者写时心法、后者写后判据，时机不同，不重复。
@@ -133,7 +124,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 
 遵循语义化版本 `MAJOR.MINOR.PATCH`，起始 `0.1.0`（早期，未承诺稳定）。
 
-- **MAJOR**：breaking change——改变会使用户**已有笔记 / 配置 / 工作流失效或不一致**的改动。包括：`landing-rule` 落点变更、任一模板结构变更、`tag-system` 或 `frontmatter-spec` 变更、`jsonl-schema` 删改字段、受控词表标识符重命名。
+- **MAJOR**：breaking change——改变会使用户**已有笔记 / 配置 / 工作流失效或不一致**的改动。包括：`landing-rule` 落点变更、任一模板结构变更、`tag-system` 或 `frontmatter-spec` 变更、受控词表标识符重命名。
 - **MINOR**：向后兼容的新增——加新规则项、加新 reference、加可选字段。
 - **PATCH**：不改行为的修正——措辞、错别字、补充示例。
 
@@ -141,7 +132,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 - 每个文件 frontmatter 的 `version` = **该文件**的版本。
 - SKILL.md frontmatter 的 `version` = **整个 skill** 的对外版本，进 CHANGELOG。
 
-CHANGELOG.md（skill 域内，给人看的版本叙事，随 skill 入库并一同分发，见宿主仓库 ADR-0008）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（Mode B，面向维护者，详尽）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
+CHANGELOG.md（skill 域内，给人看的版本叙事，随 skill 入库并一同分发，见宿主仓库 ADR-0008）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（仓库维护文件，不是对外写入能力）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
 
 <a id="6"></a>
 ## 6. 修改流程（强制）

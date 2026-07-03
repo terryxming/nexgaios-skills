@@ -1,14 +1,14 @@
 ---
 name: quality-check
 metadata:
-  version: 0.3.2
+  version: 0.3.3
   provides: [quality-rubric]
   depends_on: [credibility-spec, source-fidelity, mastery-lens]
 ---
 
 # 写盘前质量自检
 
-**这是写盘前对单篇笔记的最后一道闸**：不合格先重写，别把问题留给未来的自己。它与 monitoring 的"两周复盘"分工不同——复盘是事后看全库哪些被用上，本表是此刻看这一篇够不够好。
+**这是写盘前对单篇笔记的最后一道闸**：不合格先重写，别把问题留给未来的自己。本表只判断这一篇是否值得写入 Obsidian，不承担事后复盘或回访统计。
 
 抽取完、套好模板、写盘前，逐项过一遍：
 

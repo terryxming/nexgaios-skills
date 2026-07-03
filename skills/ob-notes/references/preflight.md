@@ -1,29 +1,28 @@
 ---
 name: preflight
 metadata:
-  version: 0.1.0
-  provides: [kb-root, landing-rule, preflight-flow, path-normalize, concurrency-safe]
+  version: 1.0.0
+  provides: [kb-root, landing-rule, preflight-flow, path-normalize]
   depends_on: []
 ---
 
-# 环境契约 — 落点解析与写盘前校验
+# 环境契约 — Obsidian 落点解析与写盘前校验
 
-本文件是所有写盘动作的前置关卡。它定义知识库根路径怎么读、各 Mode 落点在哪、写盘前必须校验什么、跨系统路径如何归一、并发写如何安全。**任何写入笔记或日志的动作，都必须先走完这里的 preflight 五步。**
+本文件是所有写盘动作的前置关卡。它定义 Obsidian 知识库根路径怎么读、笔记落点在哪、写盘前必须校验什么、跨系统路径如何归一。**任何写入笔记的动作，都必须先走完这里的 preflight 四步。**
 
 ## 目录
 
 - [1. kb-root：知识库根路径](#kb-root)
-- [2. landing-rule：各 Mode 落点](#landing)
-- [3. preflight-flow：写盘前五步校验](#flow)
+- [2. landing-rule：Obsidian 入口落点](#landing)
+- [3. preflight-flow：写盘前四步校验](#flow)
 - [4. path-normalize：跨系统路径归一](#norm)
-- [5. concurrency-safe：并发写安全](#conc)
 
 ---
 
 <a id="kb-root"></a>
 ## 1. kb-root：知识库根路径
 
-落点不硬编码绝对路径，统一基于一个可配置的根路径变量 `{kb_root}`。**配置存放在 skill 之外**——因为 skill 会被更新覆盖，配置若写进 skill 会在升级时丢失。
+落点不硬编码绝对路径，统一基于一个可配置的根路径变量 `{kb_root}`。**配置存放在 skill 之外**，因为 skill 会被更新覆盖，配置若写进 skill 会在升级时丢失。
 
 **读取顺序**（取第一个命中的）：
 
@@ -42,32 +41,28 @@ metadata:
 ---
 
 <a id="landing"></a>
-## 2. landing-rule：各 Mode 落点
+## 2. landing-rule：Obsidian 入口落点
 
-落点由沉淀类型（Mode，判定见 SKILL.md 的 mode-decision）决定：
+本 skill 只把笔记投递到 Obsidian 知识库统一入口：
 
 | 用途 | 落点 |
 |---|---|
-| Mode A 知识沉淀 | `{kb_root}/00 - raw/00 - inbox/`（知识库统一入口，只投递，下游路由/编译不归本 skill 管） |
-| Mode B 项目记忆 | 跟所属项目走，落项目根（见下分支） |
-| 监控日志 | `{kb_root}/_meta/capture-log.jsonl`（中立持久区，不进 skill 文件夹） |
+| 对话价值沉淀 | `{kb_root}/00 - raw/00 - inbox/` |
 
-**Mode B 落点分支**（按当前工作环境判定）：
+说明：
 
-1. 当前工作目录是 git 仓库 → 落仓库内 `docs/dev-log.md`。
-2. 当前正在开发的项目本身就是某个 skill / 工具目录 → 落该目录根（如 `<该skill>/dev-log.md`）。
-3. 非代码项目、且无项目目录 → 退回知识库的项目区 `{kb_root}/projects/<项目名>/dev-log.md`（**不是 inbox**——inbox 是知识流入口，不是项目记忆的家）。
-
-判定原则：项目记忆永远跟着"它所属的那个项目"走，与代码同库版本控制；只有无处可归时才退回知识库项目区。
+- 入口目录只负责接收 agent 产出的结构化笔记；下游路由、Wiki 编译、长期归档不归本 skill 管。
+- 不根据当前 git 仓库、项目路径或 skill 目录推断落点。
+- 不写项目目录，不创建或更新 `dev-log.md`、`README.md`、代码注释或项目流水记录。
 
 ---
 
 <a id="flow"></a>
-## 3. preflight-flow：写盘前五步校验
+## 3. preflight-flow：写盘前四步校验
 
 每次写入前按序执行，任一步不通过即停：
 
-1. **解析落点**：依据 Mode（mode-decision）与上面的 landing-rule，结合 git 检测，算出确切目标路径。先解析 `{kb_root}`（第 1 节）；未配置则停下来问。
+1. **解析落点**：先解析 `{kb_root}`（第 1 节），再得到确切目标目录 `{kb_root}/00 - raw/00 - inbox/`。未配置则停下来问。
 2. **存在性检查**：目标目录是否存在？
    - 存在 → 继续。
    - 不存在 → **停下来问用户**："目标目录 `<路径>` 未找到，是路径变了，还是要我在此创建？" 由用户拍板，**绝不静默新建、绝不退而写到当前目录**（铁律一）。
@@ -75,7 +70,6 @@ metadata:
    - 有 → 继续。
    - 无 → 不假装成功，告知用户"此环境无法写文件"，把完整笔记内容**直接贴出来**让其手动保存。
 4. **路径归一**：按第 4 节对路径做跨系统适配后再写。
-5. **并发安全**：写 jsonl 等追加型文件时，按第 5 节方式追加，避免损坏。
 
 校验全过 → 执行写入。任何一步触发"停下来问"，都不要在未确认前写盘。
 
@@ -92,15 +86,3 @@ metadata:
 - **不在路径里放敏感信息**，不把路径塞进 URL 参数。
 
 原则与铁律一一致：路径只要有不确定，就停下来问，不赌。
-
----
-
-<a id="conc"></a>
-## 5. concurrency-safe：并发写安全
-
-`capture-log.jsonl` 可能被多个 agent（Claude、Codex…）先后甚至并发写入。避免损坏的做法：
-
-- **只追加，不读改写**：每次写一条新行用追加模式（`O_APPEND` 语义），不要"读出整个文件→改→整体写回"——后者在并发下会互相覆盖。
-- **一次一行、原子写**：把一条日志序列化成单行 JSON，一次写入并以换行结尾。小行追加在多数系统上接近原子，能显著降低交错风险。
-- **失败重试**：若写入因占用/锁失败，短暂退避后重试一两次；仍失败则告知用户而非静默丢弃。
-- **不依赖第三方锁库**：用文件系统追加语义即可，保持零依赖、可移植。

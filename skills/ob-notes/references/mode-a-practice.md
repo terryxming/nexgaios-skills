@@ -1,7 +1,7 @@
 ---
 name: mode-a-practice
 metadata:
-  version: 0.4.1
+  version: 1.0.0
   provides: [practice-template]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -48,8 +48,6 @@ updated: {{同 date，实战型一般写完冻结}}
 source: {{来源 agent/任务}}
 source_url: {{原文/一手出处链接，有外部来源就填，见 frontmatter-spec；纯自查可省}}
 tags: [类型/实战, 可信/已验证, 状态/稳定]
-read_count: 0
-last_read:
 ---
 
 > [!summary] 一句话

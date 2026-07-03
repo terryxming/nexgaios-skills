@@ -1,7 +1,7 @@
 ---
 name: mode-a-research
 metadata:
-  version: 0.6.0
+  version: 1.0.0
   provides: [research-template, source-fidelity, mastery-lens]
   depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
@@ -48,8 +48,6 @@ updated: {{最后更新日}}
 source: {{来源 agent/任务}}
 source_url: {{原文/一手出处链接，有外部来源就填，见 frontmatter-spec}}
 tags: [类型/研究, 可信/待验证, 状态/持续]
-read_count: 0
-last_read:
 ---
 
 > [!summary] 30 秒读法

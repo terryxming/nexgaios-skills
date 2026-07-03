@@ -3,19 +3,17 @@ title: ob-notes 开发日志
 date: 2026-06-26
 updated: 2026-07-03
 source: claude (网页对话) / 交接给 Claude Code 续做
-tags: [类型/项目日志, 状态/持续]
-read_count: 0
-last_read:
+tags: [状态/持续]
 ---
 
 # ob-notes 开发日志
 
 > [!note] 交接说明
-> 本文件是 ob-notes 这个 skill 自身的项目记忆（Mode B）。它在一个 Claude 网页对话里设计成型，现交接给 Claude Code 续做。**接手前请先读本文件 + SKILL.md + references/maintenance.md**，即可恢复全部设计上下文，无需原始对话记录。
+> 本文件是 ob-notes 这个 skill 自身的维护日志，属于仓库内开发记录，不代表 ob-notes 对外提供"写 dev-log"能力。它在一个 Claude 网页对话里设计成型，现由 Claude Code / Codex 接力维护。**接手前请先读本文件 + SKILL.md + references/maintenance.md**，即可恢复全部设计上下文，无需原始对话记录。
 
 ## 项目意图
 
-做一个遵循 Agent Skills 开放标准、可被 Claude/Codex 等多 agent 通用的 skill，把人与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论、项目进展）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库或项目目录。
+做一个遵循 Agent Skills 开放标准、可被 Claude/Codex 等多 agent 通用的 skill，把人与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库。
 
 成功标准：解决用户随手让 agent "记一下"时的四类毛病——不知道记什么、压缩过狠、格式丑、没重点；并且 skill 自身可长期维护、不随复杂度上升而前后矛盾。
 
@@ -51,13 +49,15 @@ last_read:
 | 2026-06-27 | **v0.7.0**：source-fidelity 仪式闸→实质闸（覆盖表锁最细粒度、放行改"机制能否只凭笔记读懂"、保留清单补机制/确切名 + 源上限护栏） | dogfood 复盘：AWS 笔记出了覆盖表却仍把各框架 H3 机制（Mem0 六层模块名、Letta 工具名）压没——根因覆盖表停 H2 粒度、旧"<1/4 补覆盖表"出口被一张表满足（仪式≠实质）；核对原文区分"原文有却被压没"(保真 bug)与"原文本就没有"(源上限、非 bug)。实质闸与评测的回查测试同句，skill 标准＝评测标准、由构造一致 | 再加第六处反压缩声明(否:五处已存、B 类冗余、治不了仪式≠实质)；实质闸上提 SKILL 铁律二常驻(缓办:本次 source-fidelity 确被加载、无加载失败证据，留观察项) |
 | 2026-07-03 | **迁入 `nexgaios-skills-dev`**：该仓库成唯一事实源、原仓库整体退役；SKILL.md 的 provides/depends_on 改逗号字符串、脚本解析兼容两式；归属表有家的孤儿规则由警告升 error | 双仓并存必双源漂移；官方 skills-ref 拒流式列表 + spec 要求 metadata 值为字符串；SKILL.md 声明断裂只配警告会被静默放行（宿主仓库 A5：不阻断的告警会被无视） | 保持流式列表（否：宿主桶一门禁红）；双仓各自维护（否：漂移）；孤儿一律 error（否：真"待实现"场景需要 warning） |
 | 2026-07-03 | **v0.8.0 写入侧监控指令从 SKILL.md 拿走**（monitoring.md 保留、复盘引用保留；启用监控时再加回指令），收尾触发收窄为"确有留存价值时主动问一次" | 监控层暂缓是既定决策，但指令层仍无条件命令记 jsonl——执行模拟发现每次沉淀 preflight 都会因 `_meta` 不存在多问一次，指令与决策脱节（维护者知识没落到指令层）；description"也应触发"与触发节"问一次"语义不一致 | 加"未启用则跳过"条件开关（否：给暂缓功能留常驻分支判断，徒增读者负担；启用时机未到，拿走更干净） |
+| 2026-07-03 | **v1.0.0 收敛为 Obsidian-only**：移除项目目录/dev-log 写入能力、删除 monitoring 回访机制、tag 移除 `类型/项目日志` | 用户重新明确定位：ob-notes 只做一件事，把人与 agent 对话里值得长期复用的信息写回 Obsidian；项目目录写入和回访信号都会把职责拉宽 | 保留 dev-log 作为第二模式（否：偏离定位）；保留 monitoring 空壳（否：无意义且制造机制负担） |
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v0.8.0**（内容质量审查：写入侧监控指令拿走、收尾触发收窄 MINOR；此前 v0.7.1 迁入接缝修复 PATCH）。本 skill 已于 2026-07-03 **迁入 `nexgaios-skills-dev` 仓库**（`skills/ob-notes/`），该仓库为唯一事实源，原仓库退役；宿主仓库八门禁（skills-ref/可移植/中文化/杂物/version 等）全绿，基线 tag `ob-notes/v0.7.0` 已打。evals 已补（触发 20 条 + 执行 3 条，官方 skill-creator 格式，经用户过目）。31 规则项 MECE 通过（build_depmap 已兼容 SKILL.md 字符串式声明）。监控层(`_meta`)按用户选择**暂缓未建**。
+- 现状：**v1.0.0 候选**（Obsidian-only 破坏性收敛）：主能力只写 `{kb_root}/00 - raw/00 - inbox/`，Mode B / 项目目录写入 / dev-log 对外能力 / monitoring 回访机制已移除；受控词表收敛为 25 项，`dependency-map.md` 已重建。当前改动在分支 `codex/ob-notes-obsidian-only`，待宿主 lint、评测与发布门禁完成后才能合入 main 并打 tag。
 - 下一步：
-  1. **跑 F 全栈评测**（宿主纪律 F/G②）：触发 20 条隔离子代理 + pass^k、执行 3 条 with-skill vs baseline + 独立 grader——达标前不得发布。
-  2. 继续观察真实沉淀数据（现 1 篇 `Agent 记忆模块最佳实践（AWS）.md`）；攒多了看 source-fidelity / 可信度 / mastery-lens 纪律是否稳定。监控层等"规律沉淀 + 确认会复盘"时再启用。
+  1. **跑宿主 lint 与 skill 校验**，确保 v1.0.0 结构门禁全绿。
+  2. **补跑 F/G② 评测**：重点覆盖 Obsidian-only 正例、dev-log 负例、kb_root 未配置停问。
+  3. 达标后合入 main 并打 tag `ob-notes/v1.0.0`。
 - 卡点：无。
 - **续做提示（给接手的你/agent）**：先读宿主仓库 `CLAUDE.md`/`AGENTS.md`（工程纪律，含 skill 迁入/发布门禁）与 `docs/decisions/`；改本 skill 任何文件前必读 `references/maintenance.md`（§6 修改流程）。换新机器需自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 preflight.md）。旧仓库的"并 main/OKC console"开放项已随原仓库退役作废。
 - 已解决：
@@ -69,6 +69,7 @@ last_read:
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-07-03：**v1.0.0 候选改造**。按用户确认：①摘除写项目目录能力，删除 `mode-b-devlog.md`，SKILL.md 只保留研究型/实战型 Obsidian 笔记；②删除 monitoring 回访机制与 `monitoring.md`，frontmatter 去掉 `read_count`/`last_read`；③tag 体系移除 `类型/项目日志`；④preflight 落点统一为 `{kb_root}/00 - raw/00 - inbox/`；⑤trigger/evals 增 dev-log 负例，项目决策正例改为 Obsidian-only。`build_depmap.py` 重跑通过，受控词表 31→25 项。尚待宿主 lint、评测与发布门禁。
 - 2026-07-03：**执行评测第 1 轮：with-skill 两组全胜（独立盲评 grader，位置对照排除偏差）**。E1 白纸建笔记 **20:14 大胜**（增益 = 可信度三态自降级、frontmatter 可索引、第一屏摘要、适用边界）；E2 dev-log 更新 **20:18 小胜**（增益 = 被推翻决策就地"已过时"删除线留痕；差距小属预判混杂——预置 fixture 本身即 skill 模板，baseline 靠格式跟随得分）；E3 铁律一双侧零写盘（with 侧教科书：拒编造 + 停问 + 未新建目录；baseline 侧归因混杂——unstage 后子代理在仓库 cwd 读到 `skills/ob-notes` 源照做，**"skill 源在 cwd"本身即泄漏**，干净 baseline 需完全无源环境）。机械断言：E1w 9/9、E2w 9/9；差分证据：E1b 结构 0/5（无 frontmatter/可信度/tag）、E2b 无删除线留痕。**G② 执行侧"优于 baseline"初步达标（k=1）**；正式发布仍待 G④（dist 构建未建）。方法（可复用）：双沙箱 w/b 防交叉、config 挪移防写真库、两波串行防 skill 互见、盲评 A/B 反向排位。
 - 2026-07-03：**触发评测第 1 轮（k=1）满分：20/20**——正例 10/10 触发（显式/隐式/情境/typo/竞争全命中）、负例 10/10 正确拒绝、**误触发 0（G 全局底线达标）**。方法：每条用例一个隔离子代理收 query 原文（无评测框架）、解析其转录 `Skill(ob-notes)` tool_use 客观判定；写盘隔离 = 临时挪走 `~/.config/ob-notes/config.json`，铁律一顺带实测通过（T1/T8/T9 走到写盘全部停下来问、零写盘、零编造）。事故与教训：①20 并发瞬间打满限流、10 个子代理被掐（其中 7 个已留下激活证据仍有效，F3/F9/F10 补跑）——**spawn 须分批（≤5）**；②F6"记住用 pnpm"被子代理当真实偏好写入宿主记忆——**负例的"正确行为"也有副作用，跑完须巡检**；③T1 在仓库 cwd 里 grep 出用例文件识破评测——触发判定不受污染（激活在先），但**执行评测须换干净 cwd**（环境泄漏）。诚实标注：k=1 摸底轮；pass^k 加采样与执行评测（baseline 对照）未跑，G② 尚未完全达标。
 - 2026-07-03：**发 v0.8.0（MINOR）**——SKILL.md 内容质量专项审查（执行模拟镜头）：①写入侧监控指令拿走（监控暂缓却无条件命令记 jsonl，每次沉淀会被 preflight 多问一次；monitoring.md 与复盘引用保留）②收尾触发收窄并与触发节"问一次"对齐 ③铁律三倒置指代修正。SKILL.md depends_on 去掉 jsonl-schema/revisit-signal，depmap 重跑图变化确认。教训：审查结论须声明镜头与覆盖面——上一轮结构审查曾误背书"设计无问题"。

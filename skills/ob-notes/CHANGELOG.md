@@ -4,6 +4,16 @@
 
 版本遵循语义化版本 `MAJOR.MINOR.PATCH`，规则见 `references/maintenance.md` 第 5 节。
 
+## [1.0.0] - 2026-07-03
+
+破坏性定位收敛：ob-notes 只负责把对话中的长期复用信息写回 Obsidian。
+
+- **移除项目目录写入能力**：删除 Mode B / dev-log 写入路径，落点统一为 `{kb_root}/00 - raw/00 - inbox/`；项目中的可复用决策、踩坑、方案取舍仍可沉淀，但只能作为 Obsidian 笔记。
+- **移除 monitoring 回访机制**：删除 `monitoring.md`、`capture-log.jsonl`、`read_count`、`last_read`、`review-flow`、`revisit-signal`、`concurrency-safe` 等规则与字段。
+- **精简 frontmatter/tag 契约**：frontmatter 只保留笔记内容字段；tag 移除 `类型/项目日志`。
+- **更新评测回归**：项目决策正例改为 Obsidian-only；新增 dev-log 写入负例，防止旧能力回流。
+- **维护词表重建**：受控规则项从 31 项收敛到 25 项，依赖图重新生成。
+
 ## [0.8.0] - 2026-07-03
 
 SKILL.md 内容质量审查后的指令层修正（MINOR，向后兼容——监控本就暂缓未启用）。
