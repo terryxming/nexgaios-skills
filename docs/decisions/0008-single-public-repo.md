@@ -17,7 +17,7 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 3. **源头干净,而非出口净化**:分发物 = **完整 skill 目录**(含 `dev-log.md`、`CHANGELOG.md`、`evals/`——透明信任资产)。质量由 lint 门禁在**源头**保证(README 类重复文档禁入),不在出口删文件。ADR-0006 的"构建分发时排除"条款废止,其"域内开发文件跟 skill 走"的方向保留并走到底。
 4. **main = 可安装态(方案甲)**:`skills/<name>/` 目录的改动在**分支**上进行,全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件(`tools/`、`docs/`、`journal/`、纪律双份)可在 main 直接迭代。
 5. **机制拆除清单**:晋升脚本(promote)不建;"晋升一致性"门禁消失;`metadata.channels` 标记取消(内部 skill 根本不进本仓,无需路由);prod 仓不建。
-6. **保留**:`tools/install.py`(Codex/自定义 skills 目录自用渠道,纯复制);`marketplace.json`(放本仓,Claude Code 走 plugin marketplace;首个 skill 正式发布时建)。
+6. **保留**:`tools/install.py`(自用渠道,纯复制到本机两端用户目录:Claude `~/.claude/skills`、Codex `$CODEX_HOME/skills`);`marketplace.json`(放本仓,首个 skill 正式发布时建;Claude Code 亦可经 plugin marketplace 安装)。
 7. **内部 skill**(公司业务等不可公开者):未来真实出现时**另立私有仓**,届时才为它付费。
 
 ## 证据(附来源,区分已证实/推断)
@@ -26,6 +26,8 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 2. **推断(强)**:两者均无"净化/排除"步骤——其文档只字未提;实施 install.py 时可读 skill-installer 脚本终审。
 3. **已证实**:官方杂物条款原文为创作指引("Do NOT **create** extraneous documentation",本机实读 Codex skill-creator SKILL.md,承 ADR-0005 证据 2)。
 4. **已证实(操作核验)**:仓库现为 `terryxming/nexgaios-skills`,visibility=PUBLIC,本地 remote 已切换且 ls-remote 连通。
+5. **已证实(纠错留痕)**:Claude Code 存在用户级 personal skills 目录 `~/.claude/skills`(官方 plugins-reference:"`~/.claude/skills/` | personal | In every project",https://code.claude.com/docs/en/plugins-reference,2026-07-04 复核)。commit `a786c4d` 曾依据 `claude plugin --help` 与本机目录不存在,误判"Claude Code 无固定 skills 目录"并移除该安装目标——目录不存在只说明尚未使用,不能证明机制不存在;决策 6 与 install.py 已恢复两端安装。
+6. **已证实(终审)**:官方安装链路为整目录复制、无净化——Codex skill-installer 的 `install-skill-from-github.py:176` 为裸 `shutil.copytree(src, dest_dir)`,无任何 ignore/exclude(本机实读,闭环证据 2 的待终审项);其安装目标 `$CODEX_HOME/skills/<skill-name>`(defaults to `~/.codex/skills`,SKILL.md:48,闭环"存疑"第 3 项)。
 
 ## 影响
 
@@ -39,7 +41,7 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 
 - 外部用户从"多 skill 单仓"安装单个 skill 的实际体验(marketplace.json 指向子目录、$skill-installer 按 path 装),首次外部发布时实测。
 - journal 公开后"忠实记录 vs 自我审查"的张力,留观察;必要时敏感细节可写本机不入库文件。
-- Codex 用户级安装目录终审(`~/.codex/skills`,承 ADR-0001)。
+- ~~Codex 用户级安装目录终审(`~/.codex/skills`,承 ADR-0001)~~ 已闭环:见证据 6(本机实读官方 skill-installer SKILL.md:48)。
 
 ## 来源
 
