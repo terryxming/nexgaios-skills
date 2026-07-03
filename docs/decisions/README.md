@@ -42,4 +42,5 @@
 - [0004 纪律硬/软分界：门禁二值化 + 桶三人在环 + 评测发布](0004-discipline-hard-soft-gates.md)（决策四之自建评测路线被 0005 修正）
 - [0005 评测与创作委托官方 skill-creator，仓库不自建](0005-delegate-to-skill-creator.md)（决策 3 被 0006 精化）
 - [0006 skill 源域与分发物分层：开发文件域内聚合、分发时排除](0006-skill-domain-vs-distribution.md)
-- [0007 分发与开源架构：双仓晋升制](0007-dual-repo-promotion.md)
+- [0007 分发与开源架构：双仓晋升制](0007-dual-repo-promotion.md)（被 0008 取代）
+- [0008 单仓公开制：仓库即分发，skill 为发布单元](0008-single-public-repo.md)

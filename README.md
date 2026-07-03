@@ -1,4 +1,4 @@
-# nexgaios-skills-dev
+# nexgaios-skills
 
 多 agent（Claude Code + Codex）的 **skill 生产流水线**：开发、测试、评测、发布、迭代一条龙。
 
@@ -18,7 +18,7 @@
 | 目录 | 用途 |
 |---|---|
 | `skills/` | 每个 skill 一个目录（唯一事实源；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
-| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` 门禁）、纪律漂移校验；安装 / 晋升脚本随 ADR-0007 实施落地 |
+| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` 门禁）、纪律漂移校验、本地安装脚本 |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
 | `journal/` | 跨设备交接文档（handoff） |
 | `.claude/skills/` | 评测/运行时暂存区（gitignore 不入库；skill 源一律在 `skills/`） |
@@ -27,7 +27,7 @@
 
 - 目标平台：**Claude Code + Codex** 两家。
 - 分发渠道：自用 + 团队共享 + 公开 marketplace + GitHub。
-- **双仓晋升制**（见 [ADR-0007](docs/decisions/0007-dual-repo-promotion.md)）：本仓（私有）= 生产流水线；公开仓 `nexgaios-skills-prod` = 开源项目本体，同时充当 Claude marketplace 源与 Codex 可安装源；发布 = 过 G 门禁打 tag 后晋升过去。自用走本地安装脚本，内部 skill（`metadata.channels: internal`）永不出私有仓。
+- **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；自用走本地 `tools/install.py`。内部 skill 未来另立私有仓。
 
 ## 工程纪律
 

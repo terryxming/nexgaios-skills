@@ -13,7 +13,7 @@ skill 级（W2，需 skills-ref）：
   ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
   ⑦ 桶二 · 无杂物文件          —— ADR-0005/0006（顶层禁 README.md 等重复文档；dev-log/CHANGELOG 属域内开发文件例外）
   ⑧ 桶二 · metadata.version   —— 纪律 G③ 版本门禁前置（版本历史 = git tag + metadata.version）
-  （桶二 · dist 一致性 待 build 脚本落地后补，见 ADR-0004/0005）
+  （dist/晋升一致性已随单仓公开制取消，见 ADR-0008）
 
 二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
 依赖：skills-ref（桶一，ADR-0004 选项 A）；其余零外部依赖。无 skill 时 ④⑤⑥ 空过。

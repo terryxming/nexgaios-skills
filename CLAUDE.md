@@ -8,7 +8,7 @@
 
 ## 一分钟速览
 
-- **单一事实源**：skill 源在 `skills/`（本私有仓）；发布 = **晋升**到公开仓 `nexgaios-skills-prod`（双仓晋升制，见 ADR-0007），晋升物只由脚本生成、永不手改。工程纪律常驻本文件，其"共享段"与另一平台文件须逐字节一致。
+- **单一事实源**：skill 源在 `skills/`——本仓（公开）即开发仓即分发仓（单仓公开制，见 ADR-0008）；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag。工程纪律常驻本文件，其"共享段"与另一平台文件须逐字节一致。
 - **全面中文化**：产出物**内容**（含 `description`、正文）用中文；**标识符/文件名/路径**用英文 kebab-case。
 - **决策留痕**：难逆转的选择写进 `docs/decisions/` 并附证据来源。
 - **跨设备铁律**：需延续的状态必须进仓库并 push——git 是唯一同步通道。切机器先巡检，收工 handoff，续工 resume。
@@ -251,7 +251,7 @@ Plan:
 | ① 写之前先读 | 新建 skill 前先读同类 skill 与官方 skill-creator 指引；改前先读其 `SKILL.md`、`evals/` 与 git tag 版本历史。 |
 | ② 编码前思考 | 先说清触发边界（何时触发 / 何时不）、平台差异、是否真需新建。 |
 | ③ 简单性 | 一个 skill 只解决一类任务；`SKILL.md` 正文短小，细节拆 `references/` 按需加载。 |
-| ④ 外科手术式修改 | 一次只动一个 skill 目录；晋升物只由脚本生成，永不手改。 |
+| ④ 外科手术式修改 | 一次只动一个 skill 目录。 |
 | ⑤ 验证 | 改 `SKILL.md` 前先把问题写成 eval 用例，先挂后过（见 F）。 |
 | ⑥ 目标驱动 | "做个 X skill"先具体化为触发正/负例 + 执行 rubric。 |
 | ⑦ 调试 | 不触发/误触发先复现（eval），再定位是 `description` 还是正文，一次改一处。 |
@@ -264,11 +264,10 @@ Plan:
 **桶一 · 委托官方 `skills-ref validate`**（Python≥3.11，`pip install skills-ref`；二值 pass/fail，不自己重写，见 B）：校验 frontmatter 与命名——`name` ≤64、仅 `[a-z0-9-]`、不以连字符起止、无连续连字符、**等于父目录名**；`description` 非空 ≤1024；`compatibility` 是字符串 ≤500；frontmatter 无白名单外字段；结构完整（路径 / 目录 / `SKILL.md` / 可解析）。
 
 **桶二 · 自建硬门禁**（skills-ref 不覆盖、可脚本化，进 lint/CI）：
-1. **晋升一致性**：公开仓 `nexgaios-skills-prod` 的 skill 内容必须能由本仓 `skills/` 经晋升脚本完整重生（净化布局见 ADR-0007）；晋升只经脚本，不手改公开仓。
-2. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
-3. **中文化兵底**：`description`、正文至少含中文（CJK），防纯英文产出。
-4. **杂物拦截**：skill 顶层禁 README.md 等与 `SKILL.md` 职责重复的文档；`dev-log.md`、`CHANGELOG.md` 属**域内开发文件**——留在源，安装/晋升净化时移出可安装目录（见 ADR-0006/0007）。
-5. **版本存在**：`SKILL.md` 须有 `metadata.version`（G③ 前置）。
+1. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
+2. **中文化兵底**：`description`、正文至少含中文（CJK），防纯英文产出。
+3. **杂物拦截**：skill 顶层禁 README.md 等与 `SKILL.md` 职责重复的文档；`dev-log.md`、`CHANGELOG.md` 属**域内开发文件**——随 skill 入库并一同分发（**源头干净而非出口净化**，见 ADR-0008）。
+4. **版本存在**：`SKILL.md` 须有 `metadata.version`（G③ 前置）。
 
 **桶三 · 人在环质量关**（语义判不了，遇到即停 + 提案 + 确认，见 A5）：
 1. **`description` 质量**：用**第三人称**讲清三件事——这个 skill 是干嘛的、何时用、何时不用（`skills-ref` 只查非空）。
@@ -283,9 +282,10 @@ Plan:
 - 用例入库 `skills/<name>/evals/`，运行产物不入库。
 
 ### G. 发布门禁
-允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）④晋升到公开仓 `nexgaios-skills-prod` 成功且与源一致 ⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
-- **版本机械参照 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；`CHANGELOG.md` 为域内人读叙事，随源入库、晋升时移入公开仓透明区（`dev/<name>/`）而不进可安装目录（见 ADR-0006/0007）。
-- **落点**（见 ADR-0004/0005/0007）：①③ 进 **CI 常驻**（③ 以 git tag 作参照）；④ 由晋升脚本在发布时执行并自校验；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
+允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）④合入 main 并打 tag `skill-name/vX.Y.Z`（main = 可安装态）⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
+- **版本机械参照 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；`CHANGELOG.md` 为域内人读叙事，随 skill 入库并一同分发（见 ADR-0006/0008）。
+- **main = 可安装态**：`skills/<name>/` 的改动在**分支**上进行，全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件（`tools/`、`docs/`、`journal/`、纪律双份）可在 main 直接迭代。
+- **落点**（见 ADR-0004/0005/0008）：①③ 进 **CI 常驻**（③ 以 git tag 作参照）；④ 即发布动作本身（merge + tag，人在环）；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
 ### H. 外部 skill 迁入（收编）
 外来 skill（他处创建）纳入本仓库管理时：
