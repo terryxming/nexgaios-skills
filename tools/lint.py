@@ -11,6 +11,8 @@ skill 级（W2，需 skills-ref）：
   ④ 桶一 · skills-ref validate —— 私有纪律 E 桶一（frontmatter/命名/结构 17 项）
   ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
   ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
+  ⑦ 桶二 · 无杂物文件          —— ADR-0005（skill 顶层禁 CHANGELOG.md/README.md 等）
+  ⑧ 桶二 · metadata.version   —— 纪律 G③ 版本门禁前置（版本历史 = git tag + metadata.version）
   （桶二 · dist 一致性 待 build 脚本落地后补，见 ADR-0004/0005）
 
 二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
@@ -146,6 +148,48 @@ def check_chinese() -> None:
         print(f"✅ 中文化兵底（桶二）：{len(dirs)} 个 SKILL.md 均含中文")
 
 
+def check_clutter() -> None:
+    """桶二：skill 顶层禁杂物文件（官方 skill-creator 点名，见 ADR-0005）。
+
+    只查顶层：assets/ 内的 README 等可能是合法模板资源，不误伤。
+    """
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过杂物检查（桶二）")
+        return
+    clutter = {"CHANGELOG.md", "README.md", "INSTALLATION_GUIDE.md", "QUICK_REFERENCE.md"}
+    bad = [f"{d.name}/{f.name} 属杂物文件（skill 内不放，版本历史用 git tag，见 ADR-0005）"
+           for d in dirs for f in d.iterdir() if f.is_file() and f.name in clutter]
+    if bad:
+        errors.extend(bad)
+    else:
+        print(f"✅ 杂物检查（桶二）：{len(dirs)} 个 skill 顶层无杂物")
+
+
+def check_version() -> None:
+    """桶二：SKILL.md 须有 metadata.version（G③ 版本门禁前置）。"""
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过 version 检查（桶二）")
+        return
+    try:
+        from skills_ref import read_properties
+    except ImportError:
+        return  # 依赖缺失已由桶一报错，不重复
+    bad = []
+    for d in dirs:
+        try:
+            props = read_properties(d)
+        except Exception:
+            continue  # 结构/frontmatter 问题由桶一报，不重复
+        if not (props.metadata or {}).get("version"):
+            bad.append(f"{d.name}/SKILL.md 缺 metadata.version（G③：版本历史 = git tag + metadata.version）")
+    if bad:
+        errors.extend(bad)
+    else:
+        print(f"✅ version 检查（桶二）：{len(dirs)} 个 skill 均有 metadata.version")
+
+
 def main() -> int:
     print("== 仓库级 + skill 级 lint（W1/W2）==")
     check_paths()
@@ -154,6 +198,8 @@ def main() -> int:
     check_skills_ref()
     check_portability()
     check_chinese()
+    check_clutter()
+    check_version()
 
     if errors:
         print("\n✗ lint 失败：")

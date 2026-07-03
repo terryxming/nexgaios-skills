@@ -285,6 +285,15 @@ Plan:
 - **版本历史 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；skill 内**不放 CHANGELOG.md**（官方 skill-creator 明确视其为杂物，见 ADR-0005）。
 - **落点**（见 ADR-0004/0005）：①③④ 进 **CI 常驻**（③ 以 git tag 作参照）；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
+### H. 外部 skill 迁入（收编）
+外来 skill（他处创建）纳入本仓库管理时：
+1. **单一源转移**：拷入 `skills/<name>/` 起，本仓库即该 skill 唯一事实源；**源仓库同步退役**（删除或标注"已迁至本仓库"），防双源漂移（见 B）。先确认迁入落地（lint 绿 + push），再执行退役。
+2. **门禁整改**：以 `tools/lint.py` 全绿为准（name = 目录名、清 CHANGELOG.md 等杂物、含中文、无机器路径）；`description` 三要素与中文化质量走桶三人在环。
+3. **版本接续**：保留原 `metadata.version`（无则起 `0.1.0`）；迁入时打基线 tag `skill-name/vX.Y.Z`。
+4. **评测补课**：evals 缺失/异构**不阻入库**，但按 F 补齐并达标前**不得发布**（G②）。
+
+迁入后的迭代与发布同本仓库原生 skill，无特殊通道。
+
 <!-- DISCIPLINE:SHARED END -->
 
 <!-- DISCIPLINE:PLATFORM BEGIN — 本段仅属当前文件，由当值平台自行维护，不参与漂移校验 -->
