@@ -12,8 +12,8 @@ skill 级（W2，需 skills-ref）：
   ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
   ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
   ⑦ 桶二 · 无杂物文件          —— ADR-0005/0006（顶层禁 README.md 等重复文档；dev-log/CHANGELOG 属域内开发文件例外）
-  ⑧ 桶二 · metadata.version   —— 纪律 G③ 版本门禁前置（版本历史 = git tag + metadata.version）
-  ⑨ marketplace↔tag 一致性    —— 纪律 G④ 发布一致性（ADR-0009：条目 ref 须为已存在 tag，
+  ⑧ 桶二 · metadata.version   —— 纪律 G·3 版本门禁前置（版本历史 = git tag + metadata.version）
+  ⑨ marketplace↔tag 一致性    —— 纪律 G·4 发布一致性（ADR-0009：条目 ref 须为已存在 tag，
                                  version 与该 tag 处的 metadata.version 一致）
   （dist/晋升一致性已随单仓公开制取消，见 ADR-0008）
 
@@ -109,7 +109,7 @@ def check_skills_ref() -> None:
 
 
 def check_portability() -> None:
-    """桶二：skill 源不写死机器路径（E.3 可移植）。"""
+    """桶二：skill 源不写死机器路径（E 桶二·1 可移植）。"""
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过可移植检查（桶二）")
@@ -134,7 +134,7 @@ def check_portability() -> None:
                 if pat.search(line):
                     hits.append(f"{f.relative_to(ROOT).as_posix()}:{i}: {line.strip()[:80]}")
     if hits:
-        errors.append("skill 源含机器路径（E.3 可移植）：\n    " + "\n    ".join(hits))
+        errors.append("skill 源含机器路径（E 桶二·1 可移植）：\n    " + "\n    ".join(hits))
     else:
         print(f"✅ 可移植检查（桶二）：{len(dirs)} 个 skill 无机器路径")
 
@@ -146,7 +146,7 @@ def check_chinese() -> None:
         print("• 无 skill，跳过中文化兵底（桶二）")
         return
     cjk = re.compile("[一-鿿]")
-    bad = [f"{d.name}/SKILL.md 无中文字符（E.4 中文化兵底）"
+    bad = [f"{d.name}/SKILL.md 无中文字符（E 桶二·2 中文化兵底）"
            for d in dirs if not cjk.search((d / "SKILL.md").read_text(encoding="utf-8"))]
     if bad:
         errors.extend(bad)
@@ -174,7 +174,7 @@ def check_clutter() -> None:
 
 
 def check_version() -> None:
-    """桶二：SKILL.md 须有 metadata.version（G③ 版本门禁前置）。"""
+    """桶二：SKILL.md 须有 metadata.version（G·3 版本门禁前置）。"""
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过 version 检查（桶二）")
@@ -192,7 +192,7 @@ def check_version() -> None:
             unparsed += 1  # 结构/frontmatter 问题由桶一报错，此处不虚报绿
             continue
         if not (props.metadata or {}).get("version"):
-            bad.append(f"{d.name}/SKILL.md 缺 metadata.version（G③：版本历史 = git tag + metadata.version）")
+            bad.append(f"{d.name}/SKILL.md 缺 metadata.version（G·3：版本历史 = git tag + metadata.version）")
     if bad:
         errors.extend(bad)
     elif unparsed:
@@ -211,7 +211,7 @@ def _skill_md_version(text: str) -> str | None:
 
 
 def check_marketplace() -> None:
-    """⑨ G④ 发布一致性：marketplace 条目 ref 须为已存在 tag，version 与该 tag 处一致（ADR-0009）。"""
+    """⑨ G·4 发布一致性：marketplace 条目 ref 须为已存在 tag，version 与该 tag 处一致（ADR-0009）。"""
     mp = ROOT / ".claude-plugin" / "marketplace.json"
     if not mp.is_file():
         print("• 无 marketplace.json，跳过发布一致性检查")
@@ -234,7 +234,7 @@ def check_marketplace() -> None:
             tag = subprocess.run(["git", "-C", str(ROOT), "tag", "-l", ref],
                                  capture_output=True, text=True, encoding="utf-8").stdout.strip()
             if not tag:
-                errors.append(f"marketplace · {name}：ref '{ref}' 不是已存在的 git tag（G④：发布 = merge + tag）")
+                errors.append(f"marketplace · {name}：ref '{ref}' 不是已存在的 git tag（G·4：发布 = merge + tag）")
                 continue
             show = subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{path}/SKILL.md"],
                                   capture_output=True, text=True, encoding="utf-8")
@@ -244,7 +244,7 @@ def check_marketplace() -> None:
             tag_ver = _skill_md_version(show.stdout)
             if version and tag_ver and version != tag_ver:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 tag '{ref}' 处 "
-                              f"metadata.version={tag_ver} 不一致（G④ 发布一致性）")
+                              f"metadata.version={tag_ver} 不一致（G·4 发布一致性）")
         elif isinstance(src, str) and src.startswith("./"):
             skill_md = ROOT / src.lstrip("./") / "SKILL.md"
             if not skill_md.is_file():
@@ -255,7 +255,7 @@ def check_marketplace() -> None:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 {src}/SKILL.md 的 "
                               f"metadata.version={tree_ver} 不一致（相对路径源装的即工作树）")
     if len(errors) == before:
-        print(f"✅ marketplace↔tag 一致性（G④）：{len(plugins)} 个条目通过")
+        print(f"✅ marketplace↔tag 一致性（G·4）：{len(plugins)} 个条目通过")
 
 
 def main() -> int:
