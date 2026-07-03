@@ -27,7 +27,7 @@
 ## 下一步(建议顺序)
 
 1. **首条真实业务 skill**:走「skill-creator 创作 → 用例给用户过目 → W2 门禁 → G 发布」全流程磨合(F 纪律首次实跑,暴露问题即回填)。
-2. **pre-flight hook 待装**(已议未落):UserPromptSubmit hook 每回合注入 3 条微清单(§2 多方案摆理由+推荐 / A4·3 自标待验证 / A2 写前声明),对抗"规则在场≠决策点触发";用 update-config 方式改 `.claude/settings.json`。
+2. ~~pre-flight hook 待装~~ **已装**(同日闭环,commit `6e0aa5d`):UserPromptSubmit hook 每回合注入 3 条微清单(`tools/preflight-reminder.py` + `.claude/settings.json`,已入库两机共用);维护约定:清单 ≤3 条,失守模式变化时替换不追加。
 3. **dist/build 专题**:build 脚本、dist 入库 ADR、dist 一致性门禁(桶二第4项)、marketplace/Codex 分发。
 4. **Codex 侧实机复核**:用户级路径终审(`~/.codex/skills`,见 ADR-0001 实机证据)、AGENTS.md 平台段接管、Codex 跑 skill-creator 的适配。
 
