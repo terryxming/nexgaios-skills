@@ -29,6 +29,7 @@
 ## 存疑 / 待验证
 
 - **Codex 用户级路径分歧**:官方文档为 `~/.agents/skills`,但部分第三方教程写 `~/.codex/skills`。判断后者为旧版遗留,但**属推断**。落地时在装有 Codex 的机器跑 `/skills` 实测确认,两路径都试。
+  - **2026-07-03 实机证据（公司机）**:本机 Codex 内置 skill 位于 `~/.codex/skills/.system/skill-creator/`,且该官方 SKILL.md 明说无 `CODEX_HOME` 时回落 `~/.codex/skills` 自动发现——本机版本**实证倾向 `~/.codex/skills`**,与"旧版遗留"的原推断相反。待 Codex 当值跑 `/skills` 终审（联动 ADR-0005）。
 
 ## 来源
 

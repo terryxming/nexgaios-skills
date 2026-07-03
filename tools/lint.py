@@ -11,7 +11,7 @@ skill 级（W2，需 skills-ref）：
   ④ 桶一 · skills-ref validate —— 私有纪律 E 桶一（frontmatter/命名/结构 17 项）
   ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
   ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
-  （桶二 · dist 一致性 待 build 脚本，见 ADR-0004 / 讨论3）
+  （桶二 · dist 一致性 待 build 脚本落地后补，见 ADR-0004/0005）
 
 二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
 依赖：skills-ref（桶一，ADR-0004 选项 A）；其余零外部依赖。无 skill 时 ④⑤⑥ 空过。
@@ -116,6 +116,8 @@ def check_portability() -> None:
         for f in d.rglob("*"):
             if not f.is_file():
                 continue
+            if "evals" in f.relative_to(d).parts:
+                continue  # 评测用例除外：官方 skill-creator 明确建议触发查询写实机路径（贴近真实场景）
             try:
                 text = f.read_text(encoding="utf-8")
             except (UnicodeDecodeError, OSError):

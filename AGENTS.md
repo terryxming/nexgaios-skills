@@ -294,7 +294,7 @@ Plan:
 > 本段仅属 `AGENTS.md`，由 Codex 维护，不参与与 `CLAUDE.md` 的漂移校验（见私有纪律 B）。
 > 以下由 Claude 依官方文档查证初始化（见 ADR-0001 / ADR-0002），**待 Codex 当值时复核接管**。
 
-- skill 读取路径：仓库 `.agents/skills`（从 cwd 向上扫到仓库根）、用户 `~/.agents/skills`、管理员 `/etc/codex/skills`；支持 symlink。（`~/.codex/skills` 之说待实机验证，见 ADR-0001 存疑项）
+- skill 读取路径：仓库 `.agents/skills`（从 cwd 向上扫到仓库根）、用户 `~/.agents/skills`、管理员 `/etc/codex/skills`；支持 symlink。（2026-07-03 实机证据：本机内置 skill 在 `~/.codex/skills/.system/`，官方 skill-creator 亦称无 `CODEX_HOME` 时回落 `~/.codex/skills`——用户级路径倾向 `~/.codex/skills`，待 Codex 当值复核，见 ADR-0001 存疑项）
 - 平台特有配置走 sidecar `agents/openai.yaml`（`display_name`、`allow_implicit_invocation`、MCP `tools` 依赖），不污染 `SKILL.md`。
 - `AGENTS.md` 合并读取上限 `project_doc_max_bytes` 默认 32 KiB；本仓库要求各机器设为 `131072`（128 KiB）。巡检项见私有纪律 C1。
 
