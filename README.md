@@ -17,8 +17,8 @@
 
 | 目录 | 用途 |
 |---|---|
-| `skills/` | 自主开发 skill，每个一个目录（唯一事实源与发布单元；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
-| `third-party/` | 第三方 skill 原样副本（研究/安装用，不参与门禁与发布；入库须有再分发许可，溯源见 [`third-party/sources.md`](third-party/sources.md)，[ADR-0010](docs/decisions/0010-third-party-skills-directory.md)） |
+| `skills/first-party/` | 自主开发 skill，每个一个目录（唯一事实源与发布单元；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
+| `skills/third-party/` | 第三方 skill 原样副本（研究/安装用，不参与门禁与发布；入库须有再分发许可，溯源见 [`sources.md`](skills/third-party/sources.md)，[ADR-0010](docs/decisions/0010-third-party-skills-directory.md)） |
 | `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` / marketplace↔tag 一致性门禁）、纪律漂移校验、handoff 联动检查、本地安装脚本 |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
 | `docs/lessons-learned.md` | 流水线/平台层经验台账（追加式，含"已固化到哪"列） |
@@ -39,7 +39,7 @@ python tools/install.py --list
 python tools/install.py ob-notes
 ```
 
-`tools/install.py` 默认安装到 Claude Code 的 `~/.claude/skills`（用户级 personal skills 目录，对所有项目生效）与 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`；`--dest` 只装到自定义目录。`skills/` 与 `third-party/` 均可安装，同名冲突时用 `--from` 指定来源。
+`tools/install.py` 默认安装到 Claude Code 的 `~/.claude/skills`（用户级 personal skills 目录，对所有项目生效）与 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`；`--dest` 只装到自定义目录。`skills/first-party/` 与 `skills/third-party/` 均可安装，同名冲突时用 `--from` 指定来源。
 
 ### Claude Code marketplace 安装
 
@@ -67,7 +67,7 @@ claude plugin install ob-notes@nexgaios-skills
 
 - **收工**：覆盖重写 [`handoff.md`](handoff.md)（当前状态 / 下一步 / 未决问题 / 环境备忘 / 上次会话摘要），坑与经验追加进 [`docs/lessons-learned.md`](docs/lessons-learned.md)，commit + push。历史在 `git log -- handoff.md`。
 - **续工**：先 pull，读 `handoff.md` 与 `docs/decisions/`，再动手。
-- **机械兜底**：CI 的 handoff 联动检查——推送动了 `skills/` 或 `docs/decisions/` 而未同批更新 `handoff.md` 即红（见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)）。
+- **机械兜底**：CI 的 handoff 联动检查——推送动了 `skills/first-party/` 或 `docs/decisions/` 而未同批更新 `handoff.md` 即红（见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)）。
 
 ### 冷启动（新机器 / 新克隆）
 

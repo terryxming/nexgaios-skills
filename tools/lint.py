@@ -47,14 +47,14 @@ def tracked_paths() -> list[str]:
 
 
 def check_paths() -> None:
-    # third-party/ 豁免：第三方 skill 原样副本，文件名不是本仓标识符（ADR-0010）
+    # skills/third-party/ 豁免：第三方 skill 原样副本，文件名不是本仓标识符（ADR-0010）
     bad = [p for p in tracked_paths()
-           if not p.startswith("third-party/") and any(ord(c) > 127 for c in p)]
+           if not p.startswith("skills/third-party/") and any(ord(c) > 127 for c in p)]
     if bad:
         errors.append("路径含非 ASCII 字符（A3：标识符/路径须英文 kebab-case）：\n    "
                       + "\n    ".join(bad))
     else:
-        print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII（third-party/ 豁免）")
+        print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII（skills/third-party/ 豁免）")
 
 
 def check_adrs() -> None:
@@ -83,11 +83,26 @@ def check_drift() -> None:
 
 
 def skill_dirs() -> list[Path]:
-    """skills/ 下每个含 SKILL.md 的目录 = 一个 skill 源。"""
-    root = ROOT / "skills"
+    """skills/first-party/ 下每个含 SKILL.md 的目录 = 一个自主开发 skill 源。"""
+    root = ROOT / "skills" / "first-party"
     if not root.is_dir():
         return []
     return sorted(d for d in root.iterdir() if d.is_dir() and (d / "SKILL.md").is_file())
+
+
+def check_layout() -> None:
+    """skills/ 一级只允许 first-party / third-party 两个分类目录（ADR-0010）。"""
+    root = ROOT / "skills"
+    if not root.is_dir():
+        print("• 无 skills/，跳过布局检查")
+        return
+    allowed = {"first-party", "third-party"}
+    bad = [e.name for e in root.iterdir() if e.name not in allowed]
+    if bad:
+        errors.append("skills/ 一级出现分类目录以外的条目（skill 应放 skills/first-party/ 或 "
+                      "skills/third-party/，ADR-0010）：\n    " + "\n    ".join(bad))
+    else:
+        print("✅ 布局检查：skills/ 一级仅 first-party / third-party")
 
 
 def check_skills_ref() -> None:
@@ -231,9 +246,9 @@ def check_marketplace() -> None:
         src = entry.get("source")
         if isinstance(src, dict) and src.get("source") == "git-subdir":
             ref, path = src.get("ref"), (src.get("path") or "").rstrip("/")
-            if not path.startswith("skills/"):
-                errors.append(f"marketplace · {name}：path '{path}' 不在 skills/ 下"
-                              f"（third-party/ 不参与分发，ADR-0010）")
+            if path.startswith("skills/third-party/"):
+                errors.append(f"marketplace · {name}：path '{path}' 在 skills/third-party/ 下"
+                              f"（第三方不参与分发，ADR-0010）")
                 continue
             if not ref:
                 continue  # 无 ref = 跟默认分支，无 tag 可校
@@ -252,9 +267,9 @@ def check_marketplace() -> None:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 tag '{ref}' 处 "
                               f"metadata.version={tag_ver} 不一致（G·4 发布一致性）")
         elif isinstance(src, str) and src.startswith("./"):
-            if not src.startswith("./skills/"):
-                errors.append(f"marketplace · {name}：source '{src}' 不在 skills/ 下"
-                              f"（third-party/ 不参与分发，ADR-0010）")
+            if src.startswith("./skills/third-party/"):
+                errors.append(f"marketplace · {name}：source '{src}' 在 skills/third-party/ 下"
+                              f"（第三方不参与分发，ADR-0010）")
                 continue
             skill_md = ROOT / src.lstrip("./") / "SKILL.md"
             if not skill_md.is_file():
@@ -271,6 +286,7 @@ def check_marketplace() -> None:
 def main() -> int:
     print("== 仓库级 + skill 级 lint（W1/W2）==")
     check_paths()
+    check_layout()
     check_adrs()
     check_drift()
     check_skills_ref()
