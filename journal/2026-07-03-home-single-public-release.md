@@ -19,7 +19,7 @@
 
 ## 本次完成
 
-1. **补 `tools/install.py`**:本机离线安装脚本,按 ADR-0008 纯复制完整 skill 目录,不构建、不净化、不排除;默认目标为 Codex `$CODEX_HOME/skills`(无则 `~/.codex/skills`)与 Claude `~/.claude/skills`。
+1. **补 `tools/install.py`**:本机离线安装脚本,按 ADR-0008 纯复制完整 skill 目录,不构建、不净化、不排除。最初误写为同时安装到 Claude `~/.claude/skills`;后续经本机 `claude plugin --help` 与目录检查确认 Claude Code 无该固定 skills 目录,已修正为只安装到 Codex `$CODEX_HOME/skills`(无则 `~/.codex/skills`)或自定义 `--dest`。
 2. **补 Claude marketplace 索引**:`.claude-plugin/marketplace.json`,首个发布项 `ob-notes`,source 使用 `git-subdir` 指向 `skills/ob-notes`,ref 为 `ob-notes/v0.8.0`。
 3. **清理 0008 后残留措辞**:`tools/lint.py` 与 `skills/ob-notes/references/maintenance.md` 不再说 `dev-log.md`/`CHANGELOG.md` 构建分发时排除,改为随 skill 入库并分发。
 4. **更新 README**:补 marketplace 路径与本地安装命令。
@@ -33,6 +33,7 @@
 - `claude plugin validate .` → Validation passed。
 - `python tools/install.py --list` → 列出 `ob-notes`。
 - `python tools/install.py ob-notes --dest tmp/install-test-20260703` → 临时复制成功,`tmp/` 已被 gitignore。
+- `claude plugin --help` / `claude plugin marketplace --help` → Claude Code 安装路径应走 plugin marketplace,不是 `~/.claude/skills`。
 - GitHub Actions: commit `175ff28` 的 CI 已完成且 success。
 
 ## 已推送

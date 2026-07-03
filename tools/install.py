@@ -6,11 +6,14 @@ tools/install.py — 本仓库 skill 的本机离线安装脚本。
 按 ADR-0008，skill 目录本身就是发布单元；本脚本只做完整目录复制，
 不做构建、净化或文件排除。
 
-用法：
+用法（Codex / 自定义 skills 目录）：
   python tools/install.py --list
-  python tools/install.py ob-notes --target codex
-  python tools/install.py ob-notes --target claude --force
-  python tools/install.py ob-notes --target both --dest D:/tmp/skills
+  python tools/install.py ob-notes
+  python tools/install.py ob-notes --force
+  python tools/install.py ob-notes --dest D:/tmp/skills
+
+Claude Code 不使用本脚本猜测本机目录；请走 `claude plugin marketplace`
+和 `claude plugin install`。
 """
 from __future__ import annotations
 
@@ -42,18 +45,8 @@ def codex_home() -> Path:
     return Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
 
 
-def claude_home() -> Path:
-    return Path(os.environ.get("CLAUDE_HOME", Path.home() / ".claude"))
-
-
-def default_targets(kind: str) -> list[Target]:
-    all_targets = {
-        "codex": Target("codex", codex_home() / "skills"),
-        "claude": Target("claude", claude_home() / "skills"),
-    }
-    if kind == "both":
-        return [all_targets["codex"], all_targets["claude"]]
-    return [all_targets[kind]]
+def default_target() -> Target:
+    return Target("codex", codex_home() / "skills")
 
 
 def skill_dirs() -> list[Path]:
@@ -84,18 +77,12 @@ def copy_skill(src: Path, target: Target, force: bool) -> Path:
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="完整复制本仓库 skills/<name> 到本机 agent skill 目录。")
+    parser = argparse.ArgumentParser(description="完整复制本仓库 skills/<name> 到 Codex 或自定义 skills 目录。")
     parser.add_argument("skills", nargs="*", help="要安装的 skill 名称；为空时配合 --list 查看")
     parser.add_argument("--list", action="store_true", help="列出本仓库可安装的 skill")
     parser.add_argument(
-        "--target",
-        choices=("codex", "claude", "both"),
-        default="both",
-        help="安装目标，默认 both",
-    )
-    parser.add_argument(
         "--dest",
-        help="自定义目标 skills 根目录；设置后忽略 --target，只安装到该目录",
+        help="自定义目标 skills 根目录；默认安装到 Codex $CODEX_HOME/skills",
     )
     parser.add_argument("--force", action="store_true", help="目标已存在时先删除再复制")
     return parser.parse_args(argv)
@@ -117,7 +104,7 @@ def main(argv: list[str]) -> int:
     if not args.skills:
         raise InstallError("请提供至少一个 skill 名称，或使用 --list 查看可安装项。")
 
-    targets = [Target("custom", Path(args.dest).expanduser())] if args.dest else default_targets(args.target)
+    targets = [Target("custom", Path(args.dest).expanduser())] if args.dest else [default_target()]
     for skill_name in args.skills:
         src = find_skill(skill_name)
         for target in targets:

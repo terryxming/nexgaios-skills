@@ -17,7 +17,7 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 3. **源头干净,而非出口净化**:分发物 = **完整 skill 目录**(含 `dev-log.md`、`CHANGELOG.md`、`evals/`——透明信任资产)。质量由 lint 门禁在**源头**保证(README 类重复文档禁入),不在出口删文件。ADR-0006 的"构建分发时排除"条款废止,其"域内开发文件跟 skill 走"的方向保留并走到底。
 4. **main = 可安装态(方案甲)**:`skills/<name>/` 目录的改动在**分支**上进行,全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件(`tools/`、`docs/`、`journal/`、纪律双份)可在 main 直接迭代。
 5. **机制拆除清单**:晋升脚本(promote)不建;"晋升一致性"门禁消失;`metadata.channels` 标记取消(内部 skill 根本不进本仓,无需路由);prod 仓不建。
-6. **保留**:`tools/install.py`(自用渠道,纯复制到本机两端用户目录);`marketplace.json`(放本仓,首个 skill 正式发布时建)。
+6. **保留**:`tools/install.py`(Codex/自定义 skills 目录自用渠道,纯复制);`marketplace.json`(放本仓,Claude Code 走 plugin marketplace;首个 skill 正式发布时建)。
 7. **内部 skill**(公司业务等不可公开者):未来真实出现时**另立私有仓**,届时才为它付费。
 
 ## 证据(附来源,区分已证实/推断)

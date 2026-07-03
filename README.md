@@ -28,16 +28,25 @@
 
 - 目标平台：**Claude Code + Codex** 两家。
 - 分发渠道：自用 + 团队共享 + 公开 marketplace + GitHub。
-- **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；自用走本地 `tools/install.py` 纯复制完整 skill 目录。内部 skill 未来另立私有仓。
+- **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过 G 门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；Codex 自用可走本地 `tools/install.py` 纯复制完整 skill 目录，Claude Code 自用走 plugin marketplace。内部 skill 未来另立私有仓。
 
-### 本地安装
+### Codex 本地安装
 
 ```bash
 python tools/install.py --list
-python tools/install.py ob-notes --target both
+python tools/install.py ob-notes
 ```
 
-`tools/install.py` 默认安装到 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）与 Claude 的 `~/.claude/skills`。目标已存在时会停止；确认要覆盖再加 `--force`。
+`tools/install.py` 默认安装到 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`。
+
+### Claude Code 安装
+
+Claude Code 使用 plugin marketplace，不写入一个固定的 `~/.claude/skills` 目录。本仓已提供 `.claude-plugin/marketplace.json`：
+
+```bash
+claude plugin marketplace add terryxming/nexgaios-skills
+claude plugin install ob-notes@nexgaios-skills
+```
 
 ## 工程纪律
 
