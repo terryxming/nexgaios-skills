@@ -240,9 +240,9 @@ Plan:
 
 ### C. 跨设备协作与开发巡检
 你会在家用机与公司机之间接力/联合开发。**git/GitHub 是唯一同步通道**，需延续的状态必须进仓库并 push。
-- **C1 · 会话起点巡检**：切换机器后、动手前，先跑开发巡检并显式报结果（同一会话内不重复）。固定清单：①git 是否 clean、是否落后远端（落后先 pull）②当前分支 ③工具链版本（git/python/node）④**本机 Codex `project_doc_max_bytes` 是否 = 131072（128 KiB）**⑤有无未读的最新 handoff。
-- **C2 · 收工 handoff**：进度、已定决策、下一步、未决问题写入 `journal/`（命名 `YYYY-MM-DD-<机器>-<主题>.md`），commit + push。
-- **C3 · 续工 resume**：先 pull，读最新 handoff 与 `docs/decisions/`，再动手。
+- **C1 · 会话起点巡检**：切换机器后、动手前，先跑开发巡检并显式报结果（同一会话内不重复）。固定清单：①git 是否 clean、是否落后远端（落后先 pull）②当前分支 ③工具链版本（git/python/node）④**本机 Codex `project_doc_max_bytes` 是否 = 131072（128 KiB）**⑤读根目录 `handoff.md`（唯一交接文档）。
+- **C2 · 收工 handoff**：**覆盖重写**根目录 `handoff.md`（唯一交接文档；固定节：当前状态 / 下一步 / 未决问题 / 环境备忘 / 上次会话摘要；历史由 git 保存，不另存副本），流水线/平台层的坑与经验追加进 `docs/lessons-learned.md`（须填"已固化到哪"），commit + push。机械兜底：CI handoff 联动检查（见 ADR-0009）。
+- **C3 · 续工 resume**：先 pull，读 `handoff.md` 与 `docs/decisions/`，再动手。
 - **C4 · 决策留痕**：难逆转的选择进 `docs/decisions/` 并附证据来源，避免另一台机器重复调研或凭记忆瞎猜。
 
 ### D. 通用纪律 → skill 场景映射
@@ -284,7 +284,7 @@ Plan:
 ### G. 发布门禁
 允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）④合入 main 并打 tag `skill-name/vX.Y.Z`（main = 可安装态）⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
 - **版本机械参照 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；`CHANGELOG.md` 为域内人读叙事，随 skill 入库并一同分发（见 ADR-0006/0008）。
-- **main = 可安装态**：`skills/<name>/` 的改动在**分支**上进行，全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件（`tools/`、`docs/`、`journal/`、纪律双份）可在 main 直接迭代。
+- **main = 可安装态**：`skills/<name>/` 的改动在**分支**上进行，全部门禁通过后 merge 进 main 并打 tag——外部用户从 main 装到的永远是已发布版。流水线自身文件（`tools/`、`docs/`、`handoff.md`、纪律双份）可在 main 直接迭代。
 - **落点**（见 ADR-0004/0005/0008）：①③ 进 **CI 常驻**（③ 以 git tag 作参照）；④ 即发布动作本身（merge + tag，人在环）；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
 ### H. 外部 skill 迁入（收编）

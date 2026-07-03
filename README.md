@@ -18,9 +18,10 @@
 | 目录 | 用途 |
 |---|---|
 | `skills/` | 每个 skill 一个目录（唯一事实源；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
-| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` 门禁）、纪律漂移校验、本地安装脚本 |
+| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` / marketplace↔tag 一致性门禁）、纪律漂移校验、handoff 联动检查、本地安装脚本 |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
-| `journal/` | 跨设备交接文档（handoff） |
+| `docs/lessons-learned.md` | 流水线/平台层经验台账（追加式，含"已固化到哪"列） |
+| `handoff.md` | 唯一交接文档（收工覆盖重写，历史在 git，见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)） |
 | `.claude/skills/` | 评测/运行时暂存区（gitignore 不入库；skill 源一律在 `skills/`） |
 | `.claude-plugin/marketplace.json` | Claude Code marketplace 索引，首个发布项为 `ob-notes` |
 
@@ -54,4 +55,4 @@ claude plugin install ob-notes@nexgaios-skills
 
 ## 跨设备协作
 
-家用/公司两台 Windows 机器经 git/GitHub 接续开发。铁律：**一切需延续的状态必须进仓库并 push**，git 是唯一同步通道。收工用 `/handoff`，续工用 `/resume`。
+家用/公司两台 Windows 机器经 git/GitHub 接续开发。铁律：**一切需延续的状态必须进仓库并 push**，git 是唯一同步通道。收工覆盖重写 [`handoff.md`](handoff.md)（历史在 git），续工先读它；CI 的 handoff 联动检查做机械兜底（见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)）。
