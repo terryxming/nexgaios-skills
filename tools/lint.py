@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-tools/lint.py — 仓库级硬门禁（议题 4 · W1）。
+tools/lint.py — 仓库级 + skill 级硬门禁（议题 4 · W1/W2）。
 
-聚合三条已认可的硬约束（能脚本化的纪律进门禁，不靠自觉）：
+仓库级（W1，零外部依赖）：
   ① 路径 ASCII 检查      —— 私有纪律 A3（标识符/文件名/路径用英文 kebab-case）
   ② ADR 留痕格式          —— 私有纪律 A1 / 通用纪律 ⑨（难逆转决策进 docs/decisions 并附据）
   ③ 纪律漂移校验          —— 私有纪律 B（调用 check-discipline-drift.py）
+skill 级（W2，需 skills-ref）：
+  ④ 桶一 · skills-ref validate —— 私有纪律 E 桶一（frontmatter/命名/结构 17 项）
+  ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
+  ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
+  （桶二 · dist 一致性 待 build 脚本，见 ADR-0004 / 讨论3）
 
-二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。零第三方依赖。
+二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
+依赖：skills-ref（桶一，ADR-0004 选项 A）；其余零外部依赖。无 skill 时 ④⑤⑥ 空过。
 用法：python tools/lint.py
 """
 from __future__ import annotations
@@ -69,11 +75,83 @@ def check_drift() -> None:
         errors.append("纪律漂移校验失败（见上）")
 
 
+def skill_dirs() -> list[Path]:
+    """skills/ 下每个含 SKILL.md 的目录 = 一个 skill 源。"""
+    root = ROOT / "skills"
+    if not root.is_dir():
+        return []
+    return sorted(d for d in root.iterdir() if d.is_dir() and (d / "SKILL.md").is_file())
+
+
+def check_skills_ref() -> None:
+    """桶一：委托官方 skills-ref validate（frontmatter/命名/结构 17 项）。"""
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过 skills-ref 校验（桶一）")
+        return
+    try:
+        from skills_ref import validate
+    except ImportError:
+        errors.append("skills-ref 未安装（桶一硬门禁依赖）：pip install -r tools/requirements.txt")
+        return
+    bad = 0
+    for d in dirs:
+        for e in validate(d):
+            bad += 1
+            errors.append(f"skills-ref · {d.name}：{e}")
+    if not bad:
+        print(f"✅ skills-ref 校验（桶一）：{len(dirs)} 个 skill 全通过")
+
+
+def check_portability() -> None:
+    """桶二：skill 源不写死机器路径（E.3 可移植）。"""
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过可移植检查（桶二）")
+        return
+    # 机器路径：Windows 盘符路径（负向前瞻排除 http(s):/ 等多字母 scheme）、Unix 家目录绝对路径
+    pat = re.compile(r"(?<![A-Za-z])[A-Za-z]:[\\/]|/(?:Users|home|root)/")
+    hits: list[str] = []
+    for d in dirs:
+        for f in d.rglob("*"):
+            if not f.is_file():
+                continue
+            try:
+                text = f.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue  # 跳过二进制/不可读
+            for i, line in enumerate(text.splitlines(), 1):
+                if pat.search(line):
+                    hits.append(f"{f.relative_to(ROOT).as_posix()}:{i}: {line.strip()[:80]}")
+    if hits:
+        errors.append("skill 源含机器路径（E.3 可移植）：\n    " + "\n    ".join(hits))
+    else:
+        print(f"✅ 可移植检查（桶二）：{len(dirs)} 个 skill 无机器路径")
+
+
+def check_chinese() -> None:
+    """桶二：中文化兵底——SKILL.md 至少含中文（防纯英文产出）。"""
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过中文化兵底（桶二）")
+        return
+    cjk = re.compile("[一-鿿]")
+    bad = [f"{d.name}/SKILL.md 无中文字符（E.4 中文化兵底）"
+           for d in dirs if not cjk.search((d / "SKILL.md").read_text(encoding="utf-8"))]
+    if bad:
+        errors.extend(bad)
+    else:
+        print(f"✅ 中文化兵底（桶二）：{len(dirs)} 个 SKILL.md 均含中文")
+
+
 def main() -> int:
-    print("== 仓库级 lint（W1）==")
+    print("== 仓库级 + skill 级 lint（W1/W2）==")
     check_paths()
     check_adrs()
     check_drift()
+    check_skills_ref()
+    check_portability()
+    check_chinese()
 
     if errors:
         print("\n✗ lint 失败：")

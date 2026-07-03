@@ -1,0 +1,4 @@
+# skill 级 lint 的外部依赖（见 ADR-0004 · E.1 桶一 · 选项 A）。
+# 桶一委托官方 skills-ref validate 校验 frontmatter/命名/结构，不自己重写。
+# 版本固定以保证 CI 可复现；跟随 spec 演进时显式 bump。
+skills-ref==0.1.1
