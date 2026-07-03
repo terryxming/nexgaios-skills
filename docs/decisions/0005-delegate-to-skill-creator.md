@@ -18,6 +18,7 @@
    - B 瘦身成"调 skill-creator + 套约定"的薄包装：仍与官方重复、层级绕、触发打架。
    - **采 A**。
 3. **skill 内不放 CHANGELOG.md**：官方 skill-creator 明确将 CHANGELOG.md 列为不该出现在 skill 里的杂物（"Do NOT create extraneous documentation ... CHANGELOG.md"）。版本历史 = **git tag `skill-name/vX.Y.Z`** + frontmatter `metadata.version`（与 G③ 的 CI 参照本就一致，消除双源）。
+   > **被 [ADR-0006](0006-skill-domain-vs-distribution.md) 精化（2026-07-03）**：官方杂物约束的对象是**分发物**而非源域——dev-log/CHANGELOG 为域内开发文件，留在 `skills/<name>/`、构建分发时排除；git tag + metadata.version 仍是版本机械参照。
 4. **eval 用例格式采用 skill-creator 约定**（`skills/<name>/evals/evals.json` + 触发查询 JSON），复用其 viewer / aggregate_benchmark / run_loop，不自造 YAML 格式（作废 ADR-0004 的 trigger.yaml/execution.yaml 约定）。
 5. **评测用例人在环**：任何评测运行前，用例（触发正/负例、执行场景）**必须显式给用户过目确认**——是否贴近真实场景由人判定，不许闷头自测。此为官方 skill-creator 的标准动作（"Here are a few test cases... Do these look right?"），升格为本仓库纪律。
 6. **仓库保留的独有价值**（skill-creator 不覆盖）：W2 skill 级硬门禁（skills-ref/可移植/中文化）、工程纪律与 ADR 体系、双平台对等与分发（marketplace + Codex 安装 + sidecar）、中文化约定、发布门禁 G（**消费** skill-creator 的评测结果、按阈值放行，阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）。

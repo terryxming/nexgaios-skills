@@ -267,6 +267,8 @@ Plan:
 1. **单一事实源一致性**：`dist/` 必须能由 `skills/` 经构建脚本完整重生；CI 校验 `dist/` 无手工漂移。
 2. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
 3. **中文化兵底**：`description`、正文至少含中文（CJK），防纯英文产出。
+4. **杂物拦截**：skill 顶层禁 README.md 等与 `SKILL.md` 职责重复的文档；`dev-log.md`、`CHANGELOG.md` 属**域内开发文件**——留在源、构建分发时排除（见 ADR-0006）。
+5. **版本存在**：`SKILL.md` 须有 `metadata.version`（G③ 前置）。
 
 **桶三 · 人在环质量关**（语义判不了，遇到即停 + 提案 + 确认，见 A5）：
 1. **`description` 质量**：用**第三人称**讲清三件事——这个 skill 是干嘛的、何时用、何时不用（`skills-ref` 只查非空）。
@@ -282,13 +284,13 @@ Plan:
 
 ### G. 发布门禁
 允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）④构建到 `dist/` 且与源一致 ⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
-- **版本历史 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；skill 内**不放 CHANGELOG.md**（官方 skill-creator 明确视其为杂物，见 ADR-0005）。
+- **版本机械参照 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；`CHANGELOG.md` 为域内人读叙事，随源不随发（分发物排除开发文件，见 ADR-0006）。
 - **落点**（见 ADR-0004/0005）：①③④ 进 **CI 常驻**（③ 以 git tag 作参照）；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
 ### H. 外部 skill 迁入（收编）
 外来 skill（他处创建）纳入本仓库管理时：
 1. **单一源转移**：拷入 `skills/<name>/` 起，本仓库即该 skill 唯一事实源；**源仓库同步退役**（删除或标注"已迁至本仓库"），防双源漂移（见 B）。先确认迁入落地（lint 绿 + push），再执行退役。
-2. **门禁整改**：以 `tools/lint.py` 全绿为准（name = 目录名、清 CHANGELOG.md 等杂物、含中文、无机器路径）；`description` 三要素与中文化质量走桶三人在环。
+2. **门禁整改**：以 `tools/lint.py` 全绿为准（name = 目录名、清 README.md 等重复文档、含中文、无机器路径）；`dev-log.md`/`CHANGELOG.md` 属域内开发文件**随迁保留**；`description` 三要素与中文化质量走桶三人在环。
 3. **版本接续**：保留原 `metadata.version`（无则起 `0.1.0`）；迁入时打基线 tag `skill-name/vX.Y.Z`。
 4. **评测补课**：evals 缺失/异构**不阻入库**，但按 F 补齐并达标前**不得发布**（G②）。
 

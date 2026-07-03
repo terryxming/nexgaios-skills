@@ -11,7 +11,7 @@ skill 级（W2，需 skills-ref）：
   ④ 桶一 · skills-ref validate —— 私有纪律 E 桶一（frontmatter/命名/结构 17 项）
   ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
   ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
-  ⑦ 桶二 · 无杂物文件          —— ADR-0005（skill 顶层禁 CHANGELOG.md/README.md 等）
+  ⑦ 桶二 · 无杂物文件          —— ADR-0005/0006（顶层禁 README.md 等重复文档；dev-log/CHANGELOG 属域内开发文件例外）
   ⑧ 桶二 · metadata.version   —— 纪律 G③ 版本门禁前置（版本历史 = git tag + metadata.version）
   （桶二 · dist 一致性 待 build 脚本落地后补，见 ADR-0004/0005）
 
@@ -118,8 +118,11 @@ def check_portability() -> None:
         for f in d.rglob("*"):
             if not f.is_file():
                 continue
-            if "evals" in f.relative_to(d).parts:
+            rel = f.relative_to(d)
+            if "evals" in rel.parts:
                 continue  # 评测用例除外：官方 skill-creator 明确建议触发查询写实机路径（贴近真实场景）
+            if len(rel.parts) == 1 and rel.name in ("dev-log.md", "CHANGELOG.md"):
+                continue  # 域内开发文件除外：历史忠实记录含真机路径是本性，不分发（ADR-0006）
             try:
                 text = f.read_text(encoding="utf-8")
             except (UnicodeDecodeError, OSError):
@@ -149,16 +152,17 @@ def check_chinese() -> None:
 
 
 def check_clutter() -> None:
-    """桶二：skill 顶层禁杂物文件（官方 skill-creator 点名，见 ADR-0005）。
+    """桶二：skill 顶层禁与 SKILL.md 重复的文档（官方 skill-creator 点名）。
 
     只查顶层：assets/ 内的 README 等可能是合法模板资源，不误伤。
+    dev-log.md / CHANGELOG.md 属域内开发文件，留在源、构建分发时排除（ADR-0006）。
     """
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过杂物检查（桶二）")
         return
-    clutter = {"CHANGELOG.md", "README.md", "INSTALLATION_GUIDE.md", "QUICK_REFERENCE.md"}
-    bad = [f"{d.name}/{f.name} 属杂物文件（skill 内不放，版本历史用 git tag，见 ADR-0005）"
+    clutter = {"README.md", "INSTALLATION_GUIDE.md", "QUICK_REFERENCE.md"}
+    bad = [f"{d.name}/{f.name} 属杂物文件（与 SKILL.md 职责重复，不入 skill，见 ADR-0005/0006）"
            for d in dirs for f in d.iterdir() if f.is_file() and f.name in clutter]
     if bad:
         errors.extend(bad)
