@@ -17,9 +17,9 @@
 
 | 目录 | 用途 |
 |---|---|
-| `skills/` | 每个 skill 一个目录（唯一事实源，含流水线自用 skill） |
-| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化门禁）、纪律漂移校验；构建/发布脚本随 dist 专题后补 |
-| `dist/claude/`、`dist/codex/` | 构建产物，按平台分，**永不手改** |
+| `skills/` | 每个 skill 一个目录（唯一事实源；evals 用例与 `dev-log.md`/`CHANGELOG.md` 等域内开发文件随源入库，见 [ADR-0006](docs/decisions/0006-skill-domain-vs-distribution.md)） |
+| `tools/` | 确定性脚本：lint（skills-ref / 可移植 / 中文化 / 杂物拦截 / `metadata.version` 门禁）、纪律漂移校验；构建/发布脚本随 dist 专题后补 |
+| `dist/claude/`、`dist/codex/` | 构建产物，按平台分，**永不手改**；分发时排除域内开发文件（见 ADR-0006） |
 | `docs/decisions/` | 决策记录（ADR），附证据来源 |
 | `journal/` | 跨设备交接文档（handoff） |
 | `.claude/skills/` | 评测/运行时暂存区（gitignore 不入库；skill 源一律在 `skills/`） |
