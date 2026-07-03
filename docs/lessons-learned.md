@@ -18,3 +18,4 @@
 | 2026-07-04 | WebFetch 特定站点长挂 | 抓 developers.openai.com 挂 12 分钟无响应，阻塞整轮 | 先 WebSearch 拿摘要，必要再 fetch；久挂即弃、换信息路径 | 暂留为知识 |
 | 2026-07-04 | 交接散乱即 B 条违例 | 6 份 journal 互相搬运未决项/环境备忘（可避免的重复）；"该读哪份"歧义直接导致格式漂移 | 单文件覆盖重写，历史交给 `git log` | handoff.md + C1-C3 修订 + CI 门禁（ADR-0009） |
 | 2026-07-04 | 流水线文件提交落错分支 | 上一批收尾停在 feature 分支未切回，下一批开工未复核当前分支就动手——纪律/README 改动被提交到 candidate 分支而非 main（后 cherry-pick 修复，内容一致故发布合并无冲突） | 任何 commit 前先看 `git branch --show-current`；跨批次收尾时显式切回 main | 暂留为知识（若复发，考虑进 pre-flight 提醒清单） |
+| 2026-07-04 | 目录重构跨分支合并的改名冲突 | main 整目录 `git mv` 后 merge 进大幅重写同目录的分支：重写幅度大的文件相似度匹配失败，报 rename/delete 与 add/add 冲突；另 cherry-pick 造成的"同内容不同提交"在 main 再前进后同样会冲突 | 分支先做**同款 git mv** 再 merge（git mv 需目标父目录先存在）；内容冲突按"谁改了内容谁赢"裁决——纯改名侧让位；解决后验证关键文件（version、新增文件在位） | 暂留为知识 |
