@@ -16,7 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 FILES = ["CLAUDE.md", "AGENTS.md"]
 
-BEGIN = "DISCIPLINE:SHARED BEGIN"
+# 锚定完整 HTML 注释头，防正文里出现同名字样时切错段
+BEGIN = "<!-- DISCIPLINE:SHARED BEGIN"
 END = "<!-- DISCIPLINE:SHARED END -->"
 
 # 体积护栏：本仓库要求 Codex project_doc_max_bytes = 128 KiB（见 ADR-0002 / config.toml）。
