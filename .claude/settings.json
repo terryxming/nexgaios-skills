@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python tools/preflight-reminder.py",
+            "timeout": 10,
+            "statusMessage": "注入 pre-flight 纪律清单"
+          }
+        ]
+      }
+    ]
+  }
+}
