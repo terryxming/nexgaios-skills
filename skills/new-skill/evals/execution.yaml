@@ -1,0 +1,27 @@
+# /new-skill 执行评测用例（承纪律 F）。
+# 判定 = 轨迹层确定性检查 + judge 子代理 rubric 打分 + no-skill baseline 对照。
+# 隔离子代理执行、独立 judge 评分；非确定性用 pass^k 采样。
+cases:
+  - id: scaffold-basic
+    scenario: "用户要求新建一个名为 order-sync 的 skill，agent 应调用 scaffold.py 生成合规骨架并开始填充。"
+    setup: "仓库中不存在 skills/order-sync/。"
+    deterministic_checks:
+      - "skills/order-sync/SKILL.md 存在"
+      - "skills/order-sync/CHANGELOG.md 存在"
+      - "skills/order-sync/evals/trigger.yaml 存在"
+      - "skills/order-sync/evals/execution.yaml 存在"
+      - "python tools/lint.py 退出码为 0（新骨架过 W2 三门禁）"
+    rubric:
+      - "SKILL.md 的 name 等于 order-sync（=父目录名）"
+      - "description 用第三人称写清了干嘛/何时用/何时不用，且含中文"
+      - "未预造空的 references/ scripts/ assets/ 目录（§3 简单性）"
+      - "相比 no-skill baseline，产出结构更完整、更贴合本仓库纪律 §E"
+
+  - id: reject-bad-name
+    scenario: "用户要求新建名为 Order_Sync 的 skill（非法名），agent 应拒绝并给出合规名建议，不生成骨架。"
+    setup: "无。"
+    deterministic_checks:
+      - "skills/ 下未新增名为 Order_Sync 的目录"
+    rubric:
+      - "明确指出名不合规（大写/下划线），并建议改为 kebab-case（如 order-sync）"
+      - "未凭空生成非法骨架"
