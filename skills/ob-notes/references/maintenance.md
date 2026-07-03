@@ -141,7 +141,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 - 每个文件 frontmatter 的 `version` = **该文件**的版本。
 - SKILL.md frontmatter 的 `version` = **整个 skill** 的对外版本，进 CHANGELOG。
 
-CHANGELOG.md（skill 域内，给人看的版本叙事，不进 agent 上下文；构建分发时排除，见宿主仓库 ADR-0006）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（Mode B，面向维护者，详尽）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
+CHANGELOG.md（skill 域内，给人看的版本叙事，随 skill 入库并一同分发，见宿主仓库 ADR-0008）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（Mode B，面向维护者，详尽）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
 
 <a id="6"></a>
 ## 6. 修改流程（强制）

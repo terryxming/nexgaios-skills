@@ -155,7 +155,7 @@ def check_clutter() -> None:
     """桶二：skill 顶层禁与 SKILL.md 重复的文档（官方 skill-creator 点名）。
 
     只查顶层：assets/ 内的 README 等可能是合法模板资源，不误伤。
-    dev-log.md / CHANGELOG.md 属域内开发文件，留在源、构建分发时排除（ADR-0006）。
+    dev-log.md / CHANGELOG.md 属域内开发文件，随 skill 入库并一同分发（ADR-0008）。
     """
     dirs = skill_dirs()
     if not dirs:

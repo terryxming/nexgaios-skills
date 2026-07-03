@@ -1,0 +1,33 @@
+{
+  "name": "nexgaios-skills",
+  "owner": {
+    "name": "terryxming"
+  },
+  "metadata": {
+    "description": "nexgaios 公开 agent skills marketplace，提供可直接安装的中文化工作流 skill。"
+  },
+  "plugins": [
+    {
+      "name": "ob-notes",
+      "source": {
+        "source": "git-subdir",
+        "url": "terryxming/nexgaios-skills",
+        "path": "skills/ob-notes",
+        "ref": "ob-notes/v0.8.0"
+      },
+      "description": "把与 agent 对话中产生的高价值信息沉淀成结构化 Markdown 笔记，并回写到 Obsidian 知识库或项目目录。",
+      "version": "0.8.0",
+      "author": {
+        "name": "terryxming"
+      },
+      "repository": "https://github.com/terryxming/nexgaios-skills",
+      "keywords": [
+        "obsidian",
+        "notes",
+        "knowledge-management",
+        "agent-skills"
+      ],
+      "category": "productivity"
+    }
+  ]
+}
