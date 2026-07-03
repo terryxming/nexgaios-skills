@@ -21,6 +21,9 @@ from pathlib import Path
 # ^[a-z0-9]+(-[a-z0-9]+)*$ 等价于：首尾字母数字、单连字符分隔、无连续连字符、仅 [a-z0-9-]
 import re
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows 默认 GBK 控制台也能输出 ✅/中文
+
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MAX_NAME = 64
 

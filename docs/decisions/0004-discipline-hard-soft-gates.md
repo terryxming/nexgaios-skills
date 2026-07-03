@@ -32,11 +32,11 @@
 
 ### 四、F 评测形态（Claude-Code-first · YAML · 系统测量全栈）
 
-> ⚠️ **试行待验证**：以下为设计定稿，**至今无任何 skill 实跑过完整 F 流程**，真实问题未知。落地首个 skill 时按"失败即用例"暴露并回填修正本形态。
+> ⚠️ **部分已验证 / 整体试行待验证**：**触发评测的检测机制已实机验证**（子代理 spawn + 转录解析，见证据 8–10）；但**完整 F 流程（执行评测的 judge/baseline/pass^k、端到端 runner）仍无 skill 跑过**，待建 runner 时按"失败即用例"暴露并回填。
 
 - **哲学**：系统测量 > 结果打分（四层：结果 / 轨迹 / 验证 / 环境）；Skill eval 三件套 = 边界清晰任务 + 确定性 verifier + **no-skill baseline**；**子代理隔离执行 + 独立 judge 子代理**（环境干净、评分客观）；**pass^k** 一致性（非确定性 → 多次采样，生产级要 k 次全过）。
-- **触发评测**：用例 YAML（`id / should_trigger / prompt / category`，category ∈ 显式|隐式|情境|负例）；判定 = 在隔离子会话 `claude -p "<prompt>" --output-format json`，解析是否出现目标 skill 的 `Skill` 工具调用（tool_use）。因用自然 prompt 驱动（绝不打 `/skill-name`），出现即自动激活，规避"auto vs 显式不可区分"。
-- **执行评测**：用例 YAML（`id / scenario / setup / 确定性检查 / rubric`）；判定 = ①轨迹层：解析 headless JSONL 断言命令/产物；②结果层：独立 judge 子代理用 `--json-schema` 打结构化分；③baseline：同 prompt 跑 skill-off 子会话对照，skill-on 须显著优于 baseline。
+- **触发评测**：用例 YAML（`id / should_trigger / prompt / category`，category ∈ 显式|隐式|情境|负例）；判定 = 把待测 skill 暂存到 `.claude/skills/`，用 **Agent 工具 spawn 隔离子代理**（会话内、**无鉴权问题**）自然处理 prompt，再解析该子代理转录 `<session>/subagents/agent-<id>.jsonl` 中是否出现 `"name":"Skill"` 且 `"skill":"<目标>"` 的 tool_use。**不用外部 `claude -p`**——本环境嵌套 headless 子进程无法鉴权（见证据 8）。因用自然 prompt 驱动（绝不打 `/skill-name`），出现即自动激活，规避"auto vs 显式不可区分"。
+- **执行评测**：用例 YAML（`id / scenario / setup / 确定性检查 / rubric`）；判定 = ①轨迹层：解析子代理转录 JSONL 断言命令/产物；②结果层：独立 judge 子代理打结构化分（schema 约束输出）；③baseline：同 prompt 跑 skill-off 子代理对照，skill-on 须显著优于 baseline。
 - **存放** `skills/<name>/evals/`（`trigger.yaml` + `execution.yaml`）；运行产物（JSONL trace、评分）不入库。`evals/` 为本仓库自建约定，**非官方 spec 目录**。
 - **失败即用例**：线上失败 → 回填 YAML 用例（先挂红）→ 改源码 → 全量回归绿 → 才 re-release。
 - **范围**：先 Claude-Code-first 跑通整套；Codex 适配器（足迹断言）后补。
@@ -62,9 +62,14 @@
 6. session JSONL（`~/.claude/projects/.../<id>.jsonl`）格式官方声明**内部不稳、不建议直接解析**；优先 headless JSON 或 hook。
 7. **无官方 skill eval 框架**（仅社区工具）。
 
+**已证实 · F 触发检测机制（本会话实机验证，非文档推断）：**
+
+8. **外部 `claude -p` 此环境不可用**：从会话内 spawn 的 headless `claude -p` 子进程鉴权失败（"organization does not have access"、0 token），因本会话是 OAuth + 自定义 `ANTHROPIC_BASE_URL` 的托管鉴权、子进程无法复用。→ F runner **不走外部 headless，改用会话内子代理**。
+9. **子代理机制可用**：`Agent` 工具 spawn 的子代理在会话内运行（无鉴权问题），能发现 `.claude/skills/` 下暂存的 skill 并真实激活（`Skill` tool_use，实测 `tool_uses>0`）。
+10. **客观检测链路**：子代理转录在 `<session>/subagents/agent-<id>.jsonl`，实测记录为 `"name":"Skill","input":{"skill":"new-skill","args":"..."}`。→ **`Skill` 工具入参字段 = `skill`**（更正先前文档推断的 `input.name`）；触发检测 = grep 转录里 `"skill":"<目标>"` 的 Skill tool_use，**客观、非自报**。
+
 **推断 / 待验证：**
 
-- Claude headless 里 `Skill` tool_use 的**确切入参字段名**：文档推断 `input.name`，但本会话工具 schema 入参名为 `skill`——建 runner 时实测坐实。
 - **auto 激活 vs 显式 `/skill` 在输出中不可区分**；我们用自然 prompt 驱动规避（出现即自动激活）。
 - **Codex 侧 skill 激活可观测性与官方评测范式：本篇未做一手查证**。初步印象为 Codex 无直接激活事件、官方倾向足迹断言 + `codex exec --output-schema`，均**待 Codex 适配器阶段专项查证**，不在本篇作既证事实。
 
@@ -76,7 +81,7 @@
 
 ## 存疑 / 待验证
 
-- **F 评测形态整体未经实跑验证**：至今无 skill 走过完整 F 流程，触发信号解析、no-skill baseline 对照、judge 子代理打分、pass^k 成本与稳定性等均可能在首个 skill 落地时暴露问题，届时按"失败即用例"回填修正决策四。
+- **F 评测形态：触发检测机制已验证，其余待实跑**：触发检测（子代理 spawn + 转录解析）本会话已坐实；但 no-skill baseline 对照、judge 子代理打分、pass^k 成本与稳定性、端到端 runner 仍无 skill 跑过，可能在建 runner 时暴露问题，届时按"失败即用例"回填决策四。
 - `Skill` tool_use 入参字段名（`input.name` vs `skill`），建 runner 时实测。
 - ②"agent 发布时驱动"的强制力弱于 CI 硬门禁，靠发布流程纪律 + 结果留痕保证；是否日后补一层发布 CI 复跑，留观察。
 - `pass^k` 的 k、各 skill 触发率阈值的具体值，建 runner 时定。

@@ -25,3 +25,7 @@ tmp/
 # ── 评测运行产物（用例入库，运行结果不入库）──
 evals/**/runs/
 evals/**/.cache/
+
+# ── 评测运行时暂存的 skill（源在 skills/，.claude/skills 仅供子代理发现，不入库）──
+.claude/skills/*
+!.claude/skills/.gitkeep
