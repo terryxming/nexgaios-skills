@@ -8,7 +8,7 @@ tools/lint.py — 仓库级硬门禁（议题 4 · W1）。
   ② ADR 留痕格式          —— 私有纪律 A1 / 通用纪律 ⑨（难逆转决策进 docs/decisions 并附据）
   ③ 纪律漂移校验          —— 私有纪律 B（调用 check-discipline-drift.py）
 
-任一 error → 退出 1（CI 挡）；warning 仅提示、不阻断。零第三方依赖。
+二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。零第三方依赖。
 用法：python tools/lint.py
 """
 from __future__ import annotations
@@ -24,7 +24,6 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parent.parent
 errors: list[str] = []
-warnings: list[str] = []
 
 
 def tracked_paths() -> list[str]:
@@ -56,8 +55,6 @@ def check_adrs() -> None:
             errors.append(f"ADR {adr.name} 缺「状态」")
         if not re.search(r"证据|来源|依据", text):
             errors.append(f"ADR {adr.name} 缺「证据/来源/依据」段（A1：决策须留痕附据）")
-        if "http" not in text:
-            warnings.append(f"ADR {adr.name} 未见外部来源 URL（若为纯内部决策可忽略）")
     print(f"✅ ADR 格式检查：核对 {len(adrs)} 篇")
 
 
@@ -78,8 +75,6 @@ def main() -> int:
     check_adrs()
     check_drift()
 
-    for w in warnings:
-        print(f"⚠ {w}")
     if errors:
         print("\n✗ lint 失败：")
         for e in errors:

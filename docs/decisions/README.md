@@ -39,3 +39,4 @@
 - [0001 平台兼容与单一事实源](0001-platform-compat-single-source.md)
 - [0002 工程纪律常驻上下文](0002-discipline-always-in-context.md)（落地方式已被 0003 取代）
 - [0003 工程纪律：双份文件 + 漂移校验](0003-discipline-dual-file-drift-check.md)
+- [0004 纪律硬/软分界：门禁二值化 + 桶三人在环 + 评测发布](0004-discipline-hard-soft-gates.md)

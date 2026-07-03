@@ -21,7 +21,6 @@ END = "<!-- DISCIPLINE:SHARED END -->"
 
 # 体积护栏：本仓库要求 Codex project_doc_max_bytes = 128 KiB（见 ADR-0002 / config.toml）。
 HARD_CAP_BYTES = 128 * 1024      # 128 KiB
-WARN_AT_BYTES = 120 * 1024       # 逼近阈值
 
 
 def shared_region(text: str, fname: str) -> str:
@@ -64,8 +63,6 @@ def main() -> int:
         if b > HARD_CAP_BYTES:
             print(f"✗ {f} {b} 字节，超 128 KiB 硬顶——Codex 会静默截断，必须精简")
             rc = 1
-        elif b > WARN_AT_BYTES:
-            print(f"⚠ {f} {b} 字节，逼近 128 KiB 上限，注意增长")
         else:
             print(f"✅ {f} {b} 字节，在 128 KiB 内")
 

@@ -229,6 +229,11 @@ Plan:
 6. **跨 agent 幻觉**：Claude 不臆断 Codex 机制、反之亦然；跨平台断言一律走"联网查证 + 用户确认"（联动 A1）。
 7. **失败诚实**：命令失败 / 测试红 / 步骤跳过，如实报原始输出，不粉饰、不假装成功。
 
+**A5 · 门禁二值化，不留"不阻断的 warning"。**
+- 每项检查只有两种归宿：**能机械判定 → 硬门禁**（红/绿，失败即阻断，进 lint/CI）；**判不了但重要 → 桶三人在环**（遇到即停 + 给修复方案 + 等用户确认 + 再执行，阻断式，非被动提示）；既判不了又不值得停 → 不检查。
+- **禁止"warning 但放行"的中间态**：不阻断的告警会被无视，日后酿大问题；门禁只有失败或通过两态。
+- **CI 只跑二值硬门禁**；**桶三只在 agent 会话时生效**（CI 无法"等确认"）。详见 ADR-0004。
+
 ### B. 单一事实源与 MECE
 - 同一条规则/事实/契约只允许**唯一逻辑事实源**；信息组织遵循 MECE（互斥、穷尽）；**禁止可避免的重复**，复用以引用/链接指向权威源，而非复制。
 - **例外（平台强制）**：本工程纪律须同时常驻 `CLAUDE.md` 与 `AGENTS.md`——因 AGENTS.md 无 import 机制、两平台各读各的（已证实，见 ADR-0002）。故二者的**共享段（通用 + 私有纪律）必须逐字节一致**，由 `tools/check-discipline-drift.py` 漂移校验（CI 门禁）保证；**平台差异段**各自维护、不参与比对。改了一份的共享段，必须同步另一份，校验须绿。
@@ -254,19 +259,29 @@ Plan:
 | ⑨ 沟通 | 难逆转决策进 `docs/decisions/` 附证据。 |
 | ⑩ 失败模式 | 尤其警惕知识幻觉（见 A4）。 |
 
-### E. skill 特有硬约束（能脚本化的进 lint/CI，不靠自觉）
-1. **规范合规**（集成官方 `skills-ref validate` + 自建检查）：`name` ≤64、仅 `[a-z0-9-]`、不以连字符起止、无连续连字符、**等于父目录名**；`description` ≤1024、非空、须写清"做什么 + 何时用/何时不用"；`SKILL.md` 正文建议 <500 行，超限拆 `references/`。
-2. **单一事实源一致性**：`dist/` 必须能由 `skills/` 经构建脚本完整重生；CI 校验 `dist/` 无手工漂移。
-3. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
-4. **中文化**：产出物内容（`description`、正文、changelog）一律中文。
+### E. skill 特有约束（桶一委托官方 / 桶二自建硬门禁 / 桶三人在环，机制见 A5）
+
+**桶一 · 委托官方 `skills-ref validate`**（Python≥3.11，`pip install skills-ref`；二值 pass/fail，不自己重写，见 B）：校验 frontmatter 与命名——`name` ≤64、仅 `[a-z0-9-]`、不以连字符起止、无连续连字符、**等于父目录名**；`description` 非空 ≤1024；`compatibility` 是字符串 ≤500；frontmatter 无白名单外字段；结构完整（路径 / 目录 / `SKILL.md` / 可解析）。
+
+**桶二 · 自建硬门禁**（skills-ref 不覆盖、可脚本化，进 lint/CI）：
+1. **单一事实源一致性**：`dist/` 必须能由 `skills/` 经构建脚本完整重生；CI 校验 `dist/` 无手工漂移。
+2. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
+3. **中文化兵底**：`description`、正文、changelog 至少含中文（CJK），防纯英文产出。
+
+**桶三 · 人在环质量关**（语义判不了，遇到即停 + 提案 + 确认，见 A5）：
+1. **`description` 质量**：用**第三人称**讲清三件事——这个 skill 是干嘛的、何时用、何时不用（`skills-ref` 只查非空）。
+2. **中文化质量**：中文为主；通用/专业术语保留英文并加中文注释（形如 `TDD（测试驱动开发）`），不生硬直译。
+3. **正文长度**：`SKILL.md` 正文过长时拆 `references/`（spec 建议 <500 行，非硬性）。
 
 ### F. 评测即回归
-- **两层评测**：**触发评测**（正/负例 prompt，验证 `description` 该触发才触发、不该触发不触发）+ **执行评测**（场景 + rubric，验证完成质量）。
+- **两层评测**：**触发评测**（正/负例 prompt，验证该触发才触发、不该触发不触发；判定读 headless 的 `Skill` 工具调用）+ **执行评测**（场景 + rubric + **no-skill baseline** 对照，验证 skill 确有增益）。
+- **系统测量**：测轨迹不只测结果；**隔离子代理**执行、**独立 judge 子代理**打分，非确定性用 **pass^k** 采样；用例用 YAML。先 Claude-Code-first，Codex 后补。
 - **失败即用例**：线上每个失败案例回填成一条 eval 用例，再改源码；改完跑全量回归，通过才允许 re-release。
-- 用例入库 `skills/<name>/evals/`，运行产物不入库。
+- 用例入库 `skills/<name>/evals/`，运行产物不入库。**形态定稿但尚无 skill 实跑，试行待验证——详见 ADR-0004。**
 
 ### G. 发布门禁
 允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）并更新 changelog ④构建到 `dist/` 且与源一致 ⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
+- **落点**（见 ADR-0004）：①③④ 进 **CI 常驻**（③ 以 git tag `skill-name/vX.Y.Z` 作参照）；② 因需 API 由 **agent 发布时驱动**（跑 F、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
 <!-- DISCIPLINE:SHARED END -->
 
