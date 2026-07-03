@@ -177,15 +177,19 @@ def check_version() -> None:
     except ImportError:
         return  # 依赖缺失已由桶一报错，不重复
     bad = []
+    unparsed = 0
     for d in dirs:
         try:
             props = read_properties(d)
         except Exception:
-            continue  # 结构/frontmatter 问题由桶一报，不重复
+            unparsed += 1  # 结构/frontmatter 问题由桶一报错，此处不虚报绿
+            continue
         if not (props.metadata or {}).get("version"):
             bad.append(f"{d.name}/SKILL.md 缺 metadata.version（G③：版本历史 = git tag + metadata.version）")
     if bad:
         errors.extend(bad)
+    elif unparsed:
+        print(f"• version 检查（桶二）：{len(dirs) - unparsed} 个通过，{unparsed} 个 frontmatter 不可解析（见桶一报错）")
     else:
         print(f"✅ version 检查（桶二）：{len(dirs)} 个 skill 均有 metadata.version")
 
