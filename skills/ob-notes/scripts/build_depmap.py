@@ -16,6 +16,9 @@ import sys
 import re
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")  # Windows GBK 控制台直跑也能输出中文
+
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 MAINTENANCE = SKILL_ROOT / "references" / "maintenance.md"
 OUTPUT = SKILL_ROOT / "references" / "dependency-map.md"

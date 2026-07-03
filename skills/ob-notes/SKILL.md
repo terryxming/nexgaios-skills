@@ -74,7 +74,7 @@ metadata:
 ## 引用文件（按需读，各注明时机）
 
 - `references/preflight.md` — **每次写盘前必读**：`{kb_root}` 读取、Obsidian 入口落点、存在 / 可写校验、跨 OS 路径归一。
-- `references/mode-a-research.md` / `mode-a-practice.md` / `mode-a-dialogue.md` — **判定类型后读对应一个**：模板 + 该记 / 该丢清单 + 边界示例（research 另含 source-fidelity 原文保真与 mastery-lens 掌握视角；dialogue 另含连续追问原样保留纪律）。
+- `references/mode-a-research.md` / `mode-a-practice.md` / `mode-a-dialogue.md` — **判定类型后读对应一个**：模板 + 该记 / 该丢清单 + 边界示例（research 另含 source-fidelity 原文保真与 mastery-lens 掌握视角；dialogue 另含"问题保真、回答重写"纪律）。
 - `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
 - `references/anti-patterns.md` — **抽取 / 过滤噪音时对照**：各类坏笔记的坏例与改写（逐条见 anti-patterns）。
 - `references/quality-check.md` — **写盘前自查**：30秒阅读 / 信号噪音 / 证据 / 复用 + 研究型掌握测试，不合格先重写。

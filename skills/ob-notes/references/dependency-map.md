@@ -15,7 +15,7 @@
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
 | `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule | — |
 | `references/maintenance.md` | controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry | — |
-| `references/mode-a-dialogue.md` | dialogue-template | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
+| `references/mode-a-dialogue.md` | dialogue-template | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, anti-patterns |
 | `references/mode-a-practice.md` | practice-template | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
 | `references/mode-a-research.md` | research-template, source-fidelity, mastery-lens | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
 | `references/preflight.md` | kb-root, landing-rule, preflight-flow, path-normalize | — |
@@ -26,7 +26,7 @@
 
 | 规则项 | 定义于 | 被谁依赖 |
 |---|---|---|
-| `anti-patterns` | `references/anti-patterns.md` | `SKILL.md` |
+| `anti-patterns` | `references/anti-patterns.md` | `references/mode-a-dialogue.md`, `SKILL.md` |
 | `controlled-vocab` | `references/maintenance.md` | `scripts/build_depmap.py` |
 | `credibility-spec` | `references/frontmatter-tags.md` | `references/anti-patterns.md`, `references/mode-a-dialogue.md`, `references/mode-a-practice.md`, `references/mode-a-research.md`, `references/quality-check.md`, `SKILL.md` |
 | `datestamp-rule` | `references/frontmatter-tags.md` | `references/mode-a-dialogue.md`, `references/mode-a-practice.md`, `references/mode-a-research.md`, `SKILL.md` |

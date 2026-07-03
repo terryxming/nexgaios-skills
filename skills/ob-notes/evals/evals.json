@@ -45,11 +45,13 @@
       "id": 4,
       "eval_name": "dialogue-transcript-preserve-questions",
       "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n第一轮：用户问「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n第二轮：用户追问「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？‘代码改动验证误当成收工验证’不是真正原因」。agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n第三轮：用户追问「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
-      "expected_output": "一篇问答实录型 Obsidian 笔记：判定为问答实录型；写盘前读过 preflight/frontmatter-tags/mode-a-dialogue；frontmatter 使用 类型/问答实录；保留三轮用户问题原文，使用 question callout 或等价显式标记；不压缩成单段复盘；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
+      "expected_output": "一篇问答实录型 Obsidian 笔记：判定为问答实录型；写盘前读过 preflight/frontmatter-tags/mode-a-dialogue；frontmatter 使用 类型/问答实录；保留三轮用户问题原文，使用 question callout 或等价显式标记；回答以讲解体面向未来读者重写（问题保真、回答重写），每轮末尾收口一句总纲；不压缩成单段复盘；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记 frontmatter tags 包含 类型/问答实录",
         "三轮用户提问原文被保留，不被改写成摘要",
+        "回答区为面向读者的讲解体，无“agent 当时解释说/随后承认”式转写叙事（原话仅在作为证据或认知转折时引用）",
+        "每轮末尾有一句可带走的总纲（判断/公式/对比）",
         "正文按轮次组织，并包含“本篇记录原则”和“可信度约定”或等价说明",
         "明确区分已发生事实（已验证）与底层原因判断（推测）",
         "落点为 {kb_root}/00 - raw/00 - inbox/，不写项目目录"
