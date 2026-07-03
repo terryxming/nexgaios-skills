@@ -10,7 +10,6 @@
 | 文件 | provides | depends_on |
 |---|---|---|
 | `CHANGELOG.md` | — | — |
-| `README.md` | — | — |
 | `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, jsonl-schema, revisit-signal, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule |
 | `dev-log.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |

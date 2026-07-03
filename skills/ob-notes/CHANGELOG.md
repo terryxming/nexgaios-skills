@@ -4,6 +4,16 @@
 
 版本遵循语义化版本 `MAJOR.MINOR.PATCH`，规则见 `references/maintenance.md` 第 5 节。
 
+## [0.7.1] - 2026-07-03
+
+迁入 nexgaios-skills-dev 仓库后的接缝修复（PATCH）。
+
+- **迁入**：本 skill 自 2026-07-03 起以 nexgaios-skills-dev 仓库为唯一事实源（原仓库退役），受宿主仓库八门禁与发布门禁管理；补 evals/（触发 20 条 + 执行 3 条，格式按官方 skill-creator 约定，用例经用户过目）。
+- **frontmatter 兼容**：SKILL.md 的 provides/depends_on 改为逗号分隔字符串（官方 skills-ref 拒收流式列表、spec 要求 metadata 值为字符串）；`build_depmap.py` 解析兼容两种写法（修复迁入时引入的解析回归）。
+- **校验收紧**：归属表已声明唯一家的规则项若无文件 provides，由警告升为**错误**（声明断裂 ≠ 待实现，不阻断的告警会被无视）。
+- **description 补"何时不用"**：临时草稿、无需长期留存、只要求解释而非保存时不触发。
+- 杂物清理：删 README.md（与 preflight 内容重复）、skill.yaml 与 .claude-plugin/（原仓库流水线遗物，版本/描述双源）。
+
 ## [0.7.0] - 2026-06-27
 
 source-fidelity 从"仪式闸"升级为"实质闸"：覆盖表不再能当遮羞布（MINOR，向后兼容）。

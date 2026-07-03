@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 0.4.0
+  version: 0.4.1
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -104,6 +104,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 - `provides`：本文件是哪些规则项的唯一家。**同一规则项只能出现在一个文件的 provides 中**（脚本强制校验）。无定义则写 `[]`。
 - `depends_on`：本文件引用了哪些别处定义的规则项。无依赖则写 `[]`。
 - 二者的标识符**必须**来自受控词表；未登记的标识符视为错误（脚本报错）。
+- **SKILL.md 特例**：官方 `skills-ref validate` 拒收流式列表、且 Agent Skills spec 要求 metadata 值为字符串，故 SKILL.md 的 `provides`/`depends_on` 写成**逗号分隔字符串**（如 `provides: "a, b"`）；references 文件不受官方校验，保持流式列表。`build_depmap.py` 两种写法都解析。
 - **就近原则**：依赖信息住在文件自己身上，不维护任何中心化的手写依赖表。依赖图由脚本从这些声明**派生**。
 - 脚本 `build_depmap.py` 自身也是依赖图节点。它在运行时从本文件第 1 节归属表**动态解析受控词表**（不在代码内存副本，彻底单一真相源），因此依赖 `dependency-spec`、`controlled-vocab`、`ssot-registry`（解析逻辑与归属表格式耦合）。在脚本顶部注释里以 `# depends_on: dependency-spec, controlled-vocab, ssot-registry` 形式声明（脚本非 markdown，无 frontmatter，用注释等价表达）。
 
@@ -140,7 +141,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 - 每个文件 frontmatter 的 `version` = **该文件**的版本。
 - SKILL.md frontmatter 的 `version` = **整个 skill** 的对外版本，进 CHANGELOG。
 
-CHANGELOG.md（仓库根，给人看，不进 agent 上下文）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（Mode B，面向维护者，详尽）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
+CHANGELOG.md（skill 域内，给人看的版本叙事，不进 agent 上下文；构建分发时排除，见宿主仓库 ADR-0006）记录 skill 对外版本间的变化；ob-notes 自身的开发细节（为什么这么改、踩了什么坑）记在 ob-notes 自己的 dev-log（Mode B，面向维护者，详尽）。两者职责不同：CHANGELOG 面向用户讲"变了什么"，dev-log 面向维护者讲"为什么、怎么踩坑"。
 
 <a id="6"></a>
 ## 6. 修改流程（强制）

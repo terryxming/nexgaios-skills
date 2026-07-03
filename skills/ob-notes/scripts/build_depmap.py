@@ -43,11 +43,18 @@ def load_vocab_and_homes():
 
 
 def parse_fm_list(block, key):
-    # 字段位于 frontmatter 的 metadata 下，带缩进：`  provides: [...]`
-    m = re.search(rf"^\s*{key}:\s*\[(.*?)\]\s*$", block, re.M)
-    if not m or not m.group(1).strip():
+    # 字段位于 frontmatter 的 metadata 下，带缩进。两种等价写法都解析（见 maintenance.md §3）：
+    #   流式列表   provides: [a, b]     —— references 文件用
+    #   逗号字符串 provides: "a, b"     —— SKILL.md 用（官方 skills-ref 拒收流式列表，
+    #                                     且 Agent Skills spec 要求 metadata 值为字符串）
+    m = re.search(rf"^\s*{key}:\s*(.+?)\s*$", block, re.M)
+    if not m:
         return []
-    return [s.strip() for s in m.group(1).split(",") if s.strip()]
+    val = m.group(1).strip()
+    if val.startswith("[") and val.endswith("]"):
+        val = val[1:-1]
+    val = val.strip().strip("\"'")
+    return [s.strip() for s in val.split(",") if s.strip()]
 
 
 def collect_md(path):
@@ -105,7 +112,12 @@ def main():
                     f"[归属不符] '{r}' 归属表声明唯一家为 {home_name}，但实际由 {actual} 提供")
 
     for r in sorted(vocab - defined):
-        warnings.append(f"[孤儿规则] 受控词表中的 '{r}' 尚无文件 provides（可能待实现）")
+        home = declared_home.get(r, "").strip()
+        if home and home != "—":
+            errors.append(f"[声明断裂] '{r}' 在归属表声明唯一家为 {home}，却无任何文件 provides 它"
+                          f"（解析失败或声明丢失，非'待实现'——不阻断的告警会被无视）")
+        else:
+            warnings.append(f"[孤儿规则] 受控词表中的 '{r}' 尚无文件 provides（可能待实现）")
 
     if not errors:
         write_map(nodes, definer)
