@@ -9,6 +9,7 @@
   { "id": "T8", "category": "情境-研究", "should_trigger": true, "query": "这一下午把 RAG chunking 策略研究得差不多了，整理成一篇能长期参考的笔记放知识库" },
   { "id": "T9", "category": "情境-复用", "should_trigger": true, "query": "帮我把刚才竞品分析的结论保存起来，下个月做规划要用" },
   { "id": "T10", "category": "竞争-裸写md", "should_trigger": true, "query": "把这段架构取舍的来龙去脉写成 markdown 长期保存，要规范一点别随手糊" },
+  { "id": "T11", "category": "情境-问答实录", "should_trigger": true, "query": "把刚才这三轮追问整理成问答实录，不要压缩，保留我的每个问题和你被纠正后的底层原因" },
   { "id": "F1", "category": "负-只要解释", "should_trigger": false, "query": "帮我解释一下这段代码为什么会死锁" },
   { "id": "F2", "category": "负-产出非沉淀", "should_trigger": false, "query": "把这段结论翻译成英文发给同事" },
   { "id": "F3", "category": "负-项目文档", "should_trigger": false, "query": "给这个项目写个 README.md 介绍一下" },

@@ -13,7 +13,7 @@ tags: [状态/持续]
 
 ## 项目意图
 
-做一个遵循 Agent Skills 开放标准、可被 Claude/Codex 等多 agent 通用的 skill，把人与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库。
+做一个遵循 Agent Skills 开放标准、可被 Claude/Codex 等多 agent 通用的 skill，把人与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论、连续追问）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库。
 
 成功标准：解决用户随手让 agent "记一下"时的四类毛病——不知道记什么、压缩过狠、格式丑、没重点；并且 skill 自身可长期维护、不随复杂度上升而前后矛盾。
 
@@ -50,13 +50,14 @@ tags: [状态/持续]
 | 2026-07-03 | **迁入 `nexgaios-skills-dev`**：该仓库成唯一事实源、原仓库整体退役；SKILL.md 的 provides/depends_on 改逗号字符串、脚本解析兼容两式；归属表有家的孤儿规则由警告升 error | 双仓并存必双源漂移；官方 skills-ref 拒流式列表 + spec 要求 metadata 值为字符串；SKILL.md 声明断裂只配警告会被静默放行（宿主仓库 A5：不阻断的告警会被无视） | 保持流式列表（否：宿主桶一门禁红）；双仓各自维护（否：漂移）；孤儿一律 error（否：真"待实现"场景需要 warning） |
 | 2026-07-03 | **v0.8.0 写入侧监控指令从 SKILL.md 拿走**（monitoring.md 保留、复盘引用保留；启用监控时再加回指令），收尾触发收窄为"确有留存价值时主动问一次" | 监控层暂缓是既定决策，但指令层仍无条件命令记 jsonl——执行模拟发现每次沉淀 preflight 都会因 `_meta` 不存在多问一次，指令与决策脱节（维护者知识没落到指令层）；description"也应触发"与触发节"问一次"语义不一致 | 加"未启用则跳过"条件开关（否：给暂缓功能留常驻分支判断，徒增读者负担；启用时机未到，拿走更干净） |
 | 2026-07-03 | **v1.0.0 收敛为 Obsidian-only**：移除项目目录/dev-log 写入能力、删除 monitoring 回访机制、tag 移除 `类型/项目日志` | 用户重新明确定位：ob-notes 只做一件事，把人与 agent 对话里值得长期复用的信息写回 Obsidian；项目目录写入和回访信号都会把职责拉宽 | 保留 dev-log 作为第二模式（否：偏离定位）；保留 monitoring 空壳（否：无意义且制造机制负担） |
+| 2026-07-03 | **v1.0.0 候选补问答实录型**：新增 `dialogue-template` 与 `类型/问答实录` | 用户指出实际知识库已有 `MCP 实战·...：问答实录` 体例，且"不要压缩/保留追问链"不属于 research/practice 任一模板；如果不纳入规范，agent 会继续误判成实战卡 | 硬塞进 practice（否：会丢学习路径）；硬塞进 research（否：会把问答过程改写成主题论文） |
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v1.0.0 候选**（Obsidian-only 破坏性收敛）：主能力只写 `{kb_root}/00 - raw/00 - inbox/`，Mode B / 项目目录写入 / dev-log 对外能力 / monitoring 回访机制已移除；受控词表收敛为 25 项，`dependency-map.md` 已重建。当前改动在分支 `codex/ob-notes-obsidian-only`，待宿主 lint、评测与发布门禁完成后才能合入 main 并打 tag。
+- 现状：**v1.0.0 候选**（Obsidian-only 破坏性收敛 + 问答实录型补齐）：主能力只写 `{kb_root}/00 - raw/00 - inbox/`，Mode B / 项目目录写入 / dev-log 对外能力 / monitoring 回访机制已移除；新增 research / practice / dialogue 三模板，其中 dialogue 对应 `类型/问答实录`；受控词表收敛为 26 项，`dependency-map.md` 已重建。当前改动在分支 `codex/ob-notes-obsidian-only`，待宿主 lint、评测与发布门禁完成后才能合入 main 并打 tag。
 - 下一步：
   1. **跑宿主 lint 与 skill 校验**，确保 v1.0.0 结构门禁全绿。
-  2. **补跑 F/G② 评测**：重点覆盖 Obsidian-only 正例、dev-log 负例、kb_root 未配置停问。
+  2. **补跑 F/G② 评测**：重点覆盖 Obsidian-only 正例、dev-log 负例、问答实录正例、kb_root 未配置停问。
   3. 达标后合入 main 并打 tag `ob-notes/v1.0.0`。
 - 卡点：无。
 - **续做提示（给接手的你/agent）**：先读宿主仓库 `CLAUDE.md`/`AGENTS.md`（工程纪律，含 skill 迁入/发布门禁）与 `docs/decisions/`；改本 skill 任何文件前必读 `references/maintenance.md`（§6 修改流程）。换新机器需自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 preflight.md）。旧仓库的"并 main/OKC console"开放项已随原仓库退役作废。
@@ -69,7 +70,8 @@ tags: [状态/持续]
 
 ## 进展时间线（只追加，倒序）
 
-- 2026-07-03：**v1.0.0 候选改造**。按用户确认：①摘除写项目目录能力，删除 `mode-b-devlog.md`，SKILL.md 只保留研究型/实战型 Obsidian 笔记；②删除 monitoring 回访机制与 `monitoring.md`，frontmatter 去掉 `read_count`/`last_read`；③tag 体系移除 `类型/项目日志`；④preflight 落点统一为 `{kb_root}/00 - raw/00 - inbox/`；⑤trigger/evals 增 dev-log 负例，项目决策正例改为 Obsidian-only。`build_depmap.py` 重跑通过，受控词表 31→25 项。尚待宿主 lint、评测与发布门禁。
+- 2026-07-03：**v1.0.0 候选补问答实录型**。用户指出刚写入的《Codex 执行仓库纪律三次失守》被误写成实战踩坑复盘，与知识库既有《MCP 实战·工具加载与粒度：问答实录》《MCP 实战·密钥与信任边界：问答实录》体例不一致；追问后确认 research/practice 都不覆盖"连续追问/不要压缩/保留学习路径"。动作：①Obsidian 笔记改名并重写为《Codex 执行仓库纪律三次失守：问答实录》；②新增 `references/mode-a-dialogue.md` 和 `dialogue-template`；③tag-system 增 `类型/问答实录`；④SKILL.md mode-decision 改为 research/practice/dialogue 三分；⑤evals 增问答实录触发与执行用例。待 lint/depmap/安装验证。
+- 2026-07-03：**v1.0.0 候选改造初步收敛**。按用户确认：①摘除写项目目录能力，删除 `mode-b-devlog.md`；②删除 monitoring 回访机制与 `monitoring.md`，frontmatter 去掉 `read_count`/`last_read`；③tag 体系移除 `类型/项目日志`；④preflight 落点统一为 `{kb_root}/00 - raw/00 - inbox/`；⑤trigger/evals 增 dev-log 负例，项目决策正例改为 Obsidian-only。该步先把受控词表 31→25 项；随后同日补问答实录型后为 26 项。
 - 2026-07-03：**执行评测第 1 轮：with-skill 两组全胜（独立盲评 grader，位置对照排除偏差）**。E1 白纸建笔记 **20:14 大胜**（增益 = 可信度三态自降级、frontmatter 可索引、第一屏摘要、适用边界）；E2 dev-log 更新 **20:18 小胜**（增益 = 被推翻决策就地"已过时"删除线留痕；差距小属预判混杂——预置 fixture 本身即 skill 模板，baseline 靠格式跟随得分）；E3 铁律一双侧零写盘（with 侧教科书：拒编造 + 停问 + 未新建目录；baseline 侧归因混杂——unstage 后子代理在仓库 cwd 读到 `skills/ob-notes` 源照做，**"skill 源在 cwd"本身即泄漏**，干净 baseline 需完全无源环境）。机械断言：E1w 9/9、E2w 9/9；差分证据：E1b 结构 0/5（无 frontmatter/可信度/tag）、E2b 无删除线留痕。**G② 执行侧"优于 baseline"初步达标（k=1）**；正式发布仍待 G④（dist 构建未建）。方法（可复用）：双沙箱 w/b 防交叉、config 挪移防写真库、两波串行防 skill 互见、盲评 A/B 反向排位。
 - 2026-07-03：**触发评测第 1 轮（k=1）满分：20/20**——正例 10/10 触发（显式/隐式/情境/typo/竞争全命中）、负例 10/10 正确拒绝、**误触发 0（G 全局底线达标）**。方法：每条用例一个隔离子代理收 query 原文（无评测框架）、解析其转录 `Skill(ob-notes)` tool_use 客观判定；写盘隔离 = 临时挪走 `~/.config/ob-notes/config.json`，铁律一顺带实测通过（T1/T8/T9 走到写盘全部停下来问、零写盘、零编造）。事故与教训：①20 并发瞬间打满限流、10 个子代理被掐（其中 7 个已留下激活证据仍有效，F3/F9/F10 补跑）——**spawn 须分批（≤5）**；②F6"记住用 pnpm"被子代理当真实偏好写入宿主记忆——**负例的"正确行为"也有副作用，跑完须巡检**；③T1 在仓库 cwd 里 grep 出用例文件识破评测——触发判定不受污染（激活在先），但**执行评测须换干净 cwd**（环境泄漏）。诚实标注：k=1 摸底轮；pass^k 加采样与执行评测（baseline 对照）未跑，G② 尚未完全达标。
 - 2026-07-03：**发 v0.8.0（MINOR）**——SKILL.md 内容质量专项审查（执行模拟镜头）：①写入侧监控指令拿走（监控暂缓却无条件命令记 jsonl，每次沉淀会被 preflight 多问一次；monitoring.md 与复盘引用保留）②收尾触发收窄并与触发节"问一次"对齐 ③铁律三倒置指代修正。SKILL.md depends_on 去掉 jsonl-schema/revisit-signal，depmap 重跑图变化确认。教训：审查结论须声明镜头与覆盖面——上一轮结构审查曾误背书"设计无问题"。

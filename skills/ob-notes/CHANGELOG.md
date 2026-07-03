@@ -10,9 +10,10 @@
 
 - **移除项目目录写入能力**：删除 Mode B / dev-log 写入路径，落点统一为 `{kb_root}/00 - raw/00 - inbox/`；项目中的可复用决策、踩坑、方案取舍仍可沉淀，但只能作为 Obsidian 笔记。
 - **移除 monitoring 回访机制**：删除 `monitoring.md`、`capture-log.jsonl`、`read_count`、`last_read`、`review-flow`、`revisit-signal`、`concurrency-safe` 等规则与字段。
-- **精简 frontmatter/tag 契约**：frontmatter 只保留笔记内容字段；tag 移除 `类型/项目日志`。
-- **更新评测回归**：项目决策正例改为 Obsidian-only；新增 dev-log 写入负例，防止旧能力回流。
-- **维护词表重建**：受控规则项从 31 项收敛到 25 项，依赖图重新生成。
+- **精简 frontmatter/tag 契约**：frontmatter 只保留笔记内容字段；tag 移除 `类型/项目日志`，新增 `类型/问答实录`。
+- **新增问答实录型模板**：用于连续追问、教学讲解、认知纠错这类"理解路径本身有价值"的笔记，保留用户问题与纠错瞬间，不压成实战卡。
+- **更新评测回归**：项目决策正例改为 Obsidian-only；新增 dev-log 写入负例与问答实录正例，防止旧能力回流和模板误判。
+- **维护词表重建**：受控规则项从 31 项收敛到 26 项，依赖图重新生成。
 
 ## [0.8.0] - 2026-07-03
 
