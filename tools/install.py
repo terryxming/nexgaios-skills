@@ -13,8 +13,8 @@ tools/install.py — 本仓库 skill 的本机离线安装脚本。
   python tools/install.py ob-notes --dest D:/tmp/skills   # 只装到自定义目录
   python tools/install.py xxx --from third-party          # 同名冲突时指定来源
 
-来源目录：`skills/`（自主开发）与 `third-party/`（第三方原样副本，见 ADR-0010）
-都可安装；同名冲突须用 --from 指定。默认目标：Claude Code `~/.claude/skills`
+来源目录：`skills/first-party/`（自主开发）与 `skills/third-party/`（第三方原样
+副本，见 ADR-0010）都可安装；同名冲突须用 --from 指定。默认目标：Claude Code `~/.claude/skills`
 （官方 plugins-reference：personal scope，对所有项目生效）与 Codex
 `$CODEX_HOME/skills`（无 CODEX_HOME 时 `~/.codex/skills`，同官方 skill-installer）。
 外部用户另可走 Claude plugin marketplace（见 README）。
@@ -33,7 +33,8 @@ for _stream in (sys.stdout, sys.stderr):
         _stream.reconfigure(encoding="utf-8")  # Windows GBK 控制台直跑也能输出中文
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_DIRS = {"skills": ROOT / "skills", "third-party": ROOT / "third-party"}
+SOURCE_DIRS = {"first-party": ROOT / "skills" / "first-party",
+               "third-party": ROOT / "skills" / "third-party"}
 
 
 class InstallError(Exception):
@@ -68,7 +69,7 @@ def find_skill(name: str, source: str | None) -> Path:
     hits = [(label, SOURCE_DIRS[label] / name) for label in labels
             if (SOURCE_DIRS[label] / name / "SKILL.md").is_file()]
     if len(hits) > 1:
-        raise InstallError(f"'{name}' 在 skills/ 与 third-party/ 中同名，请用 --from 指定来源")
+        raise InstallError(f"'{name}' 在 first-party 与 third-party 中同名，请用 --from 指定来源")
     if not hits:
         available = ", ".join(d.name for label in labels for d in skill_dirs(SOURCE_DIRS[label])) or "无"
         raise InstallError(f"未找到 skill：{name}。可安装项：{available}")
@@ -94,7 +95,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--list", action="store_true", help="列出本仓库可安装的 skill")
     parser.add_argument(
         "--from", dest="source", choices=list(SOURCE_DIRS),
-        help="限定来源目录（skills / third-party）；同名冲突时必填",
+        help="限定来源目录（first-party / third-party）；同名冲突时必填",
     )
     parser.add_argument(
         "--dest",
