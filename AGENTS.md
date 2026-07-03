@@ -9,7 +9,7 @@
 ## 一分钟速览
 
 - **单一事实源**：skill 源在 `skills/`；`dist/` 是构建产物，永不手改。工程纪律常驻本文件，其"共享段"与另一平台文件须逐字节一致。
-- **全面中文化**：产出物**内容**（含 `description`、正文、changelog）用中文；**标识符/文件名/路径**用英文 kebab-case。
+- **全面中文化**：产出物**内容**（含 `description`、正文）用中文；**标识符/文件名/路径**用英文 kebab-case。
 - **决策留痕**：难逆转的选择写进 `docs/decisions/` 并附证据来源。
 - **跨设备铁律**：需延续的状态必须进仓库并 push——git 是唯一同步通道。切机器先巡检，收工 handoff，续工 resume。
 - **非 Claude 平台的事实**：先查官方文档再落笔；存疑项标注待实机验证，不凭记忆断言。
@@ -248,7 +248,7 @@ Plan:
 ### D. 通用纪律 → skill 场景映射
 | 通用纪律 | 在本仓库的形态 |
 |---|---|
-| ① 写之前先读 | 新建 skill 前先读 `templates/` 和同类 skill；改前先读其 `SKILL.md`、`evals/`、changelog。 |
+| ① 写之前先读 | 新建 skill 前先读同类 skill 与官方 skill-creator 指引；改前先读其 `SKILL.md`、`evals/` 与 git tag 版本历史。 |
 | ② 编码前思考 | 先说清触发边界（何时触发 / 何时不）、平台差异、是否真需新建。 |
 | ③ 简单性 | 一个 skill 只解决一类任务；`SKILL.md` 正文短小，细节拆 `references/` 按需加载。 |
 | ④ 外科手术式修改 | 一次只动一个 skill 目录；`dist/` 永不手改。 |
@@ -266,7 +266,7 @@ Plan:
 **桶二 · 自建硬门禁**（skills-ref 不覆盖、可脚本化，进 lint/CI）：
 1. **单一事实源一致性**：`dist/` 必须能由 `skills/` 经构建脚本完整重生；CI 校验 `dist/` 无手工漂移。
 2. **平台可移植**：skill 源不写死机器路径或平台假设；平台差异（Codex 的 `agents/openai.yaml` 等 sidecar）与 `SKILL.md` 分离。
-3. **中文化兵底**：`description`、正文、changelog 至少含中文（CJK），防纯英文产出。
+3. **中文化兵底**：`description`、正文至少含中文（CJK），防纯英文产出。
 
 **桶三 · 人在环质量关**（语义判不了，遇到即停 + 提案 + 确认，见 A5）：
 1. **`description` 质量**：用**第三人称**讲清三件事——这个 skill 是干嘛的、何时用、何时不用（`skills-ref` 只查非空）。
@@ -274,14 +274,16 @@ Plan:
 3. **正文长度**：`SKILL.md` 正文过长时拆 `references/`（spec 建议 <500 行，非硬性）。
 
 ### F. 评测即回归
-- **两层评测**：**触发评测**（正/负例 prompt，验证该触发才触发、不该触发不触发；判定读 headless 的 `Skill` 工具调用）+ **执行评测**（场景 + rubric + **no-skill baseline** 对照，验证 skill 确有增益）。
-- **系统测量**：测轨迹不只测结果；**隔离子代理**执行、**独立 judge 子代理**打分，非确定性用 **pass^k** 采样；用例用 YAML。先 Claude-Code-first，Codex 后补。
+- **评测与创作引擎委托官方 `skill-creator`，不自建 runner**（见 ADR-0005）：触发评测（正/负例、多次采样出触发率）与执行评测（with-skill vs **no-skill baseline** 子代理对照 + grader 打分 + benchmark 聚合）都用其机器；仓库只定阈值、消费结果。
+- **用例人在环**：评测用例（触发正/负例、执行场景）运行前**必须给用户过目确认**——是否贴近真实场景由人判定，不许闷头自测。
+- **用例格式**：采用 skill-creator 约定（`skills/<name>/evals/evals.json` + 触发查询 JSON），复用其 viewer / aggregate / run_loop，不自造格式。
 - **失败即用例**：线上每个失败案例回填成一条 eval 用例，再改源码；改完跑全量回归，通过才允许 re-release。
-- 用例入库 `skills/<name>/evals/`，运行产物不入库。**形态定稿但尚无 skill 实跑，试行待验证——详见 ADR-0004。**
+- 用例入库 `skills/<name>/evals/`，运行产物不入库。
 
 ### G. 发布门禁
-允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）并更新 changelog ④构建到 `dist/` 且与源一致 ⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
-- **落点**（见 ADR-0004）：①③④ 进 **CI 常驻**（③ 以 git tag `skill-name/vX.Y.Z` 作参照）；② 因需 API 由 **agent 发布时驱动**（跑 F、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
+允许发布/更新，须依次通过：①`skills-ref validate` + 自建 lint 全绿 ②该 skill 触发/执行评测达标 ③版本按 skill 独立 bump（`metadata.version`）④构建到 `dist/` 且与源一致 ⑤涉及难逆转决策的，`docs/decisions/` 有记录。任一不过，不予发布。
+- **版本历史 = git tag `skill-name/vX.Y.Z` + `metadata.version`**；skill 内**不放 CHANGELOG.md**（官方 skill-creator 明确视其为杂物，见 ADR-0005）。
+- **落点**（见 ADR-0004/0005）：①③④ 进 **CI 常驻**（③ 以 git tag 作参照）；② 由 **agent 发布时驱动**（用 skill-creator 跑评测、留痕、达标才发；阈值 = 全局底线[负例误触发 = 0、优于 baseline] + 每 skill 可调）；⑤ **发布时人在环**（停 + 确认）。
 
 <!-- DISCIPLINE:SHARED END -->
 

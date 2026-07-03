@@ -1,6 +1,6 @@
 # 0004. 纪律硬/软分界：门禁二值化、桶三人在环、评测与发布
 
-- 状态:已接受
+- 状态:已接受（决策四的自建 F runner 路线与 trigger.yaml/execution.yaml 格式被 [ADR-0005](0005-delegate-to-skill-creator.md) 修正；其余决策与证据继续有效）
 - 日期:2026-07-03
 - 决策人:terry（公司电脑）+ Claude
 
