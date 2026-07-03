@@ -10,7 +10,7 @@
 | 文件 | provides | depends_on |
 |---|---|---|
 | `CHANGELOG.md` | — | — |
-| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, jsonl-schema, revisit-signal, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule |
+| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule |
 | `dev-log.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
 | `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule | — |
@@ -37,7 +37,7 @@
 | `devlog-template` | `references/mode-b-devlog.md` | `SKILL.md` |
 | `frontmatter-spec` | `references/frontmatter-tags.md` | `references/mode-a-practice.md`, `references/mode-a-research.md`, `references/mode-b-devlog.md`, `references/monitoring.md`, `SKILL.md` |
 | `iron-laws` | `SKILL.md` | — |
-| `jsonl-schema` | `references/monitoring.md` | `SKILL.md` |
+| `jsonl-schema` | `references/monitoring.md` | — |
 | `kb-root` | `references/preflight.md` | `references/monitoring.md`, `SKILL.md` |
 | `landing-rule` | `references/preflight.md` | `references/mode-b-devlog.md`, `SKILL.md` |
 | `layout-rule` | `references/frontmatter-tags.md` | `SKILL.md` |
@@ -52,7 +52,7 @@
 | `quality-rubric` | `references/quality-check.md` | `SKILL.md` |
 | `research-template` | `references/mode-a-research.md` | `SKILL.md` |
 | `review-flow` | `references/monitoring.md` | `SKILL.md` |
-| `revisit-signal` | `references/monitoring.md` | `SKILL.md` |
+| `revisit-signal` | `references/monitoring.md` | — |
 | `source-fidelity` | `references/mode-a-research.md` | `references/quality-check.md`, `SKILL.md` |
 | `ssot-registry` | `references/maintenance.md` | `scripts/build_depmap.py` |
 | `tag-system` | `references/frontmatter-tags.md` | `references/mode-a-practice.md`, `references/mode-a-research.md`, `SKILL.md` |

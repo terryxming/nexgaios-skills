@@ -1,10 +1,10 @@
 ---
 name: ob-notes
-description: 把与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论、项目进展）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库或项目目录。当用户说沉淀、记录、回写、存一下、写进笔记、记到 obsidian、更新 dev-log，或要求把对话里的上下文、决策、经验教训、研究结论、项目进展保存成笔记时使用——即使没有明说文件格式。项目类任务收尾、出现值得留存的决策或进展时也应触发。涉及把对话内容长期保存以备日后复用时务必使用本 skill，不要自行随意写 Markdown。临时草稿、无需长期留存的内容，或用户只要求解释而非保存时，不使用本 skill。
+description: 把与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论、项目进展）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库或项目目录。当用户说沉淀、记录、回写、存一下、写进笔记、记到 obsidian、更新 dev-log，或要求把对话里的上下文、决策、经验教训、研究结论、项目进展保存成笔记时使用——即使没有明说文件格式。项目类任务收尾、且确有值得留存的决策或进展时，主动问一次是否沉淀。涉及把对话内容长期保存以备日后复用时务必使用本 skill，不要自行随意写 Markdown。临时草稿、无需长期留存的内容，或用户只要求解释而非保存时，不使用本 skill。
 metadata:
-  version: 0.7.1
+  version: 0.8.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, jsonl-schema, revisit-signal, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule"
+  depends_on: "kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, devlog-template, review-flow, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule"
 ---
 
 # ob-notes — 对话价值沉淀
@@ -23,7 +23,7 @@ metadata:
 
 **铁律二·保留确切细节，禁止过度概括。** 宁可留原始具体内容，也不要压成抽象描述：确切的命令、报错原文、数字、路径、版本号、配置片段一律原样保留。反例——把"2.1.3 版 Windows 上 Shift+Tab 跳过了 plan mode，需改用 /plan"压成"快捷键有兼容性问题"，后者三个月后毫无复用价值。概括是模型本能，要刻意对抗。压缩过狠的具体长相见 `references/anti-patterns.md`（规则项 anti-patterns）；沉淀网页/长文/报告时，按 `references/mode-a-research.md` 的 source-fidelity 做原文结构覆盖，别把长文压成观点卡。
 
-**铁律三·每条结论标可信度。** 对话可能是错的：agent 会自信地说错、中途结论会被推翻。忠实记录而不甄别，等于把错误固化成带格式的"伪知识"，比不记更危险。故每条结论性内容必须标可信度。三档的定义与确切标记格式见 `references/frontmatter-tags.md`（规则项 credibility-spec）——写笔记前已要求读该文件，照其格式标即可。
+**铁律三·每条结论标可信度。** 对话可能是错的：agent 会自信地说错、中途结论会被推翻。忠实记录而不甄别，等于把错误固化成带格式的"伪知识"，比不记更危险。故每条结论性内容必须标可信度。三档的定义与确切标记格式见 `references/frontmatter-tags.md`（规则项 credibility-spec），照其格式标注即可。
 
 **铁律四·追加带日期，不覆盖历史。** 向已有笔记追加内容时带日期；新信息推翻旧结论时保留旧的、不静默覆盖。其确切的日期与过时标注格式、以及"项目记忆当前状态块可覆盖更新"这一例外，见 `references/frontmatter-tags.md`（规则项 datestamp-rule）。
 
@@ -57,7 +57,6 @@ Mode A 再分子类型：偏"持续生长的主题知识"走研究型，偏"一�
 - **写研究型笔记时，落笔前先过 mode-a-research 的 mastery-lens**（学习闭环自问：能讲清 / 何时不成立 / 能迁到哪 / 连得上谁），让"掌握"从行文里透出来，而非做成"复述""迁移"等章节。
 - **写盘前过一遍质量自检**：落盘前按 `references/quality-check.md` 的 quality-rubric 自查（30秒阅读 / 信号噪音 / 证据 / 复用；研究型笔记另加掌握测试），不合格先重写再写——这是写盘前的质量闸，与复盘的事后批量复查分工不同。
 - **落点由 `references/preflight.md` 的 landing-rule 决定**（Mode A 入知识库 inbox，Mode B 跟项目走），本文件不重复落点路径。校验未过则按铁律一停下来问。
-- **写入后记监控**：按 `references/monitoring.md` 追加一条 jsonl 日志（jsonl-schema），并对读取过的笔记更新回访信号（revisit-signal）。监控数据落 `{kb_root}` 下的中立位置、不进本 skill 文件夹（skill 会被覆盖）；dev-log 是例外，它属于具体项目、跟项目走。
 
 ---
 
@@ -81,7 +80,7 @@ Mode A 再分子类型：偏"持续生长的主题知识"走研究型，偏"一�
 - `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
 - `references/anti-patterns.md` — **抽取 / 过滤噪音时对照**：各类坏笔记的坏例与改写（逐条见 anti-patterns）。
 - `references/quality-check.md` — **写盘前自查**：30秒阅读 / 信号噪音 / 证据 / 复用 + 研究型掌握测试，不合格先重写。
-- `references/monitoring.md` — **写入后及复盘时读**：jsonl 字段、回访信号、复盘查询。
+- `references/monitoring.md` — **复盘时读**：jsonl 字段、回访信号、复盘查询。（监控层暂缓启用，写入侧不记监控——启用时再把"写入后记监控"指令加回沉淀动作。）
 
 ---
 
