@@ -28,4 +28,4 @@
 
 ## 上次会话摘要（2026-07-04 · 家用机）
 
-检查并修正 Codex 产出（恢复 install.py 的 Claude `~/.claude/skills` 目标——官方文档证实其存在，tag/marketplace 核验通过）；ob-notes dialogue 模板按实库对比重构（「问题保真、回答重写」，`913f2c8`）；交接体系重构落地：journal/ 退役删除 → 本文件 + lessons-learned 台账 + C1-C3 修订 + CI 两门禁（ADR-0009）。
+检查并修正 Codex 产出（恢复 install.py 的 Claude `~/.claude/skills` 目标——官方文档证实其存在，tag/marketplace 核验通过）；ob-notes dialogue 模板按实库对比重构（「问题保真、回答重写」，`913f2c8`）；交接体系重构落地：journal/ 退役删除 → 本文件 + lessons-learned 台账 + C1-C3 修订 + CI 两门禁（ADR-0009）；纪律双份风格统一（私有纪律改为通用纪律的讲解体，规则语义与标识符 A1-A5/C1-C4/桶一二三/G①-⑤ 原样保留；删通用标题"一字未改"括注）+ README 增协作运行手册。
