@@ -3,7 +3,7 @@ name: presentation
 metadata:
   version: 1.0.0
   provides: [presentation-modes, mastery-lens]
-  depends_on: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
+  depends_on: [source-fidelity, credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule]
 ---
 
 # 呈现侧重 — 蒸馏出的信号，按复用目标摆成笔记

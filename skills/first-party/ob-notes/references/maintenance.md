@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 1.1.0
+  version: 1.2.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -51,9 +51,9 @@ metadata:
 | `signal-noise` | 信号/噪音分离引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 | distill.md |
 | `source-fidelity` | 引用外部材料时的原文保真：结构覆盖，防长文压成观点卡 | distill.md |
 | `presentation-modes` | 三种呈现侧重：追问链/解法卡（骨架）+ 主题网（内容主导、不套骨架） | presentation.md |
-| `mastery-lens` | 主题网骨架的掌握视角写作纪律（写前自问 + 让掌握从字里行间透出，不做章节） | presentation.md |
+| `mastery-lens` | 主题网的掌握视角写作纪律（写前自问 + 让掌握从字里行间透出，不做章节） | presentation.md |
 | `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
-| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 研究型掌握测试） | quality-check.md |
+| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 主题网掌握测试） | quality-check.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
 | `dependency-spec` | 依赖声明规范（第 3 节） | maintenance.md |
 | `version-rule` | 版本规则（第 5 节） | maintenance.md |
@@ -63,7 +63,7 @@ metadata:
 注：以下几对易混，特此划清（均不算 MECE 重复）：
 - `source-fidelity`（针对**外部来源**：源材料别被压没）vs `anti-patterns`（针对**所有笔记**的通用坏例）——前者管保真、后者管通病，互补不重叠。
 - `anti-patterns` 只给坏例与改写方向，**不重新定义**可信度/日期/双链等规则；命中处一律按各自唯一家（如 credibility-spec）处理。
-- `mastery-lens`（研究型**写作时**的思考纪律：写前自问、让掌握从字里行间透出）vs `quality-rubric` 的掌握测试（**写盘前**检验掌握有没有透出来）——前者写时心法、后者写后判据，时机不同，不重复。
+- `mastery-lens`（主题网**写作时**的思考纪律：写前自问、让掌握从字里行间透出）vs `quality-rubric` 的掌握测试（**写盘前**检验掌握有没有透出来）——前者写时心法、后者写后判据，时机不同，不重复。
 - `layout-rule`（markdown 元素用途的**正面规约**）vs `anti-patterns` 第 5 条格式炫技（**坏例**）——正例与坏例互补；callout / 双链 / 代码块细节仍归 `linking-convention`，`layout-rule` 不重定义。
 
 <a id="2"></a>
@@ -95,6 +95,7 @@ SKILL.md 顶层另含 description（触发描述）；reference 文件可只有 
 - `provides`：本文件是哪些规则项的唯一家。**同一规则项只能出现在一个文件的 provides 中**（脚本强制校验）。无定义则写 `[]`。
 - `depends_on`：本文件引用了哪些别处定义的规则项。无依赖则写 `[]`。
 - 二者的标识符**必须**来自受控词表；未登记的标识符视为错误（脚本报错）。
+- **声明分界（规范性依赖 vs 指路引用）**：`depends_on` 只登记**规范性依赖**——执行本文件职责时必须按该规则项的定义产出或校验，该规则变了、本文件不跟着变就会出错的，才登记。仅告诉读者"细节 / 相关内容在哪"的**指路引用**（"见 X 的 Y"式说明、上下游流程描述）不登记——否则依赖图会稠密到失去"改了谁必须联动谁"的信号。判不准时问一句：**该规则项的内容变了，本文件不改会不会出错？** 会 → 声明；不会 → 指路。
 - **SKILL.md 特例**：官方 `skills-ref validate` 拒收流式列表、且 Agent Skills spec 要求 metadata 值为字符串，故 SKILL.md 的 `provides`/`depends_on` 写成**逗号分隔字符串**（如 `provides: "a, b"`）；references 文件不受官方校验，保持流式列表。`build_depmap.py` 两种写法都解析。
 - **就近原则**：依赖信息住在文件自己身上，不维护任何中心化的手写依赖表。依赖图由脚本从这些声明**派生**。
 - 脚本 `build_depmap.py` 自身也是依赖图节点。它在运行时从本文件第 1 节归属表**动态解析受控词表**（不在代码内存副本，彻底单一真相源），因此依赖 `dependency-spec`、`controlled-vocab`、`ssot-registry`（解析逻辑与归属表格式耦合）。在脚本顶部注释里以 `# depends_on: dependency-spec, controlled-vocab, ssot-registry` 形式声明（脚本非 markdown，无 frontmatter，用注释等价表达）。

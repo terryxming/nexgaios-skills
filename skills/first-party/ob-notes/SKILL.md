@@ -4,7 +4,7 @@ description: 把人与 agent 对话中产生的高价值信息（决策、踩坑
 metadata:
   version: 1.0.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow"
+  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow"
 ---
 
 # ob-notes — 对话价值写回 Obsidian
