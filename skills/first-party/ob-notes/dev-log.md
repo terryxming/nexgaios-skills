@@ -52,14 +52,16 @@ tags: [状态/持续]
 | 2026-07-03 | **v1.0.0 收敛为 Obsidian-only**：移除项目目录/dev-log 写入能力、删除 monitoring 回访机制、tag 移除 `类型/项目日志` | 用户重新明确定位：ob-notes 只做一件事，把人与 agent 对话里值得长期复用的信息写回 Obsidian；项目目录写入和回访信号都会把职责拉宽 | 保留 dev-log 作为第二模式（否：偏离定位）；保留 monitoring 空壳（否：无意义且制造机制负担） |
 | 2026-07-03 | **v1.0.0 候选补问答实录型**：新增 `dialogue-template` 与 `类型/问答实录` | 用户指出实际知识库已有 `MCP 实战·...：问答实录` 体例，且"不要压缩/保留追问链"不属于 research/practice 任一模板；如果不纳入规范，agent 会继续误判成实战卡 | 硬塞进 practice（否：会丢学习路径）；硬塞进 research（否：会把问答过程改写成主题论文） |
 | 2026-07-04 | **dialogue-template 重构：「问题保真、回答重写」**——回答区定讲解体禁转写体（原话降级为证据引用）、每轮收口一句总纲（30 秒读法从中摘）、认知增量为主角；anti-patterns 增坏例 7"搬运已留痕的记录"（唯一家在 anti-patterns，dialogue 只引用）；eval #4 断言先行（D⑤），运行推后至迭代完；顺修 build_depmap.py 控制台 GBK 乱码（补 stdout reconfigure，宿主机实测暴露） | 实库对比（《Codex 执行仓库纪律三次失守》vs 两篇《MCP 实战》实录，用户判定后者更好）：骨架同构而质量悬殊，差距全在骨架管不到处——转写体让读者隔着"当时它怎么说"才碰到结论；"确切细节"大半是 git 已留痕的过程记录（稀释信号）；可复用产出是复述宿主纪律的 checklist（双源）；无每轮收口导致 30 秒读法无处可摘 | 拆"学习型/复盘型"两亚型（否：三条纪律已覆盖失败模式，亚型徒增判断负担）；坏例 7 塞 dialogue 模板（否：实战型同样会犯，通用坏例唯一家在 anti-patterns）；把 checklist 禁令单独立规则项（否：坏例 7 + 讲解体已覆盖，新词表项过度工程） |
+| 2026-07-04 | **v1.0.0 架构翻转（问答基底 + 信号/噪音分离为核心，宿主 ADR-0011）**：workflow 从"判定 research/practice/dialogue 三选一套模板"翻成"先分离信号噪音、再按复用目标定呈现侧重"；三模板合并为 presentation 三呈现骨架（追问链/解法卡有骨架、主题网去骨架），"问题保真、回答重写"升基底通则下沉 distill；source-fidelity 转横切纪律随 distill、mastery-lens 挂主题网；无问顺手存档划出；词表 26→25 | 分类驱动三处张力（三类非 MECE、固定模板诱导填空、三份"该记/该丢"重复）；更根本：有长期价值的知识几乎都生于问答，"问"是认知路径坐标、丢掉违背初衷，故问答是基底非三类之一，"有没有问"又是消化判据。主题网去骨架因研究型结构由内容定、固定章节削足适履且与 source-fidelity 打架（AWS 记忆文即此坑 dogfood 样本） | 留三选一入口（否：非 MECE + 判断负担 + 重复）；主题网留骨架（否：削足适履、与保真打架）；"问保真答重写"留 dialogue 专属（否：它是所有问答通则）；无问存档也收（否：未消化、非护城河） |
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v1.0.0 候选**（Obsidian-only 破坏性收敛 + 问答实录型补齐）：主能力只写 `{kb_root}/00 - raw/00 - inbox/`，Mode B / 项目目录写入 / dev-log 对外能力 / monitoring 回访机制已移除；新增 research / practice / dialogue 三模板，其中 dialogue 对应 `类型/问答实录`；受控词表收敛为 26 项，`dependency-map.md` 已重建。当前改动在分支 `codex/ob-notes-obsidian-only`，待宿主 lint、评测与发布门禁完成后才能合入 main 并打 tag。
+- 现状：**v1.0.0 候选（架构翻转已落地，见宿主 ADR-0011）**：以问答为基底，workflow = 先信号/噪音分离（`distill.md` 引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 + source-fidelity）再按复用目标定呈现侧重（`presentation.md`：追问链/解法卡有骨架、主题网去骨架、mastery-lens 挂主题网）；三 mode-a 文件已删、SKILL workflow 翻转、受控词表 26→25、depmap 全绿、5 处活跃死引用已修。当前改动在分支 `codex/ob-notes-obsidian-only`，待评测与发布门禁完成后才能合入 main 并打 tag。
 - 下一步：
-  1. **跑宿主 lint 与 skill 校验**，确保 v1.0.0 结构门禁全绿。
-  2. **补跑 F/G② 评测**：重点覆盖 Obsidian-only 正例、dev-log 负例、问答实录正例、kb_root 未配置停问。
-  3. 达标后合入 main 并打 tag `ob-notes/v1.0.0`。
+  1. **重写 evals 执行用例**：覆盖信号/噪音分离、问保真答重写、操作过程滤除、无问存档划出、主题网去骨架（触发用例基本不变）。
+  2. **跑宿主 lint 全绿**（结构门禁）。
+  3. **补跑 F/G② 评测**：重点覆盖问答基底判据、主题网去骨架的深度成色、kb_root 未配置停问；用 AWS 记忆文重测主题网去骨架是否真的更好。
+  4. 达标后合入 main 并打 tag `ob-notes/v1.0.0`（对外仍 1.0.0，候选内演化）。
 - 卡点：无。
 - **续做提示（给接手的你/agent）**：先读宿主仓库 `CLAUDE.md`/`AGENTS.md`（工程纪律，含 skill 迁入/发布门禁）与 `docs/decisions/`；改本 skill 任何文件前必读 `references/maintenance.md`（§6 修改流程）。换新机器需自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 preflight.md）。旧仓库的"并 main/OKC console"开放项已随原仓库退役作废。
 - 已解决：
@@ -71,6 +73,7 @@ tags: [状态/持续]
 
 ## 进展时间线（只追加，倒序）
 
+- 2026-07-04：**v1.0.0 架构翻转（问答基底 + 信号/噪音分离）**。公司机续工，与用户逐轮对齐后落地宿主 ADR-0011：①建 `distill.md`（信号/噪音引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果 + source-fidelity）②建 `presentation.md`（三呈现骨架，主题网去骨架、mastery-lens 挂其下）③删 mode-a-research/practice/dialogue ④SKILL workflow 翻转 + metadata ⑤归属表 26→25、depmap 全绿 ⑥修 5 处活跃死引用 + frontmatter-tags 两处措辞（"三套模板"、"研究型按由浅入深"与去骨架矛盾）+ CHANGELOG 重写 [1.0.0]。主题网去骨架的诱因是用户以 AWS 记忆文为例点破"研究型套骨架削足适履"。evals 执行用例待重写（用户定：暂不跑评测）。
 - 2026-07-03：**v1.0.0 候选补问答实录型**。用户指出刚写入的《Codex 执行仓库纪律三次失守》被误写成实战踩坑复盘，与知识库既有《MCP 实战·工具加载与粒度：问答实录》《MCP 实战·密钥与信任边界：问答实录》体例不一致；追问后确认 research/practice 都不覆盖"连续追问/不要压缩/保留学习路径"。动作：①Obsidian 笔记改名并重写为《Codex 执行仓库纪律三次失守：问答实录》；②新增 `references/mode-a-dialogue.md` 和 `dialogue-template`；③tag-system 增 `类型/问答实录`；④SKILL.md mode-decision 改为 research/practice/dialogue 三分；⑤evals 增问答实录触发与执行用例。待 lint/depmap/安装验证。
 - 2026-07-03：**v1.0.0 候选改造初步收敛**。按用户确认：①摘除写项目目录能力，删除 `mode-b-devlog.md`；②删除 monitoring 回访机制与 `monitoring.md`，frontmatter 去掉 `read_count`/`last_read`；③tag 体系移除 `类型/项目日志`；④preflight 落点统一为 `{kb_root}/00 - raw/00 - inbox/`；⑤trigger/evals 增 dev-log 负例，项目决策正例改为 Obsidian-only。该步先把受控词表 31→25 项；随后同日补问答实录型后为 26 项。
 - 2026-07-03：**执行评测第 1 轮：with-skill 两组全胜（独立盲评 grader，位置对照排除偏差）**。E1 白纸建笔记 **20:14 大胜**（增益 = 可信度三态自降级、frontmatter 可索引、第一屏摘要、适用边界）；E2 dev-log 更新 **20:18 小胜**（增益 = 被推翻决策就地"已过时"删除线留痕；差距小属预判混杂——预置 fixture 本身即 skill 模板，baseline 靠格式跟随得分）；E3 铁律一双侧零写盘（with 侧教科书：拒编造 + 停问 + 未新建目录；baseline 侧归因混杂——unstage 后子代理在仓库 cwd 读到 `skills/ob-notes` 源照做，**"skill 源在 cwd"本身即泄漏**，干净 baseline 需完全无源环境）。机械断言：E1w 9/9、E2w 9/9；差分证据：E1b 结构 0/5（无 frontmatter/可信度/tag）、E2b 无删除线留痕。**G② 执行侧"优于 baseline"初步达标（k=1）**；正式发布仍待 G④（dist 构建未建）。方法（可复用）：双沙箱 w/b 防交叉、config 挪移防写真库、两波串行防 skill 互见、盲评 A/B 反向排位。
@@ -99,6 +102,8 @@ tags: [状态/持续]
 
 ## 踩坑记录（只追加）
 
+- 2026-07-04 Edit 替换含中文标点的行（README 索引、CHANGELOG）时 old_string 用半角冒号/逗号匹配不上 `[已验证]` — 根因：仓库中文文档标点是全角，凭记忆写半角对不上、工具的 \uXXXX 兜底也救不了标点差异 — 解法：先 Read 取精确全角文本再 Edit，构造 old_string 不凭记忆、精确复制。
+- 2026-07-04 主梁"先建后删"中间态（新文件已 provides、旧文件未删）跑 depmap 报 source-fidelity/mastery-lens 重复定义 `[已验证]` — 根因：新旧唯一家并存、SSOT 冲突，是预期中间态 — 解法：该批不在中间态跑校验，删旧 + 改 SKILL 后一次跑绿（"先建后审可回退"策略的正常代价）。
 - 2026-07-03 SKILL.md frontmatter 字符串化后 build_depmap 把三个核心规则项报成孤儿 `[已验证]` — 根因：parse_fm_list 只认 `[a,b]` 流式格式；且孤儿仅 warning、exit 0，声明断裂被静默放行 — 解法：解析兼容流式列表与逗号字符串两式；归属表已声明唯一家的孤儿升 error（不阻断的告警会被无视）。
 - 2026-06-26 官方 package_skill.py 报错 "Unexpected key(s) in frontmatter: depends_on, provides, version" — 根因：Agent Skills 标准顶层只允许 name/description/license/allowed-tools/metadata/compatibility `[已验证]` — 解法：把三个自定义字段移到 metadata 下，并同步改 build_depmap.py 的解析正则（从匹配顶层改为匹配缩进字段）。
 - 2026-06-26 最终自检发现 preflight.md 含私人路径 nexgaios-kbase `[已验证]` — 根因：举例时写了真实私人路径，发布包不应含 — 解法：`sed -i 's/nexgaios-kbase/my-kbase/g'`，全包复查无残留。

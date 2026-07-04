@@ -18,3 +18,4 @@
 | 2026-07-04 | WebFetch 特定站点长挂 | 抓 developers.openai.com 挂 12 分钟无响应，阻塞整轮 | 先 WebSearch 拿摘要，必要再 fetch；久挂即弃、换信息路径 | 暂留为知识 |
 | 2026-07-04 | 交接散乱即 B 条违例 | 6 份 journal 互相搬运未决项/环境备忘（可避免的重复）；"该读哪份"歧义直接导致格式漂移 | 单文件覆盖重写，历史交给 `git log` | handoff.md + C1-C3 修订 + CI 门禁（ADR-0009） |
 | 2026-07-04 | 流水线文件提交落错分支 | 上一批收尾停在 feature 分支未切回，下一批开工未复核当前分支就动手——纪律/README 改动被提交到 candidate 分支而非 main（后 cherry-pick 修复，内容一致故发布合并无冲突） | 任何 commit 前先看 `git branch --show-current`；跨批次收尾时显式切回 main | 暂留为知识（若复发，考虑进 pre-flight 提醒清单） |
+| 2026-07-04 | Edit 的 old_string 凭记忆写、中文标点半/全角不符即匹配失败 | 替换中文文档行时用半角冒号/逗号，与仓库全角标点对不上；工具 \uXXXX 兜底也救不了标点差异（本轮 README 索引、dev-log 各栽一次） | 构造 old_string 前先 Read 目标行、精确复制、不凭记忆；改中文文档尤其核对全/半角 | 暂留为知识（若复发考虑进 pre-flight 清单） |

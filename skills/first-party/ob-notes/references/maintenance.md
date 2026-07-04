@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -45,14 +45,13 @@ metadata:
 | `naming-rule` | 笔记文件命名规则 | frontmatter-tags.md |
 | `datestamp-rule` | 追加带日期、过时标注、不覆盖历史 | frontmatter-tags.md |
 | `layout-rule` | 排版规约（markdown 元素用途与克制，反炫技） | frontmatter-tags.md |
-| `mode-decision` | 研究型 / 实战型 / 问答实录型笔记的判定逻辑与实例 | SKILL.md |
+| `mode-decision` | 呈现侧重判定：消化后按“未来复用什么”选追问链/解法卡/主题网 | SKILL.md |
 | `iron-laws` | 铁律本身 | SKILL.md |
 | `trigger-rule` | 触发方式与边界排除 | SKILL.md |
-| `research-template` | 研究型笔记模板与该记/该丢清单 | mode-a-research.md |
-| `source-fidelity` | 源信息留存与原文结构覆盖（长文/网页沉淀防压成观点卡） | mode-a-research.md |
-| `mastery-lens` | 学习闭环写作纪律（写前自问 ＋ 让掌握从字里行间透出，不做章节） | mode-a-research.md |
-| `practice-template` | 实战型笔记模板与该记/该丢清单 | mode-a-practice.md |
-| `dialogue-template` | 问答实录型笔记模板与连续追问保留纪律 | mode-a-dialogue.md |
+| `signal-noise` | 信号/噪音分离引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 | distill.md |
+| `source-fidelity` | 引用外部材料时的原文保真：结构覆盖，防长文压成观点卡 | distill.md |
+| `presentation-modes` | 三种呈现侧重：追问链/解法卡（骨架）+ 主题网（内容主导、不套骨架） | presentation.md |
+| `mastery-lens` | 主题网骨架的掌握视角写作纪律（写前自问 + 让掌握从字里行间透出，不做章节） | presentation.md |
 | `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
 | `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 研究型掌握测试） | quality-check.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |

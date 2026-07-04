@@ -44,3 +44,6 @@
 - [0006 skill 源域与分发物分层：开发文件域内聚合、分发时排除](0006-skill-domain-vs-distribution.md)
 - [0007 分发与开源架构：双仓晋升制](0007-dual-repo-promotion.md)（被 0008 取代）
 - [0008 单仓公开制：仓库即分发，skill 为发布单元](0008-single-public-repo.md)
+- [0009 单一交接文档 + 经验台账 + C2/G④ 机械门禁](0009-single-handoff-and-lessons.md)
+- [0010 skills 目录二分：first-party 与 third-party](0010-third-party-skills-directory.md)
+- [0011 问答为基底、信号/噪音分离（ob-notes 架构翻转）](0011-dialogue-first-signal-noise.md)

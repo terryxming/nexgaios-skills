@@ -4,14 +4,16 @@ description: 把人与 agent 对话中产生的高价值信息（决策、踩坑
 metadata:
   version: 1.0.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, research-template, practice-template, dialogue-template, maintenance-flow, source-fidelity, anti-patterns, quality-rubric, mastery-lens, layout-rule"
+  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow"
 ---
 
 # ob-notes — 对话价值写回 Obsidian
 
-把一次对话里真正有长期复用价值的信息，按稳定规范抽取、结构化、格式化，写回 Obsidian 知识库。口头讨论里最值钱的东西（为什么做某个决策、踩了什么坑怎么解、一个验证过的知识点）会随对话结束蒸发；随手让 agent "记一下"又常出四类毛病：不知道记什么、压缩过狠、格式丑、没重点。本 skill 用固定规范钉死这四点，并让遵循 Agent Skills 标准的多个 agent（Claude / Codex 等）产出一致的 Obsidian 笔记。
+把一次对话里真正有长期复用价值的信息，按稳定规范抽取、结构化、格式化，写回 Obsidian 知识库。口头讨论里最值钱的东西（为什么做某个决策、踩了什么坑怎么解、一个验证过的知识点）会随对话结束蒸发；随手让 agent “记一下”又常出四类毛病：不知道记什么、压缩过狠、格式丑、没重点。本 skill 用固定规范钉死这四点，并让遵循 Agent Skills 标准的多个 agent（Claude / Codex 等）产出一致的 Obsidian 笔记。
 
-职责到"把格式正确的笔记投递到 Obsidian 入口"为止；下游路由分发、Wiki 编译、项目 dev-log、README、代码注释不归本 skill 管。
+有长期价值的知识几乎都产生于**问答**——用户的“问”是认知路径的坐标，不是要压缩掉的过程噪音。所以本 skill 以问答为基底：先把对话流里的信号从噪音里分离出来，再按复用目标摆成笔记。
+
+职责到“把格式正确的笔记投递到 Obsidian 入口”为止；下游路由分发、Wiki 编译、项目 dev-log、README、代码注释不归本 skill 管。
 
 `{kb_root}` 表示可配置的 Obsidian 知识库根路径，其定义与读取顺序见 `references/preflight.md`（规则项 kb-root），本文件只引用、不重复定义。
 
@@ -21,52 +23,48 @@ metadata:
 
 每次沉淀都必须守住这些铁律，不可妥协。它们是命令；命令所引用的细节规范（如可信度格式、日期标注格式）住在各自的 reference 文件里，本文件只下令、不复述。
 
-**铁律一·先校验，绝不写到不确定的地方。** 任何写盘前，先按 `references/preflight.md` 校验环境。目标目录不存在就停下来问用户，绝不静默新建、绝不退而写到当前目录。理由：用户最大的恐惧不是"没沉淀"，而是"以为沉淀了、其实写丢或写错地方了"。当前 agent 无写入能力时，不要假装成功，把内容直接贴出来让用户手存。
+**铁律一·先校验，绝不写到不确定的地方。** 任何写盘前，先按 `references/preflight.md` 校验环境。目标目录不存在就停下来问用户，绝不静默新建、绝不退而写到当前目录。理由：用户最大的恐惧不是“没沉淀”，而是“以为沉淀了、其实写丢或写错地方了”。当前 agent 无写入能力时，不要假装成功，把内容直接贴出来让用户手存。
 
-**铁律二·保留确切细节，禁止过度概括。** 宁可留原始具体内容，也不要压成抽象描述：确切的命令、报错原文、数字、路径、版本号、配置片段一律原样保留。反例：把"2.1.3 版 Windows 上 Shift+Tab 跳过了 plan mode，需改用 /plan"压成"快捷键有兼容性问题"，后者三个月后毫无复用价值。概括是模型本能，要刻意对抗。压缩过狠的具体长相见 `references/anti-patterns.md`（规则项 anti-patterns）；沉淀网页/长文/报告时，按 `references/mode-a-research.md` 的 source-fidelity 做原文结构覆盖，别把长文压成观点卡。
+**铁律二·保留确切细节，禁止过度概括。** 宁可留原始具体内容，也不要压成抽象描述：确切的命令、报错原文、数字、路径、版本号、配置片段一律原样保留。反例：把“2.1.3 版 Windows 上 Shift+Tab 跳过了 plan mode，需改用 /plan”压成“快捷键有兼容性问题”，后者三个月后毫无复用价值。概括是模型本能，要刻意对抗。从对话流里分离信号与噪音、并守住确切细节的完整方法，见 `references/distill.md`（规则项 signal-noise）；压缩过狠的具体长相见 `references/anti-patterns.md`。沉淀网页/长文/报告时，按 distill.md 的 source-fidelity 做原文结构覆盖，别把长文压成观点卡。
 
-**铁律三·每条结论标可信度。** 对话可能是错的：agent 会自信地说错，中途结论会被推翻。忠实记录而不甄别，等于把错误固化成带格式的"伪知识"，比不记更危险。故每条结论性内容必须标可信度。三档的定义与确切标记格式见 `references/frontmatter-tags.md`（规则项 credibility-spec），照其格式标注即可。
+**铁律三·每条结论标可信度。** 对话可能是错的：agent 会自信地说错，中途结论会被推翻。忠实记录而不甄别，等于把错误固化成带格式的“伪知识”，比不记更危险。故每条结论性内容必须标可信度。三档的定义与确切标记格式见 `references/frontmatter-tags.md`（规则项 credibility-spec），照其格式标注即可。
 
 **铁律四·追加带日期，不覆盖历史。** 向已有笔记追加内容时带日期；新信息推翻旧结论时保留旧的、不静默覆盖。其确切的日期与过时标注格式见 `references/frontmatter-tags.md`（规则项 datestamp-rule）。
 
 ---
 
-## 判定笔记类型
+## 分离信号噪音，再定呈现侧重
 
-动手前先分清这次沉淀更像**研究型笔记**、**实战型笔记**还是**问答实录型笔记**。这一步决定后续读哪个模板；三者都只写入 Obsidian。
+动手写之前有两步，顺序不能反。
 
-**研究型笔记**：偏持续生长的主题知识 / 研究结论，复用者是"未来任意场景的你"。
-- "loop engineering 是什么"一路深挖研究 → 研究型。
-- 对一篇长文、报告、官方文档做结构化吸收 → 研究型。
+**第一步 · 分离信号与噪音（核心动作）。** 以问答为基底，从这段对话里抽出该沉淀的信号、滤掉噪音——这一步决定**记什么**，是整个 skill 的心脏，必读 `references/distill.md`（规则项 signal-noise）。三条要点：① 判据——「删掉它，一个没有这场对话记忆、不熟这个主题、但懂通用常识的人会不会看不懂」，受损即信号；② 用户的问原样保真，回答重写成给未来读者的讲解（换讲法不换事实）；③ 操作与工具执行留结果不留过程。无问的顺手存档（没消化、只想存档）不归本 skill，交给剪藏/稍后读工具。
 
-**实战型笔记**：偏一次性解决的具体问题 / 踩坑 / 决策 / 方案取舍，复用者是"未来遇到同类问题的你"。
-- 查清"Claude plan mode 用 /plan 进入" → 实战型。
-- 某项目里做过一个值得复用的架构取舍 → 实战型，并用 `类型/决策` 等 tag 标明性质。
+**第二步 · 定呈现侧重（mode-decision）。** 信号抽出来后，按**未来最想复用什么**选一种呈现，不是入口处给对话贴类型标签：
 
-**问答实录型笔记**：偏连续追问、教学讲解、认知纠错、学习路径本身有复用价值，复用者是"未来想重走这条理解路径的你"。
-- 用户说"不要压缩 / 问答实录 / 保留我的每个问题" → 问答实录型。
-- 连续追问把一个表层解释逼到底层原因，过程本身有价值 → 问答实录型。
+- 复用的是**追问路径本身**（连续追问、认知纠错的过程有价值）→ **追问链**
+- 复用的是**一条具体解法**（某报错怎么修、某命令怎么用）→ **解法卡**
+- 复用的是**一个要长期养的主题**（会反复回来深挖）→ **主题网**
 
-项目相关信息只有在包含可复用决策、踩坑、方案取舍、研究结论时才沉淀为 Obsidian 笔记；单纯"今天做到哪了"这类流水进度不收。本 skill 不写项目目录，不更新 dev-log。
+三种呈现的骨架与纪律见 `references/presentation.md`（规则项 presentation-modes）：追问链、解法卡由形式定结构、有骨架；主题网由内容定结构、不套骨架。**交叉场景**（研究着就动手了 / 解法里带出通用知识）不硬切：选一个主呈现定结构，另一侧信息用 `[[双链]]` 回指缝合。
 
-**交叉场景**（研究着就动手做了 / 做着沉淀出通用知识 / 问答里产生了可提炼原则）：不硬切两半。选一个主笔记类型，另一侧信息在笔记里用 `[[双链]]` 回指缝合，保持上下文连续。
+项目相关信息，只有在包含可复用的决策、踩坑、方案取舍、研究结论时才沉淀；单纯“今天做到哪了”这类进度流水不收。本 skill 只写入 Obsidian，不写项目目录、不更新 dev-log。
 
 ---
 
 ## 沉淀动作
 
-判定类型后，按需读取对应 reference 并据其规范产出笔记。各文件何时读、提供什么，见末尾引用清单。要点：
+按上面两步走，据规范产出笔记。各文件何时读、提供什么，见末尾引用清单。要点：
 
-- **写入前必读对应模板**（research / practice / dialogue 三选一）与 `references/frontmatter-tags.md`，严格套用其模板、清单与格式。不要凭印象写，这是防格式飘的关键。抽取时执行铁律二、三；过滤噪音时对照 `references/anti-patterns.md`（坏例与改写）；排版按 frontmatter-tags 的 layout-rule 克制用 markdown（每元素一职责、段落优先、callout 克制）。
-- **写研究型笔记时，落笔前先过 mode-a-research 的 mastery-lens**（学习闭环自问：能讲清 / 何时不成立 / 能迁到哪 / 连得上谁），让"掌握"从行文里透出来，而非做成"复述""迁移"等章节。
-- **写盘前过一遍质量自检**：落盘前按 `references/quality-check.md` 的 quality-rubric 自查（30秒阅读 / 信号噪音 / 证据 / 复用；研究型笔记另加掌握测试），不合格先重写再写。
+- **先分离，必读 `references/distill.md`**：signal-noise 判据、问保真答重写四镣铐、操作留结果不留过程；含外部材料时按其中的 source-fidelity 保留原文结构。这一步执行铁律二、三。
+- **再按呈现侧重读 `references/presentation.md`**：追问链 / 解法卡有骨架，严格套用其骨架与清单；主题网不套骨架、由内容主导，守求深（mastery-lens）/ 保真（source-fidelity）/ 防腐化三条纪律。过滤噪音时对照 `references/anti-patterns.md`（坏例与改写）；排版按 frontmatter-tags 的 layout-rule 克制用 markdown（每元素一职责、段落优先、callout 克制）。
+- **写盘前过一遍质量自检**：落盘前按 `references/quality-check.md` 的 quality-rubric 自查（30秒阅读 / 信号噪音 / 证据 / 复用；主题网另加掌握测试），不合格先重写再写。
 - **落点由 `references/preflight.md` 的 landing-rule 决定**。本 skill 只投递到 Obsidian 知识库入口；校验未过则按铁律一停下来问。
 
 ---
 
 ## 触发
 
-- **显式触发**：用户说"沉淀 / 记录 / 回写 / 存一下 / 记到笔记 / 记到 Obsidian"等，或明确要求把对话内容长期保存，必应。
+- **显式触发**：用户说“沉淀 / 记录 / 回写 / 存一下 / 记到笔记 / 记到 Obsidian”等，或明确要求把对话内容长期保存，必应。
 - **边界排除**：用户只是要解释、讨论、临时草稿、README、代码注释、项目 dev-log、项目进度流水时，不使用本 skill。项目任务收尾本身不是触发条件；只有用户明确要把其中的长期价值写回 Obsidian，才执行。
 
 ---
@@ -74,10 +72,11 @@ metadata:
 ## 引用文件（按需读，各注明时机）
 
 - `references/preflight.md` — **每次写盘前必读**：`{kb_root}` 读取、Obsidian 入口落点、存在 / 可写校验、跨 OS 路径归一。
-- `references/mode-a-research.md` / `mode-a-practice.md` / `mode-a-dialogue.md` — **判定类型后读对应一个**：模板 + 该记 / 该丢清单 + 边界示例（research 另含 source-fidelity 原文保真与 mastery-lens 掌握视角；dialogue 另含"问题保真、回答重写"纪律）。
+- `references/distill.md` — **动手第一步必读**：信号/噪音分离引擎（判据 + 问保真答重写 + 操作留结果不留过程），含引用外部材料时的原文保真（source-fidelity）。
+- `references/presentation.md` — **定了呈现侧重后读**：追问链 / 解法卡骨架、主题网的放手写法与掌握视角（mastery-lens）。
 - `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
-- `references/anti-patterns.md` — **抽取 / 过滤噪音时对照**：各类坏笔记的坏例与改写（逐条见 anti-patterns）。
-- `references/quality-check.md` — **写盘前自查**：30秒阅读 / 信号噪音 / 证据 / 复用 + 研究型掌握测试，不合格先重写。
+- `references/anti-patterns.md` — **分离噪音时对照**：各类坏笔记的坏例与改写（逐条见 anti-patterns）。
+- `references/quality-check.md` — **写盘前自查**：30秒阅读 / 信号噪音 / 证据 / 复用 + 主题网掌握测试，不合格先重写。
 
 ---
 

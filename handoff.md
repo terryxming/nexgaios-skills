@@ -4,28 +4,35 @@
 
 ## 当前状态
 
-- 工作分支：`codex/ob-notes-obsidian-only`（ob-notes **v1.0.0 候选**，未合 main）——Obsidian-only 收敛 + 问答实录模板 + 模板重构「问题保真、回答重写」（`913f2c8`）。
-- main：交接体系重构（本次，ADR-0009）+ install.py 双端恢复与 GBK 修复（`d3bb020`）+ ob-notes v0.8.0 已发布（tag `ob-notes/v0.8.0` + marketplace 条目）。
-- 门禁：lint 全绿（新增 marketplace↔tag 一致性检查）；CI 扩至全分支 push，新增 handoff 联动检查（**试行待验证**——真实 push 事件下的表现待观察）。
+- **ob-notes v1.0.0 候选完成架构翻转**（ADR-0011，分支 `codex/ob-notes-obsidian-only`）：从"判定 research/practice/dialogue 三选一套模板"翻转为 **问答基底 + 信号/噪音分离（核心引擎）+ 呈现侧重**。
+  - 新 `references/distill.md`（signal-noise 引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 + source-fidelity）；新 `references/presentation.md`（三呈现骨架：追问链/解法卡有骨架、**主题网去骨架**、mastery-lens 挂主题网）。
+  - 删 `mode-a-research/practice/dialogue.md`；SKILL workflow 翻转 + metadata 改；受控词表 26→25。
+  - **门禁全绿**：depmap 25 项 + lint 12 项（ADR 11 篇格式、共享段逐字节一致、skills-ref 桶一、桶二四项、marketplace↔tag）。
+  - **整套架构试行待验证**（判据主观性、主题网去骨架的深度成色、无问存档划出的需求反弹——见 ADR-0011 存疑段）；**未 dogfood、未跑评测**（用户明确暂缓评测）。
+- 目录结构（ADR-0010）、纪律双份、CI 门禁同前，未动。
+- **发布态**：`ob-notes/v0.8.0` 已发布；marketplace 条目 pin 于 v0.8.0 tag 旧路径 `skills/ob-notes`（该 tag 树内有效，勿改），v1.0.0 发布时更新 path。
 
-## 下一步（建议顺序）
+## 下一步
 
-1. **ob-notes v1.0.0 继续迭代**（用户明确：还没迭代完，暂不重跑评测）。
-2. 迭代完走发布链：eval 用例过目（F 人在环，注意 eval #4 新增"讲解体/每轮总纲"两断言）→ 触发+执行评测重跑（description 大改，必须重测）→ 合 main → tag `ob-notes/v1.0.0`（tag message 用中文）→ 更新 marketplace.json 的 ref/version/description（lint 一致性门禁会兜底）。
-3. Codex 侧遗留：run_loop.py 嵌套鉴权、AGENTS.md 平台段接管（承前）。
+1. **建议先 dogfood**：用 AWS 记忆文《Agent 记忆模块最佳实践》重测主题网去骨架是否真比骨架版更好（架构翻转的核心待验证点，dev-log 决策表已记诱因）。
+2. **重写 evals 执行用例**：覆盖信号/噪音分离、问保真答重写、操作过程滤除、无问存档划出、主题网去骨架（触发用例基本不变）。
+3. 走发布链：eval 用例过目（F 人在环）→ 触发 + 执行评测重跑（架构大改必测）→ 合 main → tag `ob-notes/v1.0.0`（对外仍 1.0.0，候选内演化；tag message 用中文）→ **更新 marketplace.json**（path 改 `skills/first-party/ob-notes` + ref/version/description，lint 一致性门禁兜底）。
 
 ## 未决问题
 
-- skill-creator 的 run_loop.py（description 优化）依赖 `claude -p`，本机嵌套鉴权失败，待有 API key 的环境再试。
-- pass^k 的 k 与各 skill 触发率阈值未定（首个正式发布时定，且宜落成机器可读文件）。
-- 多 skill 触发互斥性未测（第二个 skill 出现时，负例集应互含对方正例）。
+- ob-notes 架构翻转整套**试行待验证**，发布前须 dogfood + 评测（ADR-0011 存疑段四项：判据松紧、主题网深度、research/practice 终态、无问存档需求反弹）。
+- evals 执行用例未随架构重写（发布前必做，G②）。
+- run_loop.py（description 优化）依赖 `claude -p`，嵌套鉴权失败，待 API key 环境。
+- pass^k 的 k 与各 skill 触发率阈值未定（首个正式发布时定，宜落成机器可读文件）。
+- 多 skill 触发互斥性未测；ADR-0010 third-party 安装路径待首个第三方 skill 收藏时实测。
+- Codex 侧遗留：run_loop.py 嵌套鉴权、AGENTS.md 平台段接管。
 
 ## 环境备忘
 
-- 家用机 TerryXming：Windows 11；git 2.53.0 / Python 3.14.2 / Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 0.1.1；`~/.codex/skills/ob-notes` 装的是 v1.0.0 候选（dogfood）。
-- 公司机 CHINAMI-5T8IKFA：Windows 11；git 2.53 / Python 3.13.5 / Node 24.14.1；Codex 128 KiB 已设；skills-ref 0.1.1。
-- 两机各自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 ob-notes preflight.md）。
+- 公司机 CHINAMI-5T8IKFA（本次续工机）：Windows 11；git 2.53.0 / Python 3.13.5 / Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 桶一通过。
+- 家用机 TerryXming：git 2.53.0 / Python 3.14.2 / Node 24.14.1 / pwsh 7.6.3；Codex 128 KiB；skills-ref 0.1.1；`~/.codex/skills/ob-notes` dogfood 装的是旧候选，架构翻转后需重装再 dogfood。
+- 两机各自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（公司机在 `D:\nexgaios-kbase`；读取顺序见 ob-notes preflight.md）。
 
-## 上次会话摘要（2026-07-04 · 家用机）
+## 上次会话摘要（2026-07-04 · 公司机 · 续工）
 
-检查并修正 Codex 产出（恢复 install.py 的 Claude `~/.claude/skills` 目标——官方文档证实其存在，tag/marketplace 核验通过）；ob-notes dialogue 模板按实库对比重构（「问题保真、回答重写」，`913f2c8`）；交接体系重构落地：journal/ 退役删除 → 本文件 + lessons-learned 台账 + C1-C3 修订 + CI 两门禁（ADR-0009）；纪律双份风格统一（私有纪律改为通用纪律的讲解体，删通用标题"一字未改"括注）+ 编号规范化（两层命名空间定案并写明约定：通用数字、私有字母、子级"父号·数字"如 G·2；圈号清零、A–H 恢复三级标题层级；lint 陈旧引用 E.3/E.4 同步修正）+ README 增协作运行手册。规则语义与标识符 A1-A5/C1-C4/桶一二三 全程未动。skills/ 二分为 `first-party/`（自主开发）与 `third-party/`（第三方收藏，ADR-0010：门禁全豁免、license 入库边界、sources.md 溯源、install.py 双目录与 --from 消歧、marketplace 黑名单防线、布局防呆；H 节补 fork 路径；初版顶层 third-party/ 同日澄清修正为 skills/ 内二分，ob-notes 已 git mv 至 skills/first-party/）。
+与用户逐轮设计对齐，把 ob-notes 从"分类驱动"翻转为"问答基底"：①问答不是三类之一而是基底、"问"是消化判据（无问顺手存档划出本 skill）②信号/噪音分离为核心引擎（三限定参照读者判据、问保真答重写四镣铐、操作留结果不留过程）③呈现侧重退居其后（追问链/解法卡/主题网），用户以 AWS 记忆文点破"研究型套骨架削足适履"→ **主题网去骨架**。落 ADR-0011 → 建 distill/presentation、删三 mode-a、SKILL 翻转、词表 26→25、修 5 处死引用与两处措辞、CHANGELOG 重写 [1.0.0]、dev-log 追加 → depmap + lint 全绿。评测按用户意愿暂缓，架构标试行待验证。本次 commit 保存里程碑，未合 main。
