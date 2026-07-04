@@ -47,3 +47,4 @@
 - [0009 单一交接文档 + 经验台账 + C2/G④ 机械门禁](0009-single-handoff-and-lessons.md)
 - [0010 skills 目录二分：first-party 与 third-party](0010-third-party-skills-directory.md)
 - [0011 问答为基底、信号/噪音分离（ob-notes 架构翻转）](0011-dialogue-first-signal-noise.md)
+- [0012 失败回填闭环：真实使用失败案例回流评测](0012-failure-backfill-loop.md)

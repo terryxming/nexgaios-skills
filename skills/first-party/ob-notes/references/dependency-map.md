@@ -10,10 +10,11 @@
 | 文件 | provides | depends_on |
 |---|---|---|
 | `CHANGELOG.md` | — | — |
-| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow |
+| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop |
 | `dev-log.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
 | `references/distill.md` | signal-noise, source-fidelity | credibility-spec, anti-patterns |
+| `references/feedback.md` | feedback-loop | — |
 | `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule | — |
 | `references/maintenance.md` | controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry | — |
 | `references/preflight.md` | kb-root, landing-rule, preflight-flow, path-normalize | — |
@@ -30,6 +31,7 @@
 | `credibility-spec` | `references/frontmatter-tags.md` | `references/anti-patterns.md`, `references/distill.md`, `references/presentation.md`, `references/quality-check.md`, `SKILL.md` |
 | `datestamp-rule` | `references/frontmatter-tags.md` | `references/presentation.md`, `SKILL.md` |
 | `dependency-spec` | `references/maintenance.md` | `scripts/build_depmap.py` |
+| `feedback-loop` | `references/feedback.md` | `SKILL.md` |
 | `frontmatter-spec` | `references/frontmatter-tags.md` | `references/presentation.md`, `SKILL.md` |
 | `iron-laws` | `SKILL.md` | — |
 | `kb-root` | `references/preflight.md` | `SKILL.md` |

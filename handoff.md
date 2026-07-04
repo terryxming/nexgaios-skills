@@ -12,6 +12,7 @@
   - **整套架构仍试行待验证**：n=1，一次成功 ≠ 可靠；判据主观性、去骨架深度、无问存档反弹见 ADR-0011 存疑段。
   - **流程走查后补七处疏漏**（`1efdcfc`，均纸面补丁待 dogfood）：三对呈现消歧、交叉选主判据、试错弯路划界（消 distill 与解法卡矛盾）、无问引导话术、增量优先升写盘前必做、手存补文件名+落点、写盘后回确认。**CHANGELOG 按 maintenance §5 分工瘦身**——理由/触发/否决拆除（唯一家在 dev-log），只留"变了什么"。
   - **架构规范严格审查后修复一批**：§3 立「规范性依赖 vs 指路引用」声明分界（maintenance 1.2.0）；quality-check §2 重写为"复核 distill 分离结果"（落 ADR-0011 决策 8，0.4.0）；SKILL/presentation 补声明断裂（naming-rule / source-fidelity）；归属表 mastery-lens 含义去"骨架"；术语立规——呈现名=主题网、tag 名仍=类型/研究（quality-check 三处 + maintenance 两处对齐）。遗留两项挂 evals 重写：description 补"无问存档不收"、evals 用例重写。
+  - **失败回填通道落地**（ADR-0012，feedback-loop，词表 26）：真实使用失败案例一句话捕获成 `evals/pending/` JSON（config 键 `dev_repo` 门控、普通用户惰性）→ pending 留 dirty 由 C1 看见 → 转换人在环入 evals.json → `lint --release` 未回填不得发布。通道未经真实失败走通，试行待验证；**维护会话 C1 巡检从此要看 evals/pending/**。
   - **新版 v1.0.0 已装本机两端**（Claude 新装、Codex `--force` 覆盖旧 v0.7.0），dogfood 测试目录在 scratchpad。
 - 目录结构（ADR-0010）、纪律双份、CI 门禁同前，未动。
 - **发布态**：`ob-notes/v0.8.0` 已发布；marketplace 条目 pin 于 v0.8.0 tag 旧路径 `skills/ob-notes`（该 tag 树内有效，勿改），v1.0.0 发布时更新 path。
@@ -39,4 +40,4 @@
 
 ## 上次会话摘要（2026-07-04 · 公司机 · 续工）
 
-与用户逐轮设计对齐，把 ob-notes 从"分类驱动"翻转为"问答基底"：①问答是基底而非三类之一、"问"是消化判据（无问顺手存档划出）②信号/噪音分离为核心引擎（三限定判据、问保真答重写四镣铐、操作留结果不留过程）③呈现侧重退居其后，用户以 AWS 记忆文点破"研究型套骨架削足适履"→ **主题网去骨架**。落 ADR-0011 → 建 distill/presentation、删三 mode-a、SKILL 翻转、词表 26→25、修死引用与措辞、CHANGELOG/dev-log 同步 → depmap + lint 全绿 → commit `4ee5a42`（里程碑）。随后按仓库评测法用**隔离子代理**做首次 dogfood 执行测：AWS 记忆文沉淀通过，去骨架/机制保留/反幻觉全成立；暴露「追问链 vs 主题网」判据盲区，已回填 SKILL.md mode-decision（本次 commit）。评测其余（追问链/解法卡/负例、A/B+N、发布链）按用户意愿续做时再推进，架构标试行待验证。随后用户走查整套 workflow，逐项补七处疏漏（边界判据 + 末端体验，`1efdcfc`）；CHANGELOG 瘦身，拆除与 dev-log 重复的理由/触发叙事（B 纪律）。最后做架构规范严格审查：查出 5 硬伤 + 5 一致性问题（3 处系本会话补丁自引入，根因=跳过 §6 更新声明/提及扫描），除两项挂 evals 重写外全部修复，depmap + lint 全绿。
+与用户逐轮设计对齐，把 ob-notes 从"分类驱动"翻转为"问答基底"：①问答是基底而非三类之一、"问"是消化判据（无问顺手存档划出）②信号/噪音分离为核心引擎（三限定判据、问保真答重写四镣铐、操作留结果不留过程）③呈现侧重退居其后，用户以 AWS 记忆文点破"研究型套骨架削足适履"→ **主题网去骨架**。落 ADR-0011 → 建 distill/presentation、删三 mode-a、SKILL 翻转、词表 26→25、修死引用与措辞、CHANGELOG/dev-log 同步 → depmap + lint 全绿 → commit `4ee5a42`（里程碑）。随后按仓库评测法用**隔离子代理**做首次 dogfood 执行测：AWS 记忆文沉淀通过，去骨架/机制保留/反幻觉全成立；暴露「追问链 vs 主题网」判据盲区，已回填 SKILL.md mode-decision（本次 commit）。评测其余（追问链/解法卡/负例、A/B+N、发布链）按用户意愿续做时再推进，架构标试行待验证。随后用户走查整套 workflow，逐项补七处疏漏（边界判据 + 末端体验，`1efdcfc`）；CHANGELOG 瘦身，拆除与 dev-log 重复的理由/触发叙事（B 纪律）。最后做架构规范严格审查：查出 5 硬伤 + 5 一致性问题（3 处系本会话补丁自引入，根因=跳过 §6 更新声明/提及扫描），除两项挂 evals 重写外全部修复，depmap + lint 全绿。收尾落失败回填通道（ADR-0012）：feedback.md 捕获 + pending 暂存 + 人在环转换 + lint --release 发布闸，红绿两态实测，两端重装为最新候选。

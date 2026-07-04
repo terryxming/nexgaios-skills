@@ -4,7 +4,7 @@ description: 把人与 agent 对话中产生的高价值信息（决策、踩坑
 metadata:
   version: 1.0.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow"
+  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop"
 ---
 
 # ob-notes — 对话价值写回 Obsidian
@@ -89,3 +89,5 @@ metadata:
 ## 维护本 skill（仅维护者，沉淀时无需理会）
 
 修改本 skill 任何文件前，**必读 `references/maintenance.md`**（规则项 maintenance-flow）：它规定每条规则的唯一家、文件间依赖、改动前如何用 `scripts/build_depmap.py` 查影响面、以及版本规则。不遵循会破坏 MECE 与版本契约。
+
+**失败回填**：用户指出本次沉淀产出有问题并要求记录 / 回填时，按 `references/feedback.md`（规则项 feedback-loop）把失败现场捕获成结构化用例暂存——失败案例是本 skill 迭代的燃料，未回填不得发布。未配置 `dev_repo` 的环境该通道惰性。

@@ -54,6 +54,7 @@ metadata:
 | `mastery-lens` | 主题网的掌握视角写作纪律（写前自问 + 让掌握从字里行间透出，不做章节） | presentation.md |
 | `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
 | `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 主题网掌握测试） | quality-check.md |
+| `feedback-loop` | 失败案例回填闭环：捕获格式、pending 暂存、转换流程与发布闸（仅维护者） | feedback.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
 | `dependency-spec` | 依赖声明规范（第 3 节） | maintenance.md |
 | `version-rule` | 版本规则（第 5 节） | maintenance.md |

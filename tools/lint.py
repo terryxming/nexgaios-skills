@@ -15,11 +15,13 @@ skill 级（W2，需 skills-ref）：
   ⑧ 桶二 · metadata.version   —— 纪律 G·3 版本门禁前置（版本历史 = git tag + metadata.version）
   ⑨ marketplace↔tag 一致性    —— 纪律 G·4 发布一致性（ADR-0009：条目 ref 须为已存在 tag，
                                  version 与该 tag 处的 metadata.version 一致）
+  ⑩ 失败回填发布闸（仅 --release）—— 纪律 F 失败即用例（ADR-0012：evals/pending/ 非空即红，
+                                 未回填不得发布；平时 CI 不查，防堵捕获通道）
   （dist/晋升一致性已随单仓公开制取消，见 ADR-0008）
 
 二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
 依赖：skills-ref（桶一，ADR-0004 选项 A）；其余零外部依赖。无 skill 时 ④⑤⑥ 空过。
-用法：python tools/lint.py
+用法：python tools/lint.py [--release]
 """
 from __future__ import annotations
 
@@ -283,8 +285,28 @@ def check_marketplace() -> None:
         print(f"✅ marketplace↔tag 一致性（G·4）：{len(plugins)} 个条目通过")
 
 
+def check_pending_release() -> None:
+    """⑩ 发布闸（仅 --release）：evals/pending/ 须为空（F 失败即用例，未回填不得发布，ADR-0012）。"""
+    dirs = skill_dirs()
+    if not dirs:
+        print("• 无 skill，跳过失败回填发布闸（--release）")
+        return
+    before = len(errors)
+    for d in dirs:
+        pending = d / "evals" / "pending"
+        if pending.is_dir():
+            files = sorted(f.name for f in pending.iterdir() if f.is_file())
+            if files:
+                errors.append(f"{d.name}/evals/pending/ 有 {len(files)} 个未回填失败案例"
+                              f"（F 失败即用例，回填进 evals.json 后方可发布，ADR-0012）：\n    "
+                              + "\n    ".join(files))
+    if len(errors) == before:
+        print(f"✅ 失败回填发布闸（--release）：{len(dirs)} 个 skill 的 evals/pending/ 均为空")
+
+
 def main() -> int:
-    print("== 仓库级 + skill 级 lint（W1/W2）==")
+    release = "--release" in sys.argv[1:]
+    print("== 仓库级 + skill 级 lint（W1/W2）==" + ("（--release 发布模式）" if release else ""))
     check_paths()
     check_layout()
     check_adrs()
@@ -295,6 +317,8 @@ def main() -> int:
     check_clutter()
     check_version()
     check_marketplace()
+    if release:
+        check_pending_release()
 
     if errors:
         print("\n✗ lint 失败：")
