@@ -41,3 +41,16 @@
 ## 上次会话摘要（2026-07-04 · 公司机 · 续工）
 
 与用户逐轮设计对齐，把 ob-notes 从"分类驱动"翻转为"问答基底"：①问答是基底而非三类之一、"问"是消化判据（无问顺手存档划出）②信号/噪音分离为核心引擎（三限定判据、问保真答重写四镣铐、操作留结果不留过程）③呈现侧重退居其后，用户以 AWS 记忆文点破"研究型套骨架削足适履"→ **主题网去骨架**。落 ADR-0011 → 建 distill/presentation、删三 mode-a、SKILL 翻转、词表 26→25、修死引用与措辞、CHANGELOG/dev-log 同步 → depmap + lint 全绿 → commit `4ee5a42`（里程碑）。随后按仓库评测法用**隔离子代理**做首次 dogfood 执行测：AWS 记忆文沉淀通过，去骨架/机制保留/反幻觉全成立；暴露「追问链 vs 主题网」判据盲区，已回填 SKILL.md mode-decision（本次 commit）。评测其余（追问链/解法卡/负例、A/B+N、发布链）按用户意愿续做时再推进，架构标试行待验证。随后用户走查整套 workflow，逐项补七处疏漏（边界判据 + 末端体验，`1efdcfc`）；CHANGELOG 瘦身，拆除与 dev-log 重复的理由/触发叙事（B 纪律）。最后做架构规范严格审查：查出 5 硬伤 + 5 一致性问题（3 处系本会话补丁自引入，根因=跳过 §6 更新声明/提及扫描），除两项挂 evals 重写外全部修复，depmap + lint 全绿。收尾落失败回填通道（ADR-0012）：feedback.md 捕获 + pending 暂存 + 人在环转换 + lint --release 发布闸，红绿两态实测，两端重装为最新候选。
+
+## Claude 会话补记（2026-07-04 · 公司机 · 待与 Codex 对齐）
+
+> 本段由 Claude 会话追加，**不覆盖上方 Codex 交接**。收工因用户下班，晚上回家续。
+
+- **本会话主线**：以官方 skill-creator 为标本拆解 skill 架构与「规则为何被绕过／如何机械强制」，并以 skill-creator 视角审查了 ob-notes。产物：①`docs/reference/skill-creator-skill-zh.md`（skill-creator SKILL.md 中文译本，已被 Codex 提交 `cee2458` 卷入 git）；②Obsidian 笔记《skill-creator 架构与规则机械强制：问答实录》→ `D:\nexgaios-kbase\00 - raw\00 - inbox\`（kbase，另行同步）；③scratchpad 有个 PreToolUse hook demo（`declare-before-edit-demo`，仅演示、未入库、不同步）。
+- **本会话对 ob-notes 的改动（P0 最小订正，本次 commit）**：
+  1. `evals/evals.json`：4 处旧架构术语随 v1.0.0 翻转更新（mode-a-practice/dialogue → 解法卡/追问链；「判定为X型」→「按 mode-decision 定呈现侧重」；读 distill/presentation）——修「评测在测已删除架构」的 stale fixture。**⚠️ 与 Codex 下一步 #2「重写 evals 执行用例」重叠**：我只做术语订正，Codex 整体重写时以其为准。
+  2. `references/preflight.md`：landing-rule 增可选 `inbox_subpath`（默认 `00 - raw/00 - inbox` 不变、向后兼容），去过拟合硬编码入口。
+  - 验证：`build_depmap.py` 全绿、JSON 合法、活跃文件旧术语清零、`dependency-map.md` 未变。
+- **未做（留维护者/今晚）**：maintenance §6 第 5、6 步——版本（建议折入未发布的 1.0.0，不新起号）、CHANGELOG（仅加 inbox_subpath 一条，面向用户）、dev-log（记两项订正）。因这几步属 Codex 叙事＋版本判断，且 evals 与 Codex 重写重叠，未擅自动。
+- **安装副本分叉**：`C:\Users\EDY\.claude\skills\ob-notes`（Claude 侧）与源已分叉（源改了、副本没改），实机测需同步。
+- **续工建议**：先决定 evals 术语订正是保留还是并入 Codex 的整体重写；再决定 inbox_subpath 的 CHANGELOG/版本落法。审查报告全文与「审查建议/迭代方向/当前不足」在本次 Claude 会话记录里（P1/P2 迭代项未动，等你批）。

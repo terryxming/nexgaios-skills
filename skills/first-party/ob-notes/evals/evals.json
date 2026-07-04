@@ -3,9 +3,9 @@
   "evals": [
     {
       "id": 1,
-      "eval_name": "mode-a-practice-exact-details",
+      "eval_name": "solution-card-exact-details",
       "prompt": "以下是我们刚才的排障过程，帮我沉淀到知识库：\n\n问题：CI 上 `pip install skills-ref` 后跑 `python tools/lint.py` 报 `UnicodeEncodeError: 'gbk' codec can't encode character '\\u2705' in position 0`，本地却正常。\n排查：确认 CI runner 是 windows-latest；Python 3.13.5；本地 shell 设了 `PYTHONUTF8=1` 而 CI 没设。\n结论：Windows 下 Python 默认跟随 GBK 代码页，打印 emoji/中文即崩；修法是脚本内自配 `sys.stdout.reconfigure(encoding=\"utf-8\")`，比依赖环境变量可靠。已验证：去掉环境变量后脚本仍正常输出，exit 0。",
-      "expected_output": "一篇实战型 Obsidian 笔记：判定为实战型；写盘前读过 preflight/frontmatter-tags/mode-a-practice；报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二）；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
+      "expected_output": "一篇 Obsidian 解法卡（实战型）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为解法卡；写盘前读过 preflight/distill/presentation/frontmatter-tags；报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二）；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记中逐字保留报错原文 UnicodeEncodeError: 'gbk' codec can't encode character（铁律二，禁止概括成'编码问题'）",
@@ -19,7 +19,7 @@
       "id": 2,
       "eval_name": "project-decision-to-obsidian-only",
       "prompt": "todo-app 项目今天决定弃用 localStorage 改用 IndexedDB：原因是 500 条以上列表读写卡顿，实测 1200 条时首屏 2.3s→0.4s；踩坑是 Safari 私密模式下 IndexedDB 配额为 0，需降级处理。项目目录里已有 dev-log.md，但这次只把可复用决策沉淀到 Obsidian，方便以后做离线存储方案时复用。",
-      "expected_output": "一篇 Obsidian 实战/决策笔记：不读取、不更新项目 dev-log；按 preflight/frontmatter-tags/mode-a-practice 产出到知识库 inbox；决策（IndexedDB 及原因、实测数字 2.3s→0.4s、1200 条）、踩坑（Safari 私密模式配额 0）逐项保留；tag 使用 类型/决策 或 类型/实战/类型/踩坑，不使用 类型/项目日志。",
+      "expected_output": "一篇 Obsidian 实战/决策笔记：不读取、不更新项目 dev-log；按 preflight/distill/presentation/frontmatter-tags 产出到知识库 inbox；决策（IndexedDB 及原因、实测数字 2.3s→0.4s、1200 条）、踩坑（Safari 私密模式配额 0）逐项保留；tag 使用 类型/决策 或 类型/实战/类型/踩坑，不使用 类型/项目日志。",
       "files": [],
       "assertions": [
         "未读取或写入项目 dev-log.md，不写项目目录",
@@ -45,7 +45,7 @@
       "id": 4,
       "eval_name": "dialogue-transcript-preserve-questions",
       "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n第一轮：用户问「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n第二轮：用户追问「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？‘代码改动验证误当成收工验证’不是真正原因」。agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n第三轮：用户追问「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
-      "expected_output": "一篇问答实录型 Obsidian 笔记：判定为问答实录型；写盘前读过 preflight/frontmatter-tags/mode-a-dialogue；frontmatter 使用 类型/问答实录；保留三轮用户问题原文，使用 question callout 或等价显式标记；回答以讲解体面向未来读者重写（问题保真、回答重写），每轮末尾收口一句总纲；不压缩成单段复盘；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
+      "expected_output": "一篇 Obsidian 追问链（问答实录）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为追问链；写盘前读过 preflight/distill/presentation/frontmatter-tags；frontmatter 使用 类型/问答实录；保留三轮用户问题原文，使用 question callout 或等价显式标记；回答以讲解体面向未来读者重写（问题保真、回答重写），每轮末尾收口一句总纲；不压缩成单段复盘；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记 frontmatter tags 包含 类型/问答实录",
