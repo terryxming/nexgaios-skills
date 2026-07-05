@@ -1,0 +1,11 @@
+{
+  "captured_at": "2026-07-05",
+  "agent": "claude-code",
+  "trigger_query": "把我们前面的问答完整的回写到obsidian笔记",
+  "scenario": "一场对 Claude Code 底层机制的长篇深度解剖问答（模型 vs harness、turn 数据流七帧、transformer/无状态/采样/thinking/tokenizer/缓存的原子级原理、记忆三层、hook、OpenCode 代码对照）。用户要求『完整回写、不压缩、保留连续追问链』。agent 依 ob-notes 的『问保真答重写』原则，把每一轮 agent 实际给出的多段详细回答改写并压缩成简短讲解——原答的表格、逐帧展开、『驾驭要点』、原子级推导大量丢失。用户随后明确否决『答重写』，要求逐字保真。",
+  "produced_note_path": "D:\\nexgaios-kbase\\00 - raw\\00 - inbox\\深度解剖 Claude Code 底层机制：问答实录.md",
+  "produced_note_excerpt": "① 采样机制：一次前向传播最后一步，模型对整个词表（约 10 万+ token）各打分（logits）→ softmax 归一化成概率分布 → 采样 = 按这张表掷骰子选一个。经典旋钮：temperature（除以 T：T<1 变尖更确定、T>1 变平更随机、T→0 贪心）、top-k、top-p。Anthropic 关键反转：Opus 4.8（含 4.7/Sonnet 5/Fable 5）把 temperature/top_p/top_k 全删了，传就报 400——随机性旋钮从你手里被拿走，改用提示词 + effort。",
+  "user_complaint": "我刚看了笔记，压缩的非常严重，禁止压缩，禁止回答重写，怎么问的就怎么答",
+  "suspected_rule": "signal-noise（distill 的『②问题保真，回答重写』子则强制答重写）；presentation-modes（追问链默认答重写、无逐字挡位）",
+  "draft_assertion": "当用户明确要求『完整/逐字/不压缩』回写问答时，应逐字保留 agent 实际给出的原始回答（不做讲解式改写、不压缩技术细节），『问保真』不足以满足；追问链呈现应提供『答保真』挡位，而非无条件强制『答重写』。"
+}
