@@ -5,13 +5,13 @@
 ## 当前状态
 
 - **工作区模型（标准单仓）**：`skills/first-party/` 是所有 skill 的家；各 skill 在**各自分支**开发，共享单一工作区 `D:\nexgaios-skills`，`git checkout <skill 分支>` 切换在研 skill。⚠️ 现有两个 Claude 线程共享此工作区（一个开发 ob-notes、一个 learn-everything），同一目录一次只一个分支、切分支会互相影响——**切分支 / commit 前先 `git branch --show-current` 核对、多线程错开**。（本会话曾试行"一 skill 一 worktree"C5，判过度复杂**已撤销**，回归标准单仓。）
-- **learn-everything v0.1.0**（分支 `learn-everything-skill` `1561eed`，已 push）：认知地图自生长引擎（不套框架、整体↔原子双向）+ 六法定序 1→2→4→5→6→3 + 铁律五·审查关（一律必审、独立子 agent 联网查证、可信度五级）+ 失败回填。lint 绿；harness dogfood 六法全程跑通、审查关抓出 6 处记忆错并修正。**未走正式评测、未合 main**。
+- **learn-everything v0.1.0 已发布**：认知地图自生长引擎（不套框架、整体↔原子双向）+ 六法定序 1→2→4→5→6→3 + 铁律五·审查关（一律必审、独立子 agent 联网查证、可信度五级）+ 失败回填。触发评测达 G·2 底线（负例零误触发 + 正例 92.9%）；**已合 main、打 tag `learn-everything/v0.1.0`**。执行评测（with vs no-skill baseline）待 runner 环境。
 - **ob-notes v1.0.0 候选**（分支 `codex/ob-notes-obsidian-only`，另一个 Claude 线程在开发）：进行中。
 - **门禁**：lint 全绿（含共享段逐字节一致）。
 
 ## 下一步
 
-**learn-everything**（`git checkout learn-everything-skill`）：① evals 过目（F 人在环，含审查关回归用例 id 7）→ 触发 + 执行评测达标；② 合 main + tag `learn-everything/v0.1.0`；③ 审查关"一律必审"使用一段后再评估是否放宽。
+**learn-everything**：已发布 v0.1.0（合 main + tag）。下一步：① `marketplace.json` 加条目使可从 github 拉取安装；② 从 github 装到本机 `~/.claude/skills` 验证；③ 审查关"一律必审"用一段后评估是否放宽；④ 执行评测待 runner 环境。
 **ob-notes**：续 v1.0.0 迭代（用户明确还没迭代完，暂不跑评测）→ 发布链：eval 过目 → 评测重跑 → 合 main → tag `ob-notes/v1.0.0` → 更新 marketplace.json（path 改 `skills/first-party/ob-notes`）。
 
 ## 未决问题
