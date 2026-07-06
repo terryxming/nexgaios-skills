@@ -1,7 +1,7 @@
 ---
 name: anti-patterns
 metadata:
-  version: 0.2.0
+  version: 0.2.1
   provides: [anti-patterns]
   depends_on: [credibility-spec]
 ---
@@ -18,7 +18,7 @@ metadata:
 
 为什么坏：根因、模式、下次动作全被过程噪音淹没；未来检索命中后还得重读一遍。
 
-改写：主体改成 **症状 → 根因 → 解法 → 防复发**；过程压成一行时间线或"排除过的路径"。
+改写：把主体改成**症状 → 根因 → 解法 → 防复发**；过程只留一行时间线或「排除过的路径」。
 
 ## 2. 空泛总结（压缩过狠的另一面）
 

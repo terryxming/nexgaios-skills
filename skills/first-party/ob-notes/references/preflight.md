@@ -1,7 +1,7 @@
 ---
 name: preflight
 metadata:
-  version: 1.0.0
+  version: 1.0.1
   provides: [kb-root, landing-rule, preflight-flow, path-normalize]
   depends_on: []
 ---
@@ -22,7 +22,7 @@ metadata:
 <a id="kb-root"></a>
 ## 1. kb-root：知识库根路径
 
-落点不硬编码绝对路径，统一基于一个可配置的根路径变量 `{kb_root}`。**配置存放在 skill 之外**，因为 skill 会被更新覆盖，配置若写进 skill 会在升级时丢失。
+不要硬编码绝对路径；把落点统一建立在可配置的根路径变量 `{kb_root}` 上。**把配置存放在 skill 之外**——skill 会被更新覆盖，配置写进 skill 会在升级时丢失。
 
 **读取顺序**（取第一个命中的）：
 

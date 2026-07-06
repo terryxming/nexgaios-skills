@@ -5,11 +5,13 @@
       "id": 1,
       "eval_name": "solution-card-exact-details",
       "prompt": "以下是我们刚才的排障过程，帮我沉淀到知识库：\n\n问题：CI 上 `pip install skills-ref` 后跑 `python tools/lint.py` 报 `UnicodeEncodeError: 'gbk' codec can't encode character '\\u2705' in position 0`，本地却正常。\n排查：确认 CI runner 是 windows-latest；Python 3.13.5；本地 shell 设了 `PYTHONUTF8=1` 而 CI 没设。\n结论：Windows 下 Python 默认跟随 GBK 代码页，打印 emoji/中文即崩；修法是脚本内自配 `sys.stdout.reconfigure(encoding=\"utf-8\")`，比依赖环境变量可靠。已验证：去掉环境变量后脚本仍正常输出，exit 0。",
-      "expected_output": "一篇 Obsidian 解法卡（实战型）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为解法卡；写盘前读过 preflight/distill/presentation/frontmatter-tags；报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二）；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
+      "expected_output": "一篇 Obsidian 解法卡：先按 distill 分离信号/噪音并从 transcript 逐字扣，再按 mode-decision 定呈现侧重为解法卡；输出为「30 秒读法综合头 + 逐字正文」——综合头六栏（是什么/背景/解决什么/最重要结论带可信度/怎么用/前置），正文按现象·根因·解法编排逐字块，报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二），根因/解法用当时原话、不重写成新讲解；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记中逐字保留报错原文 UnicodeEncodeError: 'gbk' codec can't encode character（铁律二，禁止概括成'编码问题'）",
         "笔记中保留 Python 3.13.5 与 sys.stdout.reconfigure(encoding=\"utf-8\") 确切内容",
+        "输出含 30 秒读法综合头（是什么/背景/解决什么/最重要结论/怎么用/前置 六栏齐全）",
+        "正文按现象·根因·解法编排逐字块，根因与解法保留当时原话、未被重写成新的讲解措辞（铁律二·正文逐字）",
         "每条结论带可信度标记，且本条为已验证档（铁律三）",
         "frontmatter 含规范要求的字段与三轴 tag（frontmatter-tags 规范），不含 read_count/last_read",
         "落点为 {kb_root} 下 inbox（landing-rule），未写入当前目录或项目目录"
@@ -73,15 +75,15 @@
     },
     {
       "id": 6,
-      "eval_name": "topic-web-still-rewrites",
-      "prompt": "我们前面聊了好几轮 CRDT（无冲突复制数据类型），现在帮我整理成一篇主题笔记，方便以后做协同编辑时回来深挖。\n\n聊天里涉及：CRDT 解决的问题（多副本并发修改、最终一致、无需中心协调）；两大类 state-based（CvRDT，传整个状态、合并用幂等交换的 join）和 op-based（CmRDT，传操作、要求因果广播）；典型结构（G-Counter、PN-Counter、LWW-Register、OR-Set）；代价（元数据膨胀、tombstone 回收难）；与 OT（操作变换）的对比（CRDT 去中心、OT 需中心服务器但元数据轻）。",
-      "expected_output": "一篇 Obsidian 主题网（研究型）：mode-decision 判为主题网（要长期养的主题、复用的是主题知识而非追问路径），答按内容综合重写、不逐字堆砌问答——这是逐字扣只限追问链、综合呈现仍重写的边界对照；结构服从内容（如两大类 + 典型结构 + 代价 + 与 OT 对比），不套固定骨架也不保留对话问答形态；CvRDT/CmRDT、G-Counter 等确切术语保留；frontmatter 用 类型/研究；落点知识库 inbox。",
+      "eval_name": "topic-web-verbatim-organized",
+      "prompt": "把我们刚才关于 CRDT（无冲突复制数据类型）的讨论整理成一篇主题笔记，方便以后做协同编辑时回来深挖。原样保留你讲的内容，不要重写。\n\n第一轮：\n我问：「CRDT 到底解决什么问题？为什么协同编辑爱用它？」\n你答：「CRDT 解决的是**多副本并发修改、最终一致、且无需中心协调**：每个副本本地改、互相同步，合并保证收敛到同一状态。它分两大类——**state-based（CvRDT）**：传整个状态，合并用一个满足幂等、交换、结合律的 join（并操作），网络只要最终送达即可；**op-based（CmRDT）**：传操作而非状态，省带宽，但要求**因果序广播**（causal delivery），实现更重。」\n\n第二轮：\n我追问：「那具体有哪些现成结构？各自代价是什么？」\n你答：「典型结构：G-Counter（只增计数器）、PN-Counter（可增可减，两个 G-Counter 相减）、LWW-Register（last-write-wins，靠时间戳）、OR-Set（observed-remove set，加删各带唯一 tag）。代价主要两块：**元数据膨胀**（每个元素带 tag / 版本向量，OR-Set 尤甚）、**tombstone 回收难**（删除留墓碑，长期不清会涨）。跟 OT（操作变换）比：CRDT 去中心、无需中心服务器，但元数据重；OT 元数据轻，但要一个中心服务器做变换、实现复杂易错。」",
+      "expected_output": "一篇 Obsidian 主题网（研究型），mode-decision 判为主题网（要长期养的主题、复用的是主题知识而非追问路径）：正文由从 transcript 扣出的逐字块编排而成——你讲的 CvRDT/CmRDT 定义、G-Counter/OR-Set 等结构、元数据膨胀/tombstone/与 OT 对比等内容逐字保留、不重写成新讲解；作者只加内容结构的小标题（如 两大类 / 典型结构 / 代价 / 与 OT 对比）与双链把逐字块组织起来，不改块内文字；30 秒读法综合头（是什么/背景/解决什么/最重要结论/怎么用/前置/边界）允许综合概括；不保留'我问—你答'的逐轮问答形态（那是追问链）；frontmatter 用 类型/研究；落点知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记为主题网（研究型），mode-decision 判为主题网而非追问链",
-        "内容被综合组织成主题结构（两大类/典型结构/代价/对比等），不保留“我问—你答”的逐字对话形态、不是 transcript 堆砌",
-        "frontmatter tags 含 类型/研究，不含 类型/问答实录",
-        "结构服从内容、不套固定章节骨架（主题网去骨架），CvRDT/CmRDT、G-Counter/OR-Set 等确切术语保留",
+        "正文由逐字块编排：CvRDT/CmRDT 定义、G-Counter/PN-Counter/LWW-Register/OR-Set、元数据膨胀/tombstone、与 OT 对比等确切内容逐字保留，未被重写成新的讲解措辞",
+        "逐字块按内容结构（两大类/典型结构/代价/与 OT 对比等）编排，不保留'我问—你答'的逐轮对话形态，也不是 raw transcript 堆砌",
+        "30 秒读法综合头含'背景'栏；frontmatter tags 含 类型/研究，不含 类型/问答实录",
         "落点为 {kb_root}/00 - raw/00 - inbox/"
       ]
     }

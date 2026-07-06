@@ -143,8 +143,8 @@ def check_portability() -> None:
             rel = f.relative_to(d)
             if "evals" in rel.parts:
                 continue  # 评测用例除外：官方 skill-creator 明确建议触发查询写实机路径（贴近真实场景）
-            if len(rel.parts) == 1 and rel.name in ("dev-log.md", "CHANGELOG.md"):
-                continue  # 域内开发文件除外：历史忠实记录含真机路径是本性，不分发（ADR-0006）
+            if (len(rel.parts) == 1 and rel.name in ("dev-log.md", "CHANGELOG.md")) or rel.parts[0] == "dev-log":
+                continue  # 域内开发文件除外：dev-log.md/CHANGELOG.md 与 dev-log/ 分册，历史忠实记录含真机路径是本性，不分发（ADR-0006）
             try:
                 text = f.read_text(encoding="utf-8")
             except (UnicodeDecodeError, OSError):

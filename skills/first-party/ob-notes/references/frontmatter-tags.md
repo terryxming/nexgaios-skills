@@ -1,7 +1,7 @@
 ---
 name: frontmatter-tags
 metadata:
-  version: 1.0.0
+  version: 1.0.1
   provides: [credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule]
   depends_on: []
 ---
@@ -25,7 +25,7 @@ metadata:
 <a id="fm"></a>
 ## 1. frontmatter-spec：frontmatter 字段规范
 
-每篇笔记顶部用 YAML frontmatter。字段只描述这篇 Obsidian 笔记本身，不承载回访监控或项目日志机制。
+在每篇笔记顶部写一段 YAML frontmatter；字段只描述这篇 Obsidian 笔记本身，不承载回访监控或项目日志机制。
 
 ```yaml
 ---

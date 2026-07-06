@@ -4,38 +4,39 @@
 
 ## 当前状态
 
-- **ob-notes v1.0.0 候选**（分支 `codex/ob-notes-obsidian-only`）本次新增 **追问链改逐字扣（ADR-0013）**：
-  - **动机**：agent "答重写"本身是又一次 LLM 生成、会漂移（同段答重写两次都不同、都对不上原话）；长会话 compaction 后 agent 上下文前半段被摘要替换、记忆已失真 → 唯一 ground truth 是会话 jsonl。
-  - **新增规则项 `transcript-extract`**（唯一家 distill.md）+ **`scripts/extract_transcript.py`**：按 `CLAUDE_CODE_SESSION_ID` 定位 jsonl、结构层机械滤噪（thinking/tool_use/tool_result/元数据/中断/compact 摘要）、逐字提取问答；**dogfood 当前会话 9 轮通过**（问答逐字保真、噪音全滤、被工具切断的多段答正确归并）。
-  - **规范落地**：distill ② 限综合呈现 / ③ 补操作旁白；presentation 追问链答→逐字扣（总纲留作导航）；SKILL workflow/mode-decision/依赖；maintenance 登记（受控词表 26→27）；**depmap 27 项全绿**。
-  - **evals 转正**：翻转 stale 的 id4（原测"答重写成讲解体"与新架构冲突）、新增 id5（逐字保真 + 操作旁白滤，选 B）/ id6（主题网对照守"逐字只限追问链"边界）；`evals/pending/` 清空、`lint --release` 发布闸解除。
-  - **整套逐字扣仍试行待验证**：正向效果 n=1（仅暴露它的那次失败），未做正向 dogfood。
-- **延续**：ADR-0011 架构翻转、ADR-0012 feedback 通道、目录二分（ADR-0010）、纪律双份、CI 门禁同前，未动。
-- **另一条线**：learn-everything skill v0.1.0 骨架已 commit（分支 `learn-everything-skill`，off main，`ee168d3`），未过门禁未 dogfood，本会话未推进。
-- **发布态**：`ob-notes/v0.8.0` 已发布；marketplace 条目 pin 于 v0.8.0 tag 旧路径 `skills/ob-notes`（该 tag 树内有效，勿改），v1.0.0 发布时更新 path。
+- **ob-notes v2.0.0 候选（分支 `ob-notes`，本会话大改，尚未 commit）**：架构再翻转——**三种呈现正文一律逐字，区分「重写」与「编排」**（ADR-0014，扩展 0013 作用域）。
+  - **动机**：用户提出比 0013 更强的统一原则「所有沉淀禁止重写、正文一律逐字」——重写是又一次 LLM 概率生成、丢信息且对不上原话；0013 已在追问链证实，本次推广到三种呈现。用户 AskUserQuestion 选「综合头 + 逐字正文」（非纯逐字，保住主题网跨会话综合）。
+  - **核心界线**：**块内逐字（禁改块内一字）+ 块间自由（挑块 / 排序 / 加小标题·总纲·双链）**。综合概括只允许在 30 秒读法头。
+  - **改动（lint 全绿）**：distill ②（删答重写四镣铐、立重写 vs 编排）+ transcript-extract 升三种通用 + source-fidelity 标 `[待定]`；presentation 解法卡/主题网正文改逐字块编排、30 秒读法加「背景」字段统一套用、mastery-lens 转「挑块/编排」；SKILL 铁律二改「正文逐字」+ 补 输出格式/失败边界/脚本加载/评测规则指针；quality-check §2 加「偷偷重写」检查；maintenance 归属表四行 + 易混对更新。各文件版本 bump，对外 SKILL 2.0.0。
+  - **evals（已翻转，未跑）**：id6 `topic-web-still-rewrites`→`topic-web-verbatim-organized`（prompt 改真实多轮 transcript、断言测逐字块编排）；id1 解法卡补 30 秒读法 + 逐字断言；新增 `evals/README.md` 评测规则。
+  - **dev-log 拆分**：按 SSOT + 索引 + 指针拆为 `dev-log/`（decisions / timeline / pitfalls 三分册）+ `dev-log.md` 索引；`tools/lint.py` check_portability 豁免 `dev-log/`。
+  - **留痕**：ADR-0014、CHANGELOG [2.0.0]、dev-log 三分册均已记。**全为纸面翻转，未 commit、未 dogfood（`[试行待验证]`）。**
+  - **正文体例重构（本会话第二轮，用户要求）**：按「对所有 .md 的写作要求」把 SKILL + 全 references 正文改为祈使体（条件第三人称 / 动作祈使）、SKILL 落显式「## 工作流」（5 步 + checklist）作主干；distill / presentation 全 rewrite、模板骨架零改动；preflight / quality-check / anti-patterns / frontmatter-tags 真实收紧 + version bump；maintenance / feedback / evals-README 评审为已达标不 churn。官方 best-practices 全文核对：第三人称只管 description、正文祈使即最佳实践。**Q2 图片落盘已实现**：`extract_transcript.py` 加可选 `--attachments-dir`（传了才解码 base64 存 `{kb_root}/00 - raw/attachments/`、emit `![[]]`，保只读契约），合成 png 测通。quality-check 加第 6 测格式合规。**dev-log 排版重构**：三分册按可读性重排（decisions 表格→块、timeline/pitfalls→结构化块，内容逐字、条目数验证无丢失）。排版标准 = skill 自己的 `layout-rule`（无墙 + 段落优先，用户选 A），skill 言行一致、layout-rule 不动。build_depmap 27 + lint 仍全绿。
+- **延续**：ADR-0011/0012/0013、目录二分（ADR-0010）、纪律双份、CI 门禁同前，未动。本会话另把分支 `codex/ob-notes-obsidian-only`→`ob-notes`、`learn-everything-skill`→`learn-everything`（远端走 GitHub rename API、本地重挂 upstream）；纪律 §9 增「排版要能扫读」款（双份同步，已 push 到 ob-notes）。
+- **发布态**：`ob-notes/v0.8.0` 已发布；marketplace 条目 pin 于 v0.8.0 tag 旧路径 `skills/ob-notes`（该 tag 树内有效，勿改），v2.0.0 发布时更新 path。
 
 ## 下一步
 
-1. **评测重跑（G·2）**：触发 + 执行评测（架构大改必测），委托 skill-creator；执行用例已随逐字扣重写（`evals/evals.json` 6 条）。依赖 `claude -p` API key 环境（run_loop 嵌套鉴权坑未解，见未决）。评测用例须先给用户过目（F 人在环）。
-2. **跨文件回溯实机验证**：需一个由 compaction 续接的会话（jsonl 开头即 `isCompactSummary`）才能验 `logicalParentUuid` 回溯；当前会话未触发压缩、测不到。`[试行待验证]`
-3. **Codex 侧 transcript-extract**：`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`（每行 `{timestamp,type,payload}`）的 payload schema + 运行时定位当前会话机制待 Codex 实机验；未通前该侧降级 agent 转述（平台差异走 sidecar，不写进 distill.md）。
-4. **图片还原**：extract_transcript.py 现出 `[图片:media_type]` 占位，base64 → 附件文件的体积/落点策略待实现。
-5. 走发布链：eval 过目 → 评测达标 → 合 main → tag `ob-notes/v1.0.0`（对外仍 1.0.0，候选内演化；tag message 用中文）→ 更 marketplace.json（path 改 `skills/first-party/ob-notes`，lint 一致性门禁兜底）。发布须过 `lint --release`（pending 已空）。
+1. **本次改动未 commit**：等用户 review 后决定是否提交（分支 `ob-notes`）。
+2. **evals 用户过目后跑（G·2，F 人在环）**：6 条执行用例（id6/id1 本次改）须用户确认贴近真实场景，再委托 skill-creator 跑 with-skill vs baseline(v1.0.0)。依赖 `claude -p` API key 环境（run_loop 嵌套鉴权坑未解，见未决）。
+3. **补 dogfood**：主题网「逐字块编排」深度成色 n=0，用 CRDT/AWS 类多轮素材实测；解法卡纯逐字是否够扫读也要验。
+4. **source-fidelity `[待定]`**：外部长文在逐字架构下怎么处理（覆盖表进综合头 + 正文放逐字讨论？）——本次暂不动，单独找用户拍板后重构。
+5. 走发布链：eval 过目 → 达标 → 合 main → tag `ob-notes/v2.0.0`（tag message 用中文）→ 更 marketplace.json（path 改 `skills/first-party/ob-notes`）。发布须过 `lint --release`（pending 已空）。
 
 ## 未决问题
 
-- 逐字扣正向效果 n=1、compaction 全量性 n=2，均 `[试行待验证]`（发布前须补 F/G② 评测）。
-- 跨文件回溯确切规则、Codex 侧全链路 —— 待实机。
+- 逐字正文正向效果未 dogfood（主题网/解法卡 n=0）、source-fidelity 逐字处理待定，均 `[试行待验证]`。
+- 跨文件回溯确切规则、Codex 侧全链路（逐字扩到三种后 Codex 全量降级 agent 转述，影响面更大）—— 待实机。
 - run_loop.py（description 优化）依赖 `claude -p`，嵌套鉴权失败，待 API key 环境。
-- pass^k 的 k 与各 skill 触发率阈值未定；多 skill 触发互斥性未测（第二个 skill 出现时负例集互含）；ADR-0010 third-party 安装路径待首个第三方 skill 实测；AGENTS.md 平台段接管。
+- pass^k 的 k 与各 skill 触发率阈值未定；多 skill 触发互斥性未测；ADR-0010 third-party 安装路径待首个第三方 skill 实测。
 
 ## 环境备忘
 
-- 公司机 CHINAMI-5T8IKFA（本次会话机）：Windows 11；git 2.53.0 / Python 3.13.5 / Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 桶一通过。
+- 公司机 CHINAMI-5T8IKFA：Windows 11；git 2.53.0 / Python 3.13.5（另装 3.14）/ Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 桶一通过。
 - 家用机 TerryXming：git 2.53.0 / Python 3.14.2 / Node 24.14.1 / pwsh 7.6.3；Codex 128 KiB。
 - 两机各配 `~/.config/ob-notes/config.json` 指向自己 kbase（公司机 `D:\nexgaios-kbase`；读取顺序见 preflight.md）。
-- **会话 jsonl 定位（本次查证，供 transcript-extract 落地用）**：Claude Code 当前会话 = `~/.claude/projects/<cwd编码>/${CLAUDE_CODE_SESSION_ID}.jsonl`（cwd 编码规律：非字母数字 → `-`，如 `D:\nexgaios-skills` → `D--nexgaios-skills`；按 session id 直接 glob 最稳、不必重算编码）。compaction **只追加** `isCompactSummary` 摘要行、**不删原文**；压缩后可能续到**新文件**（前文在前序文件，沿 `logicalParentUuid` 回溯）。Codex 侧格式见下一步 #3。
+- **会话 jsonl 定位**：Claude Code 当前会话 = `~/.claude/projects/<cwd编码>/${CLAUDE_CODE_SESSION_ID}.jsonl`（cwd 编码：非字母数字 → `-`；按 session id 直接 glob 最稳）。compaction 只追加 `isCompactSummary` 摘要行、不删原文；压缩后可能续到新文件（沿 `logicalParentUuid` 回溯）。
 
-## 上次会话摘要（2026-07-06 · 公司机 · 本会话）
+## 上次会话摘要（2026-07-07 · 本会话）
 
-pull 续工 → 看待做（learn-everything 与 ob-notes 两线）→ 用户定先做 ob-notes、提出「追问链应逐字保真，且因 LLM 概率性须从会话 jsonl 扣原文」→ 查证（Claude 侧 jsonl 位置 / `CLAUDE_CODE_SESSION_ID` 定位 / compaction 不删原文 / 跨文件回溯 / 信号占比约 17% 全实测）→ 落 ADR-0013 → 写 `extract_transcript.py`、拿本会话 dogfood 9 轮通过 → 用户三点拍板（thinking 不留、信号逐字全留、噪音单独定义；操作旁白选 B 滤）→ 改 distill/presentation/SKILL/maintenance（登记 `transcript-extract` 规则项、词表 27）、门禁全绿 → CHANGELOG/dev-log 留痕 → evals 转正（翻 id4 + 新 id5/6、pending 清空）→ 收工 commit + push。全程 A2 落盘声明、A4·3 待验证标注到位。
+列远端分支 → 分支改名（codex/ob-notes-obsidian-only→ob-notes、learn-everything-skill→learn-everything，GitHub rename API + 本地重挂 upstream）→ 纪律 §9 增「排版要能扫读」款（记忆 + 双份同步，push ob-notes）→ **用 skill-creator 迭代 ob-notes**：联网核官方最佳实践 + 读穿现有 skill，判定「三种信息=现有三呈现、30 秒读法已存在」故是叠加非重写；识别根本冲突（用户「禁止重写」vs 现有「主题网/解法卡重写」）→ AskUserQuestion 拍板「综合头 + 逐字正文」+ 评测规则下沉 evals/ + dev-log 拆分 → 按 maintenance §6 翻转 8+ 文件（distill/presentation/SKILL/quality-check/maintenance + evals + ADR-0014 + CHANGELOG + dev-log 三分册 + lint 豁免）→ build_depmap 27 项绿、lint 全绿 → 用户逐行审 spec 图，点破两处欠账（写作要求没主动重构、5 步工作流没落地）→ 第二轮：全 .md 正文改祈使 + SKILL 落显式工作流 + Q2 图片落盘实现测通 + quality-check 加格式合规测 + 官方 best-practices 全文核对 → 未 commit，待用户 review + evals 过目。教训见踩坑（把显式指令降格成自评已达标）。全程 A2 声明、A4·3 待验证标注到位。

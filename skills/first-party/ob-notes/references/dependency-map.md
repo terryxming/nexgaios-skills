@@ -12,6 +12,10 @@
 | `CHANGELOG.md` | — | — |
 | `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, signal-noise, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop |
 | `dev-log.md` | — | — |
+| `dev-log/decisions.md` | — | — |
+| `dev-log/pitfalls.md` | — | — |
+| `dev-log/timeline.md` | — | — |
+| `evals/README.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
 | `references/distill.md` | signal-noise, source-fidelity, transcript-extract | credibility-spec, anti-patterns |
 | `references/feedback.md` | feedback-loop | — |
