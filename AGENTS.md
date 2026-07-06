@@ -244,11 +244,6 @@ Plan:
 - **C2 · 收工 handoff**：覆盖重写根目录 `handoff.md`——唯一交接文档，固定节为当前状态、下一步、未决问题、环境备忘、上次会话摘要；历史由 git 保存，不另存副本。流水线和平台层的坑与经验追加进 `docs/lessons-learned.md`，须填"已固化到哪"。然后 commit 加 push。机械兜底：CI 的 handoff 联动检查（见 ADR-0009）。
 - **C3 · 续工 resume**：先 pull，读 `handoff.md` 与 `docs/decisions/`，再动手。
 - **C4 · 决策留痕**：难逆转的选择进 `docs/decisions/` 并附证据来源，避免另一台机器重复调研或凭记忆瞎猜。
-- **C5 · 一 skill 一 worktree（多 agent 并行的工作区隔离）**：开发某个 `skills/first-party/<skill>` 时，为它起专属 git worktree + 分支，在独立目录开发，**不在主工作区来回切分支**。
-  - 建：`git worktree add <主仓同级路径>-<skill> -b <skill>-skill main`（独立目录、分支基于 main）。发布：门禁绿 → merge main + tag → `git worktree remove <目录>`。
-  - 主克隆根目录停在 main / 作集成区，不当单 skill 的开发区、不来回切分支。
-  - 理由：本仓库多 agent（Claude+Codex）协作，共享单一工作区会被并行会话切换 HEAD——导致 commit 落错分支、工作区文件被切走"消失"（已发生并返工）。worktree 给每个 skill/agent 独立 HEAD 与物理目录：文件恒可见、分支不被切走、并行零踩踏，共享同一 `.git`。
-  - 联动：commit/reset/add 前先 `git branch --show-current` 核对当前分支；commit 用精确路径、不 `git add -A`。
 
 ### D. 通用纪律 → skill 场景映射
 
