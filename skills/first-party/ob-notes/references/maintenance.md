@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 1.2.0
+  version: 1.3.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -48,7 +48,8 @@ metadata:
 | `mode-decision` | 呈现侧重判定：消化后按“未来复用什么”选追问链/解法卡/主题网 | SKILL.md |
 | `iron-laws` | 铁律本身 | SKILL.md |
 | `trigger-rule` | 触发方式与边界排除 | SKILL.md |
-| `signal-noise` | 信号/噪音分离引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 | distill.md |
+| `signal-noise` | 信号/噪音分离引擎：三限定判据 + 答重写四镣铐（非追问链呈现）+ 操作留结果不留过程 | distill.md |
+| `transcript-extract` | 追问链的答从会话 transcript 逐字扣：结构层保留/滤除 + 操作旁白也滤 + 图片保留 + 跨文件回溯；脚本 extract_transcript.py 为其实现 | distill.md |
 | `source-fidelity` | 引用外部材料时的原文保真：结构覆盖，防长文压成观点卡 | distill.md |
 | `presentation-modes` | 三种呈现侧重：追问链/解法卡（骨架）+ 主题网（内容主导、不套骨架） | presentation.md |
 | `mastery-lens` | 主题网的掌握视角写作纪律（写前自问 + 让掌握从字里行间透出，不做章节） | presentation.md |
@@ -66,6 +67,7 @@ metadata:
 - `anti-patterns` 只给坏例与改写方向，**不重新定义**可信度/日期/双链等规则；命中处一律按各自唯一家（如 credibility-spec）处理。
 - `mastery-lens`（主题网**写作时**的思考纪律：写前自问、让掌握从字里行间透出）vs `quality-rubric` 的掌握测试（**写盘前**检验掌握有没有透出来）——前者写时心法、后者写后判据，时机不同，不重复。
 - `layout-rule`（markdown 元素用途的**正面规约**）vs `anti-patterns` 第 5 条格式炫技（**坏例**）——正例与坏例互补；callout / 双链 / 代码块细节仍归 `linking-convention`，`layout-rule` 不重定义。
+- `signal-noise` 的答重写四镣铐（针对**主题网/解法卡**综合呈现里被重组的答）vs `transcript-extract`（针对**追问链**的答，从 transcript 逐字扣、不重写）——两种答处理按呈现分流，互不重叠。
 
 <a id="2"></a>
 ## 2. 受控词表

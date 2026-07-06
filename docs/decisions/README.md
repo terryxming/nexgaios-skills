@@ -48,3 +48,4 @@
 - [0010 skills 目录二分：first-party 与 third-party](0010-third-party-skills-directory.md)
 - [0011 问答为基底、信号/噪音分离（ob-notes 架构翻转）](0011-dialogue-first-signal-noise.md)
 - [0012 失败回填闭环：真实使用失败案例回流评测](0012-failure-backfill-loop.md)
+- [0013 追问链问答从会话 transcript 逐字扣（精化 0011 决策 4·②）](0013-transcript-verbatim-extract.md)

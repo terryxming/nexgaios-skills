@@ -4,7 +4,7 @@ description: 把人与 agent 对话中产生的高价值信息（决策、踩坑
 metadata:
   version: 1.0.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop"
+  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop"
 ---
 
 # ob-notes — 对话价值写回 Obsidian
@@ -37,11 +37,11 @@ metadata:
 
 动手写之前有两步，顺序不能反。
 
-**第一步 · 分离信号与噪音（核心动作）。** 以问答为基底，从这段对话里抽出该沉淀的信号、滤掉噪音——这一步决定**记什么**，是整个 skill 的心脏，必读 `references/distill.md`（规则项 signal-noise）。三条要点：① 判据——「删掉它，一个没有这场对话记忆、不熟这个主题、但懂通用常识的人会不会看不懂」，受损即信号；② 用户的问原样保真，回答重写成给未来读者的讲解（换讲法不换事实）；③ 操作与工具执行留结果不留过程。无问的顺手存档（没消化、只想存档）不归本 skill，交给剪藏/稍后读工具。
+**第一步 · 分离信号与噪音（核心动作）。** 以问答为基底，从这段对话里抽出该沉淀的信号、滤掉噪音——这一步决定**记什么**，是整个 skill 的心脏，必读 `references/distill.md`（规则项 signal-noise）。三条要点：① 判据——「删掉它，一个没有这场对话记忆、不熟这个主题、但懂通用常识的人会不会看不懂」，受损即信号；② 用户的问原样保真；答按呈现侧重分流——**追问链从会话 transcript 逐字扣（不重写，规则项 transcript-extract）**，主题网/解法卡重写成给未来读者的讲解（换讲法不换事实）；③ 操作与工具执行留结果不留过程（含“我去查一下”这类操作旁白）。无问的顺手存档（没消化、只想存档）不归本 skill，交给剪藏/稍后读工具。
 
 **第二步 · 定呈现侧重（mode-decision）。** 信号抽出来后，按**未来最想复用什么**选一种呈现，不是入口处给对话贴类型标签：
 
-- 复用的是**追问路径本身**（连续追问、认知纠错的过程有价值）→ **追问链**
+- 复用的是**追问路径本身**（连续追问、认知纠错的过程有价值）→ **追问链**（问与答从 transcript 逐字扣）
 - 复用的是**一条具体解法**（某报错怎么修、某命令怎么用）→ **解法卡**
 - 复用的是**一个要长期养的主题**（会反复回来深挖）→ **主题网**
 
@@ -60,7 +60,7 @@ metadata:
 
 按上面两步走，据规范产出笔记。各文件何时读、提供什么，见末尾引用清单。要点：
 
-- **先分离，必读 `references/distill.md`**：signal-noise 判据、问保真答重写四镣铐、操作留结果不留过程；含外部材料时按其中的 source-fidelity 保留原文结构。这一步执行铁律二、三。
+- **先分离，必读 `references/distill.md`**：signal-noise 判据、（综合呈现）答重写四镣铐、**（追问链）transcript-extract 逐字扣**、操作留结果不留过程；含外部材料时按其中的 source-fidelity 保留原文结构。这一步执行铁律二、三。
 - **再按呈现侧重读 `references/presentation.md`**：追问链 / 解法卡有骨架，严格套用其骨架与清单；主题网不套骨架、由内容主导，守求深（mastery-lens）/ 保真（source-fidelity）/ 防腐化三条纪律。过滤噪音时对照 `references/anti-patterns.md`（坏例与改写）；排版按 frontmatter-tags 的 layout-rule 克制用 markdown（每元素一职责、段落优先、callout 克制）。
 - **写盘前过一遍质量自检**：落盘前按 `references/quality-check.md` 的 quality-rubric 自查（30秒阅读 / 信号噪音 / 证据 / 复用；主题网另加掌握测试），不合格先重写再写。
 - **落点由 `references/preflight.md` 的 landing-rule 决定**。本 skill 只投递到 Obsidian 知识库入口；校验未过则按铁律一停下来问。
@@ -78,7 +78,7 @@ metadata:
 ## 引用文件（按需读，各注明时机）
 
 - `references/preflight.md` — **每次写盘前必读**：`{kb_root}` 读取、Obsidian 入口落点、存在 / 可写校验、跨 OS 路径归一。
-- `references/distill.md` — **动手第一步必读**：信号/噪音分离引擎（判据 + 问保真答重写 + 操作留结果不留过程），含引用外部材料时的原文保真（source-fidelity）。
+- `references/distill.md` — **动手第一步必读**：信号/噪音分离引擎（判据 + 综合呈现答重写 + 追问链 transcript-extract 逐字扣 + 操作留结果不留过程），含引用外部材料时的原文保真（source-fidelity）。
 - `references/presentation.md` — **定了呈现侧重后读**：追问链 / 解法卡骨架、主题网的放手写法与掌握视角（mastery-lens）。
 - `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
 - `references/anti-patterns.md` — **分离噪音时对照**：各类坏笔记的坏例与改写（逐条见 anti-patterns）。

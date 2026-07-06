@@ -4,60 +4,38 @@
 
 ## 当前状态
 
-- **ob-notes v1.0.0 候选完成架构翻转**（ADR-0011，分支 `codex/ob-notes-obsidian-only`）：从"判定 research/practice/dialogue 三选一套模板"翻转为 **问答基底 + 信号/噪音分离（核心引擎）+ 呈现侧重**。
-  - 新 `references/distill.md`（signal-noise 引擎：三限定判据 + 问保真答重写四镣铐 + 操作留结果不留过程 + source-fidelity）；新 `references/presentation.md`（三呈现骨架：追问链/解法卡有骨架、**主题网去骨架**、mastery-lens 挂主题网）。
-  - 删三个 mode-a 文件；SKILL workflow 翻转 + metadata 改；受控词表 26→25。
-  - **门禁全绿**：depmap 25 项 + lint 12 项。
-  - **已首次 dogfood 执行测通过**（隔离子代理、未碰真库，写 scratchpad 测试目录）：把 AWS 记忆文沉淀成主题网笔记——①主题网去骨架生效（结构服从文章逻辑、未套固定格子）；②旧版被压没的机制细节（Mem0 六层模块名、Letta 三工具名、AgentCore API）**全保留**；③可信度/反幻觉在起作用（整篇钉待验证、选型钉推测、剔除 WebFetch 脑补）。暴露并已回填一处判据：SKILL.md `mode-decision` 补「追问链 vs 主题网」边界（看追问有无独立认知增量）。
-  - **整套架构仍试行待验证**：n=1，一次成功 ≠ 可靠；判据主观性、去骨架深度、无问存档反弹见 ADR-0011 存疑段。
-  - **流程走查后补七处疏漏**（`1efdcfc`，均纸面补丁待 dogfood）：三对呈现消歧、交叉选主判据、试错弯路划界（消 distill 与解法卡矛盾）、无问引导话术、增量优先升写盘前必做、手存补文件名+落点、写盘后回确认。**CHANGELOG 按 maintenance §5 分工瘦身**——理由/触发/否决拆除（唯一家在 dev-log），只留"变了什么"。
-  - **架构规范严格审查后修复一批**：§3 立「规范性依赖 vs 指路引用」声明分界（maintenance 1.2.0）；quality-check §2 重写为"复核 distill 分离结果"（落 ADR-0011 决策 8，0.4.0）；SKILL/presentation 补声明断裂（naming-rule / source-fidelity）；归属表 mastery-lens 含义去"骨架"；术语立规——呈现名=主题网、tag 名仍=类型/研究（quality-check 三处 + maintenance 两处对齐）。遗留两项挂 evals 重写：description 补"无问存档不收"、evals 用例重写。
-  - **失败回填通道落地**（ADR-0012，feedback-loop，词表 26）：真实使用失败案例一句话捕获成 `evals/pending/` JSON（config 键 `dev_repo` 门控、普通用户惰性）→ pending 留 dirty 由 C1 看见 → 转换人在环入 evals.json → `lint --release` 未回填不得发布。**捕获段已被真实失败首跑验证**（2026-07-05 家用机 dogfood，见下一步 #1）；转换段（人在环入 evals.json）待走通；**维护会话 C1 巡检从此要看 evals/pending/**。
-  - **新版 v1.0.0 已装本机两端**（Claude 新装、Codex `--force` 覆盖旧 v0.7.0），dogfood 测试目录在 scratchpad。
-- 目录结构（ADR-0010）、纪律双份、CI 门禁同前，未动。
+- **ob-notes v1.0.0 候选**（分支 `codex/ob-notes-obsidian-only`）本次新增 **追问链改逐字扣（ADR-0013）**：
+  - **动机**：agent "答重写"本身是又一次 LLM 生成、会漂移（同段答重写两次都不同、都对不上原话）；长会话 compaction 后 agent 上下文前半段被摘要替换、记忆已失真 → 唯一 ground truth 是会话 jsonl。
+  - **新增规则项 `transcript-extract`**（唯一家 distill.md）+ **`scripts/extract_transcript.py`**：按 `CLAUDE_CODE_SESSION_ID` 定位 jsonl、结构层机械滤噪（thinking/tool_use/tool_result/元数据/中断/compact 摘要）、逐字提取问答；**dogfood 当前会话 9 轮通过**（问答逐字保真、噪音全滤、被工具切断的多段答正确归并）。
+  - **规范落地**：distill ② 限综合呈现 / ③ 补操作旁白；presentation 追问链答→逐字扣（总纲留作导航）；SKILL workflow/mode-decision/依赖；maintenance 登记（受控词表 26→27）；**depmap 27 项全绿**。
+  - **evals 转正**：翻转 stale 的 id4（原测"答重写成讲解体"与新架构冲突）、新增 id5（逐字保真 + 操作旁白滤，选 B）/ id6（主题网对照守"逐字只限追问链"边界）；`evals/pending/` 清空、`lint --release` 发布闸解除。
+  - **整套逐字扣仍试行待验证**：正向效果 n=1（仅暴露它的那次失败），未做正向 dogfood。
+- **延续**：ADR-0011 架构翻转、ADR-0012 feedback 通道、目录二分（ADR-0010）、纪律双份、CI 门禁同前，未动。
+- **另一条线**：learn-everything skill v0.1.0 骨架已 commit（分支 `learn-everything-skill`，off main，`ee168d3`），未过门禁未 dogfood，本会话未推进。
 - **发布态**：`ob-notes/v0.8.0` 已发布；marketplace 条目 pin 于 v0.8.0 tag 旧路径 `skills/ob-notes`（该 tag 树内有效，勿改），v1.0.0 发布时更新 path。
 
 ## 下一步
 
-1. **转换首个 pending 失败用例（人在环，F 纪律）**：`evals/pending/2026-07-05-answer-rewrite-vs-verbatim.json`——真实 dogfood 暴露「答重写」无逐字挡位：用户明确要求"完整/逐字/不压缩"回写问答时，distill 的『问保真答重写』仍强制压缩原答，被用户否决（"怎么问的就怎么答"）。草拟断言：**默认答重写保留，用户显式要求逐字时须走「答保真」挡位**——需同步修 distill『②问题保真，回答重写』与 presentation 追问链呈现，再转换进 evals.json。
-2. **再测凑 A/B+N**：已首测通过（研究型/主题网）；下一步测 **追问链型**（真有认知转折的，验刚补的判据是否让 agent 判成追问链）、解法卡型、负例（纯讨论不该触发）。要当真可靠需 N≥数轮（dev-log 教训：n=1 会高估）。
-3. **重写 evals 执行用例**：覆盖信号/噪音分离、问保真答重写（含逐字挡位对照）、操作过程滤除、无问存档划出、主题网去骨架，并补「追问链 vs 主题网」对照用例（纪律 F）。
-4. 走发布链：eval 用例过目（F 人在环）→ 触发 + 执行评测重跑（架构大改必测）→ 合 main → tag `ob-notes/v1.0.0`（对外仍 1.0.0，候选内演化；tag message 用中文）→ **更新 marketplace.json**（path 改 `skills/first-party/ob-notes` + ref/version/description，lint 一致性门禁兜底）。发布须过 `lint --release`（pending 非空即红）。
+1. **评测重跑（G·2）**：触发 + 执行评测（架构大改必测），委托 skill-creator；执行用例已随逐字扣重写（`evals/evals.json` 6 条）。依赖 `claude -p` API key 环境（run_loop 嵌套鉴权坑未解，见未决）。评测用例须先给用户过目（F 人在环）。
+2. **跨文件回溯实机验证**：需一个由 compaction 续接的会话（jsonl 开头即 `isCompactSummary`）才能验 `logicalParentUuid` 回溯；当前会话未触发压缩、测不到。`[试行待验证]`
+3. **Codex 侧 transcript-extract**：`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`（每行 `{timestamp,type,payload}`）的 payload schema + 运行时定位当前会话机制待 Codex 实机验；未通前该侧降级 agent 转述（平台差异走 sidecar，不写进 distill.md）。
+4. **图片还原**：extract_transcript.py 现出 `[图片:media_type]` 占位，base64 → 附件文件的体积/落点策略待实现。
+5. 走发布链：eval 过目 → 评测达标 → 合 main → tag `ob-notes/v1.0.0`（对外仍 1.0.0，候选内演化；tag message 用中文）→ 更 marketplace.json（path 改 `skills/first-party/ob-notes`，lint 一致性门禁兜底）。发布须过 `lint --release`（pending 已空）。
 
 ## 未决问题
 
-- ob-notes 架构翻转整套**试行待验证**，发布前须再测凑 A/B+N + 完整评测（ADR-0011 存疑段四项）。
-- evals 执行用例未随架构重写（发布前必做，G②；含「追问链 vs 主题网」对照用例）。
+- 逐字扣正向效果 n=1、compaction 全量性 n=2，均 `[试行待验证]`（发布前须补 F/G② 评测）。
+- 跨文件回溯确切规则、Codex 侧全链路 —— 待实机。
 - run_loop.py（description 优化）依赖 `claude -p`，嵌套鉴权失败，待 API key 环境。
-- pass^k 的 k 与各 skill 触发率阈值未定（首个正式发布时定，宜落成机器可读文件）。
-- 多 skill 触发互斥性未测；ADR-0010 third-party 安装路径待首个第三方 skill 收藏时实测。
-- Codex 侧遗留：run_loop.py 嵌套鉴权、AGENTS.md 平台段接管。
+- pass^k 的 k 与各 skill 触发率阈值未定；多 skill 触发互斥性未测（第二个 skill 出现时负例集互含）；ADR-0010 third-party 安装路径待首个第三方 skill 实测；AGENTS.md 平台段接管。
 
 ## 环境备忘
 
-- 公司机 CHINAMI-5T8IKFA（本次续工机）：Windows 11；git 2.53.0 / Python 3.13.5 / Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 桶一通过。两端已装 ob-notes v1.0.0 候选。
-- 家用机 TerryXming：git 2.53.0 / Python 3.14.2 / Node 24.14.1 / pwsh 7.6.3；Codex 128 KiB；两端已装最新候选（`dfbc7a0`，逐文件哈希核验与源一致，2026-07-04 晚）。
-- 两机各自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（公司机在 `D:\nexgaios-kbase`；读取顺序见 ob-notes preflight.md）。
+- 公司机 CHINAMI-5T8IKFA（本次会话机）：Windows 11；git 2.53.0 / Python 3.13.5 / Node 24.14.1 / pwsh 7.6.3；Codex `project_doc_max_bytes=131072` 已设；skills-ref 桶一通过。
+- 家用机 TerryXming：git 2.53.0 / Python 3.14.2 / Node 24.14.1 / pwsh 7.6.3；Codex 128 KiB。
+- 两机各配 `~/.config/ob-notes/config.json` 指向自己 kbase（公司机 `D:\nexgaios-kbase`；读取顺序见 preflight.md）。
+- **会话 jsonl 定位（本次查证，供 transcript-extract 落地用）**：Claude Code 当前会话 = `~/.claude/projects/<cwd编码>/${CLAUDE_CODE_SESSION_ID}.jsonl`（cwd 编码规律：非字母数字 → `-`，如 `D:\nexgaios-skills` → `D--nexgaios-skills`；按 session id 直接 glob 最稳、不必重算编码）。compaction **只追加** `isCompactSummary` 摘要行、**不删原文**；压缩后可能续到**新文件**（前文在前序文件，沿 `logicalParentUuid` 回溯）。Codex 侧格式见下一步 #3。
 
-## 上次会话摘要（2026-07-04 · 公司机 · 续工）
+## 上次会话摘要（2026-07-06 · 公司机 · 本会话）
 
-与用户逐轮设计对齐，把 ob-notes 从"分类驱动"翻转为"问答基底"：①问答是基底而非三类之一、"问"是消化判据（无问顺手存档划出）②信号/噪音分离为核心引擎（三限定判据、问保真答重写四镣铐、操作留结果不留过程）③呈现侧重退居其后，用户以 AWS 记忆文点破"研究型套骨架削足适履"→ **主题网去骨架**。落 ADR-0011 → 建 distill/presentation、删三 mode-a、SKILL 翻转、词表 26→25、修死引用与措辞、CHANGELOG/dev-log 同步 → depmap + lint 全绿 → commit `4ee5a42`（里程碑）。随后按仓库评测法用**隔离子代理**做首次 dogfood 执行测：AWS 记忆文沉淀通过，去骨架/机制保留/反幻觉全成立；暴露「追问链 vs 主题网」判据盲区，已回填 SKILL.md mode-decision（本次 commit）。评测其余（追问链/解法卡/负例、A/B+N、发布链）按用户意愿续做时再推进，架构标试行待验证。随后用户走查整套 workflow，逐项补七处疏漏（边界判据 + 末端体验，`1efdcfc`）；CHANGELOG 瘦身，拆除与 dev-log 重复的理由/触发叙事（B 纪律）。最后做架构规范严格审查：查出 5 硬伤 + 5 一致性问题（3 处系本会话补丁自引入，根因=跳过 §6 更新声明/提及扫描），除两项挂 evals 重写外全部修复，depmap + lint 全绿。收尾落失败回填通道（ADR-0012）：feedback.md 捕获 + pending 暂存 + 人在环转换 + lint --release 发布闸，红绿两态实测，两端重装为最新候选。
-
-## Claude 会话补记（2026-07-04 · 公司机 · 待与 Codex 对齐）
-
-> 本段由 Claude 会话追加，**不覆盖上方 Codex 交接**。收工因用户下班，晚上回家续。
-
-- **本会话主线**：以官方 skill-creator 为标本拆解 skill 架构与「规则为何被绕过／如何机械强制」，并以 skill-creator 视角审查了 ob-notes。产物：①`docs/reference/skill-creator-skill-zh.md`（skill-creator SKILL.md 中文译本，已被 Codex 提交 `cee2458` 卷入 git）；②Obsidian 笔记《skill-creator 架构与规则机械强制：问答实录》→ `D:\nexgaios-kbase\00 - raw\00 - inbox\`（kbase，另行同步）；③scratchpad 有个 PreToolUse hook demo（`declare-before-edit-demo`，仅演示、未入库、不同步）。
-- **本会话对 ob-notes 的改动（P0 最小订正，本次 commit）**：
-  1. `evals/evals.json`：4 处旧架构术语随 v1.0.0 翻转更新（mode-a-practice/dialogue → 解法卡/追问链；「判定为X型」→「按 mode-decision 定呈现侧重」；读 distill/presentation）——修「评测在测已删除架构」的 stale fixture。**⚠️ 与 Codex 下一步 #2「重写 evals 执行用例」重叠**：我只做术语订正，Codex 整体重写时以其为准。
-  2. `references/preflight.md`：landing-rule 增可选 `inbox_subpath`（默认 `00 - raw/00 - inbox` 不变、向后兼容），去过拟合硬编码入口。
-  - 验证：`build_depmap.py` 全绿、JSON 合法、活跃文件旧术语清零、`dependency-map.md` 未变。
-- **未做（留维护者/今晚）**：maintenance §6 第 5、6 步——版本（建议折入未发布的 1.0.0，不新起号）、CHANGELOG（仅加 inbox_subpath 一条，面向用户）、dev-log（记两项订正）。因这几步属 Codex 叙事＋版本判断，且 evals 与 Codex 重写重叠，未擅自动。
-- **安装副本分叉**：`C:\Users\EDY\.claude\skills\ob-notes`（Claude 侧）与源已分叉（源改了、副本没改），实机测需同步。
-- **续工建议**：先决定 evals 术语订正是保留还是并入 Codex 的整体重写；再决定 inbox_subpath 的 CHANGELOG/版本落法。审查报告全文与「审查建议/迭代方向/当前不足」在本次 Claude 会话记录里（P1/P2 迭代项未动，等你批）。
-
-## 家用机晚间续工记（2026-07-04/05）
-
-- 同步：分支 ff 至 `dfbc7a0`；C1 巡检全绿（首次执行 evals/pending 检查项）；两端重装最新候选并逐文件哈希核验一致；agent 已重启生效。
-- **失败回填通道首次真实捕获**：真实 dogfood（Claude Code 底层机制长问答回写）暴露「答重写 vs 逐字保真」边界缺陷，已捕获至 pending（见下一步 #1）——ADR-0012 捕获段实证走通。
-- 另一会话按维护约定更新 pre-flight 首条为「先查证再断言·工具优先于记忆」（失守模式变化即替换，本次 commit 一并入库）。
+pull 续工 → 看待做（learn-everything 与 ob-notes 两线）→ 用户定先做 ob-notes、提出「追问链应逐字保真，且因 LLM 概率性须从会话 jsonl 扣原文」→ 查证（Claude 侧 jsonl 位置 / `CLAUDE_CODE_SESSION_ID` 定位 / compaction 不删原文 / 跨文件回溯 / 信号占比约 17% 全实测）→ 落 ADR-0013 → 写 `extract_transcript.py`、拿本会话 dogfood 9 轮通过 → 用户三点拍板（thinking 不留、信号逐字全留、噪音单独定义；操作旁白选 B 滤）→ 改 distill/presentation/SKILL/maintenance（登记 `transcript-extract` 规则项、词表 27）、门禁全绿 → CHANGELOG/dev-log 留痕 → evals 转正（翻 id4 + 新 id5/6、pending 清空）→ 收工 commit + push。全程 A2 落盘声明、A4·3 待验证标注到位。

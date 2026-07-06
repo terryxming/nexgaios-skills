@@ -44,17 +44,45 @@
     {
       "id": 4,
       "eval_name": "dialogue-transcript-preserve-questions",
-      "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n第一轮：用户问「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n第二轮：用户追问「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？‘代码改动验证误当成收工验证’不是真正原因」。agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n第三轮：用户追问「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
-      "expected_output": "一篇 Obsidian 追问链（问答实录）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为追问链；写盘前读过 preflight/distill/presentation/frontmatter-tags；frontmatter 使用 类型/问答实录；保留三轮用户问题原文，使用 question callout 或等价显式标记；回答以讲解体面向未来读者重写（问题保真、回答重写），每轮末尾收口一句总纲；不压缩成单段复盘；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
+      "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n第一轮：用户问「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n第二轮：用户追问「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？'代码改动验证误当成收工验证'不是真正原因」。agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n第三轮：用户追问「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
+      "expected_output": "一篇 Obsidian 追问链（问答实录）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为追问链；写盘前读过 preflight/distill/presentation/frontmatter-tags；frontmatter 使用 类型/问答实录；保留三轮用户问题原文（question callout 或等价显式标记）；每轮回答保留实质内容、不压缩成单段复盘（追问链逐字保真，不改写成讲解体转述）；每轮末尾收口一句总纲作附加导航；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
         "笔记 frontmatter tags 包含 类型/问答实录",
         "三轮用户提问原文被保留，不被改写成摘要",
-        "回答区为面向读者的讲解体，无“agent 当时解释说/随后承认”式转写叙事（原话仅在作为证据或认知转折时引用）",
-        "每轮末尾有一句可带走的总纲（判断/公式/对比）",
+        "每轮回答保留实质内容，不压缩成单段复盘（追问链不重写、不做讲解体转述）",
+        "每轮末尾有一句可带走的总纲（判断/公式/对比），作附加导航、不替代或改写回答原文",
         "正文按轮次组织，并包含“本篇记录原则”和“可信度约定”或等价说明",
         "明确区分已发生事实（已验证）与底层原因判断（推测）",
         "落点为 {kb_root}/00 - raw/00 - inbox/，不写项目目录"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "verbatim-extract-no-compress",
+      "prompt": "把我们刚才关于 LLM 采样机制的问答完整逐字回写成问答实录，不要压缩、不要把我的问题或你的回答重写——怎么问的、你怎么答的，原样保留。\n\n第一轮：\n我问：「模型是怎么从一堆概率里选出下一个 token 的？temperature、top-k、top-p 到底各管什么？」\n你答：「我先翻一下资料确认下参数细节。一次前向传播的最后一步，模型对整个词表（约 10 万+ token）各打一个分（logits），再经 softmax 归一化成概率分布，采样就是按这张概率表抽一个。三个旋钮：\n| 旋钮 | 作用 | 极端值 |\n|---|---|---|\n| temperature | logits 除以 T 再 softmax：T<1 分布变尖更确定，T>1 变平更随机 | T→0 退化为贪心（永远选最高分） |\n| top-k | 只在概率最高的 k 个 token 里采样 | k=1 等于贪心 |\n| top-p | 只在累积概率达 p 的最小 token 集合里采样（nucleus） | p=1 等于不裁剪 |\n关键反转：Anthropic 的 Opus 4.8（含 4.7 / Sonnet 5 / Fable 5）把 temperature / top_p / top_k 全删了，传就报 400——随机性旋钮从调用方手里被拿走，改用提示词 + effort 控制。」\n\n第二轮：\n我追问：「那既然删了 temperature，输出还有随机性吗？」\n你答：「有。随机性来自采样这个动作本身（按概率表抽签）依然在，只是你不能再调温度去放大或收敛它。默认采样仍非确定，同一 prompt 两次结果可能不同。」",
+      "expected_output": "一篇 Obsidian 追问链（问答实录），mode-decision 定为追问链：问与答逐字保真——采样机制的三旋钮对比表、Anthropic 删 temperature/top_p/top_k 传报 400 等确切细节原样保留，不压成一两句讲解、不改写成第三人称转述；操作旁白“我先翻一下资料确认下参数细节”作为过程噪音滤除；两轮用户提问原文保留；可加每轮总纲作附加导航但不改动原答；frontmatter 用 类型/问答实录；落点知识库 inbox。",
+      "files": [],
+      "assertions": [
+        "三旋钮对比表（temperature/top-k/top-p 各自作用与极端值）逐字保留，不被压缩成一两句概括（transcript-extract 逐字 + 铁律二）",
+        "“Anthropic 把 temperature/top_p/top_k 全删了、传就报 400”这一确切结论逐字保留，方向与强度不漂移",
+        "操作旁白“我先翻一下资料确认下参数细节”被滤除，不进笔记正文（选 B）",
+        "两轮用户提问原文保留，回答未被改写成“agent 解释说/它答道”式第三人称讲解",
+        "frontmatter tags 含 类型/问答实录；落点为 {kb_root}/00 - raw/00 - inbox/"
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "topic-web-still-rewrites",
+      "prompt": "我们前面聊了好几轮 CRDT（无冲突复制数据类型），现在帮我整理成一篇主题笔记，方便以后做协同编辑时回来深挖。\n\n聊天里涉及：CRDT 解决的问题（多副本并发修改、最终一致、无需中心协调）；两大类 state-based（CvRDT，传整个状态、合并用幂等交换的 join）和 op-based（CmRDT，传操作、要求因果广播）；典型结构（G-Counter、PN-Counter、LWW-Register、OR-Set）；代价（元数据膨胀、tombstone 回收难）；与 OT（操作变换）的对比（CRDT 去中心、OT 需中心服务器但元数据轻）。",
+      "expected_output": "一篇 Obsidian 主题网（研究型）：mode-decision 判为主题网（要长期养的主题、复用的是主题知识而非追问路径），答按内容综合重写、不逐字堆砌问答——这是逐字扣只限追问链、综合呈现仍重写的边界对照；结构服从内容（如两大类 + 典型结构 + 代价 + 与 OT 对比），不套固定骨架也不保留对话问答形态；CvRDT/CmRDT、G-Counter 等确切术语保留；frontmatter 用 类型/研究；落点知识库 inbox。",
+      "files": [],
+      "assertions": [
+        "笔记为主题网（研究型），mode-decision 判为主题网而非追问链",
+        "内容被综合组织成主题结构（两大类/典型结构/代价/对比等），不保留“我问—你答”的逐字对话形态、不是 transcript 堆砌",
+        "frontmatter tags 含 类型/研究，不含 类型/问答实录",
+        "结构服从内容、不套固定章节骨架（主题网去骨架），CvRDT/CmRDT、G-Counter/OR-Set 等确切术语保留",
+        "落点为 {kb_root}/00 - raw/00 - inbox/"
       ]
     }
   ]
