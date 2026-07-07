@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-check-discipline-drift.py — 工程纪律双份一致性门禁（对应私有纪律 B，选项 B）。
+check-discipline-drift.py — 工程纪律双份一致性门禁（对应纪律 B，选项 B）。
 
 背景：工程纪律须同时常驻 CLAUDE.md 与 AGENTS.md（AGENTS.md 无 import，两平台各读各的，
 见 ADR-0002）。二者的"共享段"（DISCIPLINE:SHARED 之间）必须逐字节一致；本脚本做机械校验，

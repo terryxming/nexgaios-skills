@@ -4,22 +4,22 @@
 tools/lint.py — 仓库级 + skill 级硬门禁（议题 4 · W1/W2）。
 
 仓库级（W1，零外部依赖）：
-  ① 路径 ASCII 检查      —— 私有纪律 A3（标识符/文件名/路径用英文 kebab-case）
-  ② ADR 留痕格式          —— 私有纪律 A1 / 通用纪律 ⑨（难逆转决策进 docs/decisions 并附据）
-  ③ 纪律漂移校验          —— 私有纪律 B（调用 check-discipline-drift.py）
+  ① 路径 ASCII 检查      —— 纪律 A · 文件命名规范（标识符/文件名/路径用英文 kebab-case）
+  ② ADR 留痕格式          —— 纪律 C · 决策留痕（难逆转决策进 docs/decisions 并附据）
+  ③ 纪律漂移校验          —— 纪律 B（调用 check-discipline-drift.py）
 skill 级（W2，需 skills-ref）：
-  ④ 桶一 · skills-ref validate —— 私有纪律 E 桶一（frontmatter/命名/结构 17 项）
-  ⑤ 桶二 · 可移植            —— 私有纪律 E 桶二（skill 源不写死机器路径）
-  ⑥ 桶二 · 中文化兵底         —— 私有纪律 E 桶二（SKILL.md 至少含中文）
+  ④ 桶一 · skills-ref validate —— frontmatter/命名/结构 17 项（ADR-0004）
+  ⑤ 桶二 · 可移植            —— skill 源不写死机器路径
+  ⑥ 桶二 · 中文化兵底         —— SKILL.md 至少含中文
   ⑦ 桶二 · 无杂物文件          —— ADR-0005/0006（顶层禁 README.md 等重复文档；dev-log/CHANGELOG 属域内开发文件例外）
-  ⑧ 桶二 · metadata.version   —— 纪律 G·3 版本门禁前置（版本历史 = git tag + metadata.version）
-  ⑨ marketplace↔tag 一致性    —— 纪律 G·4 发布一致性（ADR-0009：条目 ref 须为已存在 tag，
+  ⑧ 桶二 · metadata.version   —— 发布门禁前置（版本历史 = git tag + metadata.version）
+  ⑨ marketplace↔tag 一致性    —— 发布一致性（ADR-0009：条目 ref 须为已存在 tag，
                                  version 与该 tag 处的 metadata.version 一致）
-  ⑩ 失败回填发布闸（仅 --release）—— 纪律 F 失败即用例（ADR-0012：evals/pending/ 非空即红，
+  ⑩ 失败回填发布闸（仅 --release）—— 失败即用例（ADR-0012：evals/pending/ 非空即红，
                                  未回填不得发布；平时 CI 不查，防堵捕获通道）
   （dist/晋升一致性已随单仓公开制取消，见 ADR-0008）
 
-二值门禁（见纪律 A5）：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
+二值门禁：任一 error → 退出 1（CI 挡）；不设 warning 中间态。
 依赖：skills-ref（桶一，ADR-0004 选项 A）；其余零外部依赖。无 skill 时 ④⑤⑥ 空过。
 用法：python tools/lint.py [--release]
 """
@@ -53,7 +53,7 @@ def check_paths() -> None:
     bad = [p for p in tracked_paths()
            if not p.startswith("skills/third-party/") and any(ord(c) > 127 for c in p)]
     if bad:
-        errors.append("路径含非 ASCII 字符（A3：标识符/路径须英文 kebab-case）：\n    "
+        errors.append("路径含非 ASCII 字符（纪律 A 文件命名规范：标识符/路径须英文 kebab-case）：\n    "
                       + "\n    ".join(bad))
     else:
         print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII（skills/third-party/ 豁免）")
@@ -69,7 +69,7 @@ def check_adrs() -> None:
         if "状态" not in text:
             errors.append(f"ADR {adr.name} 缺「状态」")
         if not re.search(r"证据|来源|依据", text):
-            errors.append(f"ADR {adr.name} 缺「证据/来源/依据」段（A1：决策须留痕附据）")
+            errors.append(f"ADR {adr.name} 缺「证据/来源/依据」段（纪律 C 决策留痕：决策须留痕附据）")
     print(f"✅ ADR 格式检查：核对 {len(adrs)} 篇")
 
 
@@ -128,7 +128,7 @@ def check_skills_ref() -> None:
 
 
 def check_portability() -> None:
-    """桶二：skill 源不写死机器路径（E 桶二·1 可移植）。"""
+    """桶二：skill 源不写死机器路径（可移植）。"""
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过可移植检查（桶二）")
@@ -153,7 +153,7 @@ def check_portability() -> None:
                 if pat.search(line):
                     hits.append(f"{f.relative_to(ROOT).as_posix()}:{i}: {line.strip()[:80]}")
     if hits:
-        errors.append("skill 源含机器路径（E 桶二·1 可移植）：\n    " + "\n    ".join(hits))
+        errors.append("skill 源含机器路径（可移植）：\n    " + "\n    ".join(hits))
     else:
         print(f"✅ 可移植检查（桶二）：{len(dirs)} 个 skill 无机器路径")
 
@@ -165,7 +165,7 @@ def check_chinese() -> None:
         print("• 无 skill，跳过中文化兵底（桶二）")
         return
     cjk = re.compile("[一-鿿]")
-    bad = [f"{d.name}/SKILL.md 无中文字符（E 桶二·2 中文化兵底）"
+    bad = [f"{d.name}/SKILL.md 无中文字符（中文化兵底）"
            for d in dirs if not cjk.search((d / "SKILL.md").read_text(encoding="utf-8"))]
     if bad:
         errors.extend(bad)
@@ -193,7 +193,7 @@ def check_clutter() -> None:
 
 
 def check_version() -> None:
-    """桶二：SKILL.md 须有 metadata.version（G·3 版本门禁前置）。"""
+    """桶二：SKILL.md 须有 metadata.version（发布门禁前置）。"""
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过 version 检查（桶二）")
@@ -211,7 +211,7 @@ def check_version() -> None:
             unparsed += 1  # 结构/frontmatter 问题由桶一报错，此处不虚报绿
             continue
         if not (props.metadata or {}).get("version"):
-            bad.append(f"{d.name}/SKILL.md 缺 metadata.version（G·3：版本历史 = git tag + metadata.version）")
+            bad.append(f"{d.name}/SKILL.md 缺 metadata.version（发布门禁：版本历史 = git tag + metadata.version）")
     if bad:
         errors.extend(bad)
     elif unparsed:
@@ -230,7 +230,7 @@ def _skill_md_version(text: str) -> str | None:
 
 
 def check_marketplace() -> None:
-    """⑨ G·4 发布一致性：marketplace 条目 ref 须为已存在 tag，version 与该 tag 处一致（ADR-0009）。"""
+    """⑨ 发布一致性：marketplace 条目 ref 须为已存在 tag，version 与该 tag 处一致（ADR-0009）。"""
     mp = ROOT / ".claude-plugin" / "marketplace.json"
     if not mp.is_file():
         print("• 无 marketplace.json，跳过发布一致性检查")
@@ -257,7 +257,7 @@ def check_marketplace() -> None:
             tag = subprocess.run(["git", "-C", str(ROOT), "tag", "-l", ref],
                                  capture_output=True, text=True, encoding="utf-8").stdout.strip()
             if not tag:
-                errors.append(f"marketplace · {name}：ref '{ref}' 不是已存在的 git tag（G·4：发布 = merge + tag）")
+                errors.append(f"marketplace · {name}：ref '{ref}' 不是已存在的 git tag（发布一致性：发布 = merge + tag）")
                 continue
             show = subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{path}/SKILL.md"],
                                   capture_output=True, text=True, encoding="utf-8")
@@ -267,7 +267,7 @@ def check_marketplace() -> None:
             tag_ver = _skill_md_version(show.stdout)
             if version and tag_ver and version != tag_ver:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 tag '{ref}' 处 "
-                              f"metadata.version={tag_ver} 不一致（G·4 发布一致性）")
+                              f"metadata.version={tag_ver} 不一致（发布一致性）")
         elif isinstance(src, str) and src.startswith("./"):
             if src.startswith("./skills/third-party/"):
                 errors.append(f"marketplace · {name}：source '{src}' 在 skills/third-party/ 下"
@@ -282,11 +282,11 @@ def check_marketplace() -> None:
                 errors.append(f"marketplace · {name}：条目 version={version} 与 {src}/SKILL.md 的 "
                               f"metadata.version={tree_ver} 不一致（相对路径源装的即工作树）")
     if len(errors) == before:
-        print(f"✅ marketplace↔tag 一致性（G·4）：{len(plugins)} 个条目通过")
+        print(f"✅ marketplace↔tag 一致性：{len(plugins)} 个条目通过")
 
 
 def check_pending_release() -> None:
-    """⑩ 发布闸（仅 --release）：evals/pending/ 须为空（F 失败即用例，未回填不得发布，ADR-0012）。"""
+    """⑩ 发布闸（仅 --release）：evals/pending/ 须为空（失败即用例，未回填不得发布，ADR-0012）。"""
     dirs = skill_dirs()
     if not dirs:
         print("• 无 skill，跳过失败回填发布闸（--release）")
@@ -298,7 +298,7 @@ def check_pending_release() -> None:
             files = sorted(f.name for f in pending.iterdir() if f.is_file())
             if files:
                 errors.append(f"{d.name}/evals/pending/ 有 {len(files)} 个未回填失败案例"
-                              f"（F 失败即用例，回填进 evals.json 后方可发布，ADR-0012）：\n    "
+                              f"（失败即用例，回填进 evals.json 后方可发布，ADR-0012）：\n    "
                               + "\n    ".join(files))
     if len(errors) == before:
         print(f"✅ 失败回填发布闸（--release）：{len(dirs)} 个 skill 的 evals/pending/ 均为空")
