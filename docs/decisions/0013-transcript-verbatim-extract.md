@@ -17,6 +17,7 @@
 
 结论:**agent 的工作记忆不是可靠的保真来源;唯一的 ground truth 是落盘的会话 transcript(jsonl)。** 这与 ob-notes 反幻觉 / source-fidelity 哲学同向——"agent 事后重写"恰是最大的幻觉注入点，0011 的四条镣铐是打补丁，"直接从 transcript 扣原文"是拔病根。
 
+
 ## 决策
 
 **作用域限定:仅追问链(问答实录)呈现。** 解法卡的逐字只作用于确切细节(报错/命令，0011 镣铐 b 已覆盖)，主题网是综合去骨架、多来源融合，二者均不整段逐字扣。
@@ -29,6 +30,7 @@
 6. **图片保留。** user/assistant content 里的 `image` block 逐字保留，落 Obsidian 时还原成 kbase 附件文件 + `![[]]` 引用;与 `attachment` 类型行区分（后者是 `deferred_tools_delta`/`agent_listing_delta` 等系统事件，属噪音）。
 7. **平台范围:Claude 先行，Codex 待补。** Codex 侧 transcript 存在（`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`）但 payload schema 与运行时定位机制未验;实现时 Codex 侧降级为 agent 转述，平台差异与 `SKILL.md` 分离（桶二可移植纪律）。
 8. **落地物:** 新增 `skills/first-party/ob-notes/scripts/extract_transcript.py`（定位 jsonl + 跨文件回溯 + 按 `parentUuid` 重建轮次 + 提取信号）;`distill.md` ② 与 `presentation.md` 追问链段随之改;pending 用例转正进 `evals.json`。
+
 
 ## 证据(附来源，区分已证实/推断)
 
@@ -47,7 +49,8 @@
 **推断(待验证):**
 
 8. compaction 不改历史 jsonl 的行为对**所有**触发场景成立——已见两种形态（同文件插入 / 新文件开头），但样本有限（n=2），标 `[试行待验证]`。
-9. Codex 侧 rollout（`{timestamp,type,payload}`）可提取等价信号——文件存在已证实，payload schema 与运行时定位机制未验（跨平台，A4·6，须 Codex 实机核）。
+9. Codex 侧 rollout（`{timestamp,type,payload}`）可提取等价信号——文件存在已证实，payload schema 与运行时定位机制未验（跨平台，见速览「非 Claude 平台的事实」，须 Codex 实机核）。
+
 
 ## 影响
 
@@ -59,16 +62,18 @@
 - **evals**:`evals/pending/2026-07-05-answer-rewrite-vs-verbatim.json` 转正进 `evals.json`;补"逐字扣 vs 综合重写"对照、操作指令轮次滤除用例。
 - **平台差异**:Codex 侧降级说明与 `SKILL.md` 分离（sidecar）。
 - **`CHANGELOG.md` / `dev-log.md`**:同步。
-- 仍 v1.0.0 候选（未发布，非 breaking）;发布前过 G 门禁（lint + 评测）。
+- 仍 v1.0.0 候选（未发布，非 breaking）;发布前过发布门禁（ADR-0009，lint + 评测）。
+
 
 ## 存疑 / 待验证
 
-- **Codex 侧全链路**（payload schema + 运行时定位当前会话）未验，须 Codex 实机（A4·6）。
+- **Codex 侧全链路**（payload schema + 运行时定位当前会话）未验，须 Codex 实机（见速览「非 Claude 平台的事实」）。
 - **跨文件回溯精确规则**:`logicalParentUuid` 是线索，但"新文件如何指向前序文件、如何串接完整问答"的确切算法待实现时验证，`[试行待验证]`。
 - **compaction 全量性**样本有限（n=2），标 `[试行待验证]`;超长多次压缩链未测。
 - **"只留有认知增量问答对"判据**继承 0011 参照读者判据的主观性，弱 agent 可能判不准——靠评测兜底。
 - **图片 base64 还原**的体积/落点策略（大图、多图）未定，实现时按实际验证。
-- 整套"逐字扣"目前 n=1（仅暴露它的那次失败），**正向效果未 dogfood**，发布前须 F/G② 补测。
+- 整套"逐字扣"目前 n=1（仅暴露它的那次失败），**正向效果未 dogfood**，发布前须补测（ADR-0012 回填闭环 / 发布门禁 ADR-0009 评测）。
+
 
 ## 来源
 

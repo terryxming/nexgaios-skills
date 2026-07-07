@@ -7,8 +7,10 @@
 ## 背景
 
 ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支柱:
+
 1. **"这是 agent skill,为什么要排除这些文件?"** —— 重审证据:官方安装链路($skill-installer / Claude marketplace)都是**整目录复制,生态中不存在"安装/分发时净化"环节**;官方"别放 CHANGELOG"条款是**创作指引**(防 AI 生成垃圾文档),不是出口净化要求。"晋升净化"是传统"源码→构建→产物"思维的误植。
 2. **"双仓合一才对,skill 是单个发布单元。"** —— 净化取消后,"晋升"只剩纯复制;纯复制跨仓存在的唯一理由是隐私隔离(journal + 未来内部 skill),而为**尚不存在**的内部 skill 维持双仓同步机制,违反简单性纪律"没有第二个用例前不做抽象"。
+
 
 ## 决策
 
@@ -20,6 +22,7 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 6. **保留**:`tools/install.py`(自用渠道,纯复制到本机两端用户目录:Claude `~/.claude/skills`、Codex `$CODEX_HOME/skills`);`marketplace.json`(放本仓,首个 skill 正式发布时建;Claude Code 亦可经 plugin marketplace 安装)。
 7. **内部 skill**(公司业务等不可公开者):未来真实出现时**另立私有仓**,届时才为它付费。
 
+
 ## 证据(附来源,区分已证实/推断)
 
 1. **已证实**:Claude marketplace 拉取 git 仓库目录树;$skill-installer 从 repo path 复制安装(来源同 ADR-0007)。
@@ -29,6 +32,7 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 5. **已证实(纠错留痕)**:Claude Code 存在用户级 personal skills 目录 `~/.claude/skills`(官方 plugins-reference:"`~/.claude/skills/` | personal | In every project",https://code.claude.com/docs/en/plugins-reference,2026-07-04 复核)。commit `a786c4d` 曾依据 `claude plugin --help` 与本机目录不存在,误判"Claude Code 无固定 skills 目录"并移除该安装目标——目录不存在只说明尚未使用,不能证明机制不存在;决策 6 与 install.py 已恢复两端安装。
 6. **已证实(终审)**:官方安装链路为整目录复制、无净化——Codex skill-installer 的 `install-skill-from-github.py:176` 为裸 `shutil.copytree(src, dest_dir)`,无任何 ignore/exclude(本机实读,闭环证据 2 的待终审项);其安装目标 `$CODEX_HOME/skills/<skill-name>`(defaults to `~/.codex/skills`,SKILL.md:48,闭环"存疑"第 3 项)。
 
+
 ## 影响
 
 - 纪律双份:速览、D④、E 桶二(删"晋升一致性",重编号为 4 条)、G④(改为 merge+tag)与落点、新增"main=可安装态"条(共享段同步,漂移校验绿)。
@@ -37,11 +41,13 @@ ADR-0007(双仓晋升制)落地当晚,用户连续两问击穿了它的两个支
 - **存量违例(已闭环)**:ob-notes v0.8.0 早于方案甲生效时已在 main 但未打 v0.8.0 tag(基线仅 v0.7.0),属历史遗留;后续已走完 G 发布确认并补 `ob-notes/v0.8.0` tag,此后 skill 改动一律走分支。
 - 本地目录名曾仍为 `nexgaios-skills-dev`,与远端名不一致;后续已由用户在会话外改名为 `nexgaios-skills`,git 不受目录名影响。
 
+
 ## 存疑 / 待验证
 
 - 外部用户从"多 skill 单仓"安装单个 skill 的实际体验(marketplace.json 指向子目录、$skill-installer 按 path 装),首次外部发布时实测。
 - journal 公开后"忠实记录 vs 自我审查"的张力,留观察;必要时敏感细节可写本机不入库文件。
 - ~~Codex 用户级安装目录终审(`~/.codex/skills`,承 ADR-0001)~~ 已闭环:见证据 6(本机实读官方 skill-installer SKILL.md:48)。
+
 
 ## 来源
 
