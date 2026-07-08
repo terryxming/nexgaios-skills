@@ -36,6 +36,7 @@
 - 分发渠道：自用 + 团队共享 + 公开 marketplace + GitHub。
 - **单仓公开制**（见 [ADR-0008](docs/decisions/0008-single-public-repo.md)）：本仓（公开）即开发仓即分发仓；**skill 是发布单元**，发布 = 过发布门禁合入 main 并打 tag（main = 可安装态，装到的永远是已发布版）；外部用户经 Claude marketplace / Codex `$skill-installer` 直装本仓；自用走本地 `tools/install.py` 纯复制完整 skill 目录到两端用户目录，Claude Code 亦可走 plugin marketplace。内部 skill 未来另立私有仓。
 
+
 ### 本地安装（自用）
 
 ```bash
@@ -44,6 +45,7 @@ python tools/install.py ob-notes
 ```
 
 `tools/install.py` 默认安装到 Claude Code 的 `~/.claude/skills`（用户级 personal skills 目录，对所有项目生效）与 Codex 的 `$CODEX_HOME/skills`（无 `CODEX_HOME` 时为 `~/.codex/skills`）。目标已存在时会停止；确认要覆盖再加 `--force`；`--dest` 只装到自定义目录。`skills/first-party/` 与 `skills/third-party/` 均可安装，同名冲突时用 `--from` 指定来源。
+
 
 ### Claude Code marketplace 安装
 
@@ -64,16 +66,19 @@ claude plugin install ob-notes@nexgaios-skills
 
 规则本体常驻 [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)（§14 跨设备协作），本节只做人读的操作指引。
 
+
 ### 机器与 agent
 
 - 两台 Windows 11 机器经 git/GitHub 接力开发，hostname 即机器识别：家用机 `TerryXming`、公司机 `CHINAMI-5T8IKFA`。铁律：一切需延续的状态**必须进仓库并 push**，git 是唯一同步通道。
 - 两个 agent 共用本仓：Claude Code 读 `CLAUDE.md`，Codex 读 `AGENTS.md`——工程纪律共享段逐字节一致（`tools/check-discipline-drift.py` 校验）。跨 agent 的平台断言不臆测，一律查官方文档（§12 行为闸门）。
+
 
 ### 交接与续工
 
 - **收工**：覆盖重写 [`handoff.md`](handoff.md)（当前状态 / 下一步 / 未决问题 / 环境备忘 / 上次会话摘要），坑与经验追加进 [`docs/lessons-learned.md`](docs/lessons-learned.md)，commit + push。历史在 `git log -- handoff.md`。
 - **续工**：先 pull，读 `handoff.md` 与 `docs/decisions/`，再动手。
 - **机械兜底**：CI 的 handoff 联动检查——推送动了 `skills/first-party/` 或 `docs/decisions/` 而未同批更新 `handoff.md` 即红（见 [ADR-0009](docs/decisions/0009-single-handoff-and-lessons.md)）。
+
 
 ### 冷启动（新机器 / 新克隆）
 
@@ -82,6 +87,7 @@ claude plugin install ob-notes@nexgaios-skills
 3. Codex 侧：`~/.codex/config.toml` 设 `project_doc_max_bytes = 131072`——纪律常驻超默认 32 KiB 上限，不设会被静默截断（见 ADR-0002）。
 4. 自用 skill 安装见上文「本地安装（自用）」；ob-notes 使用者另配 `~/.config/ob-notes/config.json` 指向本机知识库。
 5. 开工第一件事是§14 跨设备协作（开工）巡检（agent 会自动跑并显式报结果）：git 状态与分支、工具链版本、Codex 上限、读 `handoff.md`。
+
 
 ### 环境自检
 

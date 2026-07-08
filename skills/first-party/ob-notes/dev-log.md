@@ -40,7 +40,7 @@ tags: [状态/持续]
   4. **source-fidelity 待定项**：外部长文在逐字架构下怎么处理，单独找用户拍板后重构。
   5. 达标后合 main 打 tag `ob-notes/v2.0.0`。
 - 卡点：无。
-- **续做提示（给接手的你/agent）**：先读宿主仓库 `CLAUDE.md`/`AGENTS.md`（工程纪律，含 skill 迁入/发布门禁）与 `docs/decisions/`；改本 skill 任何文件前必读 `references/maintenance.md`（§6 修改流程）。换新机器需自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 preflight.md）。旧仓库的"并 main/OKC console"开放项已随原仓库退役作废。
+- **续做提示（给接手的你/agent）**：先读宿主仓库 `CLAUDE.md`/`AGENTS.md`（工程纪律，含 skill 迁入/发布门禁）与 `docs/decisions/`；改本 skill 任何文件前必读 `references/maintenance.md`（§6 修改流程）。换新机器需自配 `~/.config/ob-notes/config.json` 指向自己的 kbase（读取顺序见 `preflight.md`）。旧仓库的"并 main/OKC console"开放项已随原仓库退役作废。
 - 已解决：
   - 原"与 OKC 做职责边界对比"——OKC 是本 skill 的**前作**(用户早先 Codex 版，流程过重而重做)，已捞五件并入 v0.3.0；项目记忆之争以 ob-notes dev-log 为准。
   - **mode-decision 是否细化**——判定维持粗分、misfit 走模板层、定可量化触发闸（见决策表 2026-06-26）；触发条件挂在上方"继续观察数据"。

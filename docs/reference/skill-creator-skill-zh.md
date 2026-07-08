@@ -3,9 +3,9 @@ name: skill-creator
 description: 创建新 skill、修改与改进现有 skill，并度量 skill 表现。当用户想从零创建一个 skill、编辑或优化现有 skill、跑评测（eval）验证 skill、用方差分析做基准测试（benchmark），或优化 skill 的 description 以提升触发准确率时使用。
 ---
 
-> 译注：本文件是 Claude 官方内置 skill `skill-creator` 的 `SKILL.md` 中文译本，仅供研读架构与原理。遵循本仓命名规范——正文中文化，而标识符、文件名、路径、frontmatter 字段名、代码块、脚本名一律保留英文原样（它们是机器契约，翻译会破坏引用）。
-
 # Skill Creator（skill 创建器）
+
+> 译注：本文件是 Claude 官方内置 skill `skill-creator` 的 `SKILL.md` 中文译本，仅供研读架构与原理。遵循本仓命名规范——正文中文化，而标识符、文件名、路径、frontmatter 字段名、代码块、脚本名一律保留英文原样（它们是机器契约，翻译会破坏引用）。
 
 一个用于创建新 skill 并对其迭代改进的 skill。
 
@@ -45,7 +45,9 @@ skill 创建器可能被各种编程行话熟悉程度天差地别的人使用�
 
 ---
 
+
 ## 创建一个 skill
+
 
 ### 捕捉意图（Capture Intent）
 
@@ -56,11 +58,13 @@ skill 创建器可能被各种编程行话熟悉程度天差地别的人使用�
 3. 期望的输出格式是什么？
 4. 我们要不要搭一套测试用例来验证这个 skill 能用？输出可被客观验证的 skill（文件转换、数据抽取、代码生成、固定的工作流步骤）能从测试用例中获益。输出主观的 skill（写作风格、艺术创作）往往不需要。根据 skill 类型给出合适的默认建议，但把决定权交给用户。
 
+
 ### 访谈与调研（Interview and Research）
 
 主动就边界情况、输入/输出格式、示例文件、成功标准和依赖发问。在把这部分敲定之前，别急着写测试 prompt。
 
 检查可用的 MCP——如果对调研有用（搜文档、找相似 skill、查最佳实践），有子代理就并行调研，没有就内联做。带着上下文有备而来，减轻用户负担。
+
 
 ### 编写 SKILL.md
 
@@ -71,7 +75,9 @@ skill 创建器可能被各种编程行话熟悉程度天差地别的人使用�
 - **compatibility**：所需工具、依赖（可选，很少需要）
 - **skill 的其余部分 :)**
 
+
 ### skill 写作指南
+
 
 #### skill 的解剖结构（Anatomy of a Skill）
 
@@ -85,6 +91,7 @@ skill-name/
     ├── references/ - Docs loaded into context as needed
     └── assets/     - Files used in output (templates, icons, fonts)
 ```
+
 
 #### 渐进式披露（Progressive Disclosure）
 
@@ -111,9 +118,11 @@ cloud-deploy/
 ```
 Claude 只读相关的那份 reference 文件。
 
+
 #### 「不出意外」原则（Principle of Lack of Surprise）
 
 这本不用说，但 skill 绝不能包含恶意软件、漏洞利用代码，或任何可能危及系统安全的内容。一个 skill 的内容，若按其描述去理解，不应让用户感到意外。不要配合那些要求创建误导性 skill、或旨在便利未授权访问、数据外泄或其他恶意活动的请求。不过像「roleplay as an XYZ（扮演某某角色）」这类是 OK 的。
+
 
 #### 写作模式（Writing Patterns）
 
@@ -137,9 +146,11 @@ Input: Added user authentication with JWT tokens
 Output: feat(auth): implement JWT-based authentication
 ```
 
+
 ### 写作风格（Writing Style）
 
 试着向模型解释「为什么这些重要」，而不是堆一大堆刻板发霉的「MUST」。运用心智理论（theory of mind），努力让 skill 通用，而不要死抠具体示例、过分狭窄。先写一版草稿，然后用一双新的眼睛重看一遍、加以改进。
+
 
 ### 测试用例（Test Cases）
 
@@ -169,6 +180,7 @@ Output: feat(auth): implement JWT-based authentication
 本节是一段连续的序列——不要中途停下。**不要**使用 `/skill-test` 或任何其他测试类 skill。
 
 把结果放进 `<skill-name>-workspace/`，作为 skill 目录的同级兄弟目录。在这个 workspace 里，按迭代组织结果（`iteration-1/`、`iteration-2/` 等等），其中每个测试用例各占一个目录（`eval-0/`、`eval-1/` 等等）。别一开始就把这些全建出来——用到哪个才建哪个。
+
 
 ### 第 1 步：在同一轮里把所有 run（with-skill 和 baseline）都发出去
 
@@ -200,6 +212,7 @@ Execute this task:
 }
 ```
 
+
 ### 第 2 步：趁 run 在跑，起草 assertion
 
 别只是干等 run 跑完——这段时间你可以用起来。为每个测试用例起草定量 assertion，并向用户解释它们。如果 `evals/evals.json` 里已经有 assertion，就复查一遍并解释它们各查什么。
@@ -207,6 +220,7 @@ Execute this task:
 好的 assertion 是可被客观验证、且有描述性名字的——它们应当在 benchmark viewer 里读起来一目了然，让扫一眼结果的人立刻明白每一条在查什么。主观类 skill（写作风格、设计质量）更适合定性评估——别硬把 assertion 塞给那些需要人类判断的东西。
 
 起草好 assertion 后，把它们更新进各 `eval_metadata.json` 和 `evals/evals.json`。同时向用户解释他们将在 viewer 里看到什么——既有定性的输出，也有定量的 benchmark。
+
 
 ### 第 3 步：run 完成时，捕获计时数据
 
@@ -221,6 +235,7 @@ Execute this task:
 ```
 
 这是捕获该数据的唯一机会——它随任务通知一次性到来，别处不会持久化。每条通知一到就处理，别想着攒起来批量处理。
+
 
 ### 第 4 步：打分、聚合、启动 viewer
 
@@ -254,6 +269,7 @@ Execute this task:
 
 5. **告诉用户**类似这样的话：「我已经在你的浏览器里打开了结果。有两个标签页——『Outputs』让你逐个点开每个测试用例并留下反馈，『Benchmark』展示定量对比。看完后回到这里告诉我一声。」
 
+
 ### 用户在 viewer 里看到什么
 
 「Outputs」标签页一次展示一个测试用例：
@@ -267,6 +283,7 @@ Execute this task:
 「Benchmark」标签页展示统计摘要：各配置的 pass rate、计时、token 用量，附每个 eval 的细分和分析师观察。
 
 导航靠上一个/下一个按钮或方向键。看完后，他们点「Submit All Reviews」，会把所有反馈保存到 `feedback.json`。
+
 
 ### 第 5 步：读反馈
 
@@ -293,9 +310,11 @@ kill $VIEWER_PID 2>/dev/null
 
 ---
 
+
 ## 改进 skill（Improving the skill）
 
 这是整个循环的核心。你已经跑完测试用例，用户已经审阅了结果，现在你要根据他们的反馈把 skill 做得更好。
+
 
 ### 该怎么看待「改进」
 
@@ -308,6 +327,7 @@ kill $VIEWER_PID 2>/dev/null
 4. **留意跨测试用例的重复劳动。** 读测试 run 的 transcript，注意子代理们是不是各自独立地写了相似的辅助脚本、或对某件事采取了同样的多步做法。如果 3 个测试用例都导致子代理写了个 `create_docx.py` 或 `build_chart.py`，那是一个强烈信号：这个 skill 应该把那段脚本打包进去。写一次，放进 `scripts/`，然后叫 skill 去用它。这能让未来每一次调用都省下重造轮子的功夫。
 
 这个任务相当重要（我们可是在试图创造每年数十亿的经济价值！），而你的思考时间不是瓶颈；慢慢来，真正把事情琢磨透。我建议你先写一版修订草稿，然后重新审视、加以改进。真的尽你所能钻进用户的脑子里，理解他们想要什么、需要什么。
+
 
 ### 迭代循环（The iteration loop）
 
@@ -326,6 +346,7 @@ kill $VIEWER_PID 2>/dev/null
 
 ---
 
+
 ## 进阶：盲测对比（Blind comparison）
 
 当你想在一个 skill 的两个版本之间做更严格的对比时（比如用户问「新版本真的更好吗？」），有一套盲测对比系统。细节读 `agents/comparator.md` 和 `agents/analyzer.md`。基本思路是：把两份输出交给一个独立的 agent，不告诉它哪份是哪份，让它评判质量。然后再分析赢家为什么赢。
@@ -334,9 +355,11 @@ kill $VIEWER_PID 2>/dev/null
 
 ---
 
+
 ## description 优化（Description Optimization）
 
 SKILL.md frontmatter 里的 description 字段，是决定 Claude 是否调用某个 skill 的首要机制。创建或改进完 skill 后，主动提出为触发准确率优化这个 description。
+
 
 ### 第 1 步：生成触发评测查询
 
@@ -361,6 +384,7 @@ SKILL.md frontmatter 里的 description 字段，是决定 Claude 是否调用�
 
 要极力避免的一点：别把 should-not-trigger 查询写得明显不相干。「写一个斐波那契函数」作为 PDF skill 的负例太容易了——它什么都没测到。负例应当是真正刁钻的。
 
+
 ### 第 2 步：与用户一起复查
 
 用 HTML 模板把这套评测集呈现给用户复查：
@@ -375,6 +399,7 @@ SKILL.md frontmatter 里的 description 字段，是决定 Claude 是否调用�
 5. 文件会下载到 `~/Downloads/eval_set.json`——去 Downloads 文件夹里找最新的那份，以防有多个（比如 `eval_set (1).json`）
 
 这一步很关键——糟糕的评测查询会导致糟糕的 description。
+
 
 ### 第 3 步：跑优化循环
 
@@ -397,17 +422,20 @@ python -m scripts.run_loop \
 
 这个脚本会自动处理整个优化循环。它把评测集切成 60% 训练（train）和 40% 留出测试（held-out test），评估当前 description（每条查询跑 3 次以拿到可靠的触发率），然后调用 Claude、根据失败项提出改进。它在 train 和 test 上重新评估每个新 description，最多迭代 5 次。跑完后，它会在浏览器里打开一份 HTML 报告，逐轮展示结果，并返回含 `best_description` 的 JSON——该 description 是按 test 分数（而非 train 分数）选出的，以避免过拟合。
 
+
 ### 触发机制是怎么工作的
 
 理解触发机制有助于设计更好的评测查询。skill 会带着它的 name + description 出现在 Claude 的 `available_skills` 列表里，Claude 基于该 description 决定是否去参考某个 skill。要紧的一点是：Claude 只会为那些它自己没法轻松搞定的任务去参考 skill——像「读这个 PDF」这种简单的一步查询，即便 description 完美匹配也可能不触发 skill，因为 Claude 用基础工具就能直接处理。复杂、多步或专门化的查询，在 description 匹配时会可靠地触发 skill。
 
 这意味着你的评测查询应当足够有分量，让 Claude 真的会从参考 skill 中获益。像「读文件 X」这种简单查询是糟糕的测试用例——无论 description 质量如何它们都不会触发 skill。
 
+
 ### 第 4 步：应用结果
 
 从 JSON 输出里取出 `best_description`，更新 skill 的 SKILL.md frontmatter。把改动前/后拿给用户看，并报告分数。
 
 ---
+
 
 ### 打包与呈现（仅当有文件投递工具时）
 
@@ -420,6 +448,7 @@ python -m scripts.package_skill <path/to/skill-folder>
 当用户所在组织允许创建 skill 时，被呈现的 `.skill`（或裸 `SKILL.md`）文件卡片会显示一个 **Save skill** 按钮；点击它就会把该 skill 安装进他们的个人档案。
 
 ---
+
 
 ## Claude.ai 专属说明
 
@@ -446,6 +475,7 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 ---
 
+
 ## Cowork 专属说明
 
 如果你在 Cowork 里，主要要知道这些：
@@ -459,6 +489,7 @@ python -m scripts.package_skill <path/to/skill-folder>
 - **更新现有 skill**：用户可能是让你更新一个现有 skill，而不是创建新的。遵循上面 Claude.ai 一节里的更新指引。
 
 ---
+
 
 ## Reference 文件
 
