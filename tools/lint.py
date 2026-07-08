@@ -4,9 +4,9 @@
 tools/lint.py — 仓库级 + skill 级硬门禁（议题 4 · W1/W2）。
 
 仓库级（W1，零外部依赖）：
-  ① 路径 ASCII 检查      —— 纪律 A · 文件命名规范（标识符/文件名/路径用英文 kebab-case）
-  ② ADR 留痕格式          —— 纪律 C · 决策留痕（难逆转决策进 docs/decisions 并附据）
-  ③ 纪律漂移校验          —— 纪律 B（调用 check-discipline-drift.py）
+  ① 路径 ASCII 检查      —— §12 · 文件命名规范（标识符/文件名/路径用英文 kebab-case）
+  ② ADR 留痕格式          —— §14 · 决策留痕（难逆转决策进 docs/decisions 并附据）
+  ③ 纪律漂移校验          —— §13（调用 check-discipline-drift.py）
 skill 级（W2，需 skills-ref）：
   ④ 桶一 · skills-ref validate —— frontmatter/命名/结构 17 项（ADR-0004）
   ⑤ 桶二 · 可移植            —— skill 源不写死机器路径
@@ -53,7 +53,7 @@ def check_paths() -> None:
     bad = [p for p in tracked_paths()
            if not p.startswith("skills/third-party/") and any(ord(c) > 127 for c in p)]
     if bad:
-        errors.append("路径含非 ASCII 字符（纪律 A 文件命名规范：标识符/路径须英文 kebab-case）：\n    "
+        errors.append("路径含非 ASCII 字符（§12 文件命名规范：标识符/路径须英文 kebab-case）：\n    "
                       + "\n    ".join(bad))
     else:
         print("✅ 路径 ASCII 检查：全部 tracked 路径均为 ASCII（skills/third-party/ 豁免）")
@@ -69,7 +69,7 @@ def check_adrs() -> None:
         if "状态" not in text:
             errors.append(f"ADR {adr.name} 缺「状态」")
         if not re.search(r"证据|来源|依据", text):
-            errors.append(f"ADR {adr.name} 缺「证据/来源/依据」段（纪律 C 决策留痕：决策须留痕附据）")
+            errors.append(f"ADR {adr.name} 缺「证据/来源/依据」段（§14 决策留痕：决策须留痕附据）")
     print(f"✅ ADR 格式检查：核对 {len(adrs)} 篇")
 
 

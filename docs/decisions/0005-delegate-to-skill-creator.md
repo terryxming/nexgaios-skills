@@ -9,7 +9,7 @@
 
 执行 W3（F 评测 runner）前，用户提出两个问题：①Claude 与 Codex **都内置了 skill-creator**，为何要自己造 new-skill 和评测 runner？②评测用例必须显式给用户过目，否则用户不知道用例是否贴近真实场景。
 
-按 纪律 A「没有调查就没有发言权」实读两端内置 skill-creator 的 SKILL.md 后证实：**本仓库正在重复造轮子**。官方 skill-creator 已覆盖创作脚手架、触发评测、执行评测（含 no-skill baseline）、grader、benchmark 聚合、结果可视化、description 触发优化的完整闭环——与我们的 new-skill + F runner 设计大面积重叠，且官方版本更完整（用例给用户签字、train/test 防过拟合、viewer 人工复核）。
+按 §12「没有调查就没有发言权」实读两端内置 skill-creator 的 SKILL.md 后证实：**本仓库正在重复造轮子**。官方 skill-creator 已覆盖创作脚手架、触发评测、执行评测（含 no-skill baseline）、grader、benchmark 聚合、结果可视化、description 触发优化的完整闭环——与我们的 new-skill + F runner 设计大面积重叠，且官方版本更完整（用例给用户签字、train/test 防过拟合、viewer 人工复核）。
 
 
 ## 决策

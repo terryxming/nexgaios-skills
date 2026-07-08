@@ -16,4 +16,4 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")  # Windows 默认 GBK 控制台兼容
 
-print("[pre-flight] ①先查证再断言·工具优先于记忆；查不到才标「待验证」(纪律 A/§7) ②多方案→摆理由+给推荐(§2) ③落盘前先声明(纪律 A)")
+print("[pre-flight] ①先查证再断言·工具优先于记忆；查不到才标「待验证」(§12/§7) ②多方案→摆理由+给推荐(§2) ③落盘前先声明(§12)")

@@ -7,7 +7,7 @@
 
 ## 背景
 
-journal/ 逐次追加式交接运行三天即暴露结构问题:6 份文件互相搬运"未决项/环境备忘"(违反纪律 B 单一事实源·禁止可避免的重复——历史状态序列本就是 git 天然记录的东西);"该读哪份、读几份"存在歧义,直接诱发 Codex 失守(补写 handoff 前只列文件名未读正文→格式漂移);会话起点重建状态需读多份文件。
+journal/ 逐次追加式交接运行三天即暴露结构问题:6 份文件互相搬运"未决项/环境备忘"(违反 §13 单一事实源·禁止可避免的重复——历史状态序列本就是 git 天然记录的东西);"该读哪份、读几份"存在歧义,直接诱发 Codex 失守(补写 handoff 前只列文件名未读正文→格式漂移);会话起点重建状态需读多份文件。
 
 同时,不够格进纪律/ADR 的运营性经验(限流、评测副作用、平台怪癖)散落在不会被重读的 handoff 里,无固化管道。
 
@@ -28,7 +28,7 @@ journal/ 逐次追加式交接运行三天即暴露结构问题:6 份文件互�
 5. **机械兜底(C2 门禁,试行待验证)**:CI 扩至全分支 push(原仅 main,Codex 分支推送根本不触发 CI);新增 `tools/check-handoff-sync.py`——push 范围内动了 `skills/**` 或 `docs/decisions/**` 而未同批更新 `handoff.md` 即红。
 6. **发布一致性门禁(G④)**:lint 新增 marketplace↔tag 检查——marketplace.json 条目的 `ref` 必须是已存在的 git tag,且条目 `version` 与**该 tag 处**的 `metadata.version` 一致(不与工作树比,开发期不误红)。
 7. **验收标准(净减法)**:重构后每会话固定写入义务数不增——journal 义务被 handoff 义务 1:1 替代,台账仅有坑才写。
-8. **命名(纪律 A「文件命名规范」惯例查证)**:`lessons-learned` 为业界既定术语(postmortem=单次事故复盘,lessons learned=跨项目可复用经验沉淀,语义正合本表);`handoff.md` 用小写守 kebab-case——本仓大写文件名仅限平台/生态强制(CLAUDE/AGENTS/README/CHANGELOG),不自增例外。
+8. **命名(§12「文件命名规范」惯例查证)**:`lessons-learned` 为业界既定术语(postmortem=单次事故复盘,lessons learned=跨项目可复用经验沉淀,语义正合本表);`handoff.md` 用小写守 kebab-case——本仓大写文件名仅限平台/生态强制(CLAUDE/AGENTS/README/CHANGELOG),不自增例外。
 
 
 ## 证据(附来源,区分已证实/推断)

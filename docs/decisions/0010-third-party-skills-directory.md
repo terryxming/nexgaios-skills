@@ -7,14 +7,14 @@
 
 ## 背景
 
-用户会从 GitHub 等处下载第三方 skill,用于研究学习或安装进本机 agent 路径;跨机同步需求(纪律 C 铁律:需延续的状态必须进仓库)要求这些收藏入库。但 `skills/` 按 ADR-0008 是"发布单元"语义——main 上即可安装的已发布版,且八门禁(中文化兵底、杂物拦截、metadata.version 等)全为自产 skill 设计,第三方 skill 一进即红。研究收藏与发布单元混在同一语义目录,会污染"main = 可安装态"的承诺。
+用户会从 GitHub 等处下载第三方 skill,用于研究学习或安装进本机 agent 路径;跨机同步需求(§14 铁律:需延续的状态必须进仓库)要求这些收藏入库。但 `skills/` 按 ADR-0008 是"发布单元"语义——main 上即可安装的已发布版,且八门禁(中文化兵底、杂物拦截、metadata.version 等)全为自产 skill 设计,第三方 skill 一进即红。研究收藏与发布单元混在同一语义目录,会污染"main = 可安装态"的承诺。
 
 实施注记:初版误落为顶层 `third-party/` 与 `skills/` 并列,用户同日澄清本意为 **skills/ 内二分**,随即修正;本 ADR 记录修正后的终态。嵌套分类恰是官方惯例(见证据 3)。
 
 
 ## 决策
 
-1. **skills/ 内二分**:`skills/first-party/`(自主开发,发布单元)与 `skills/third-party/`(第三方**原样副本**,逐字节不改,保 diff 上游的能力)。`first-party` 是 `third-party` 的标准反义配对(纪律 A「文件命名规范」通用词);`skills/` 一级只允许这两个分类目录,lint 布局检查机械防呆(skill 落错层即红)。
+1. **skills/ 内二分**:`skills/first-party/`(自主开发,发布单元)与 `skills/third-party/`(第三方**原样副本**,逐字节不改,保 diff 上游的能力)。`first-party` 是 `third-party` 的标准反义配对(§12「文件命名规范」通用词);`skills/` 一级只允许这两个分类目录,lint 布局检查机械防呆(skill 落错层即红)。
 2. **门禁豁免**:桶一/桶二/桶三、G 发布门禁、中文化对 `skills/third-party/` 不适用;lint 路径 ASCII 检查排除该目录(第三方文件名不是本仓标识符)。
 3. **入库边界 = 再分发许可**:本仓公开,push 即再分发;有 MIT/Apache 等再分发许可才提交内容,无许可或不明的只在 `skills/third-party/sources.md` 记一行、内容留本机。
 4. **溯源清单** `skills/third-party/sources.md`:名称/来源/ref/取回日期/license/内容入库/备注,单文件置于目录顶层——不塞进副本内部,保持副本原样。含安全提醒(半信任内容,安装前通读)。
