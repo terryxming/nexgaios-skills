@@ -31,6 +31,7 @@ description: 创建新 skill、修改与改进现有 skill，并度量 skill 表
 
 明白了吗？很好。
 
+
 ## 与用户沟通
 
 skill 创建器可能被各种编程行话熟悉程度天差地别的人使用。你要是没听说过（也难怪，这股风潮很近才起来）：如今 Claude 的能力正激励着水管工打开自己的终端、让父母和祖父母去谷歌搜「怎么装 npm」。而另一方面，大部分用户大概还是相当熟悉计算机的。
@@ -74,7 +75,7 @@ skill 创建器可能被各种编程行话熟悉程度天差地别的人使用�
 
 #### skill 的解剖结构（Anatomy of a Skill）
 
-```
+```text
 skill-name/
 ├── SKILL.md (required)
 │   ├── YAML frontmatter (name, description required)
@@ -100,7 +101,7 @@ skill 采用三级加载系统：
 - 对于大的 reference 文件（>300 行），加一个目录（table of contents）
 
 **领域组织（Domain organization）**：当一个 skill 支持多个领域/框架时，按变体（variant）来组织：
-```
+```text
 cloud-deploy/
 ├── SKILL.md (workflow + selection)
 └── references/
@@ -162,6 +163,7 @@ Output: feat(auth): implement JWT-based authentication
 
 完整 schema（包括你之后才会补的 `assertions` 字段）见 `references/schemas.md`。
 
+
 ## 运行与评估测试用例
 
 本节是一段连续的序列——不要中途停下。**不要**使用 `/skill-test` 或任何其他测试类 skill。
@@ -174,7 +176,7 @@ Output: feat(auth): implement JWT-based authentication
 
 **With-skill run（挂 skill 的 run）：**
 
-```
+```text
 Execute this task:
 - Skill path: <path-to-skill>
 - Task: <eval prompt>

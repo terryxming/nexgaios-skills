@@ -4,6 +4,7 @@
 - 日期:2026-07-03
 - 决策人:terry（公司电脑）+ Claude
 
+
 ## 背景
 
 执行 W3（F 评测 runner）前，用户提出两个问题：①Claude 与 Codex **都内置了 skill-creator**，为何要自己造 new-skill 和评测 runner？②评测用例必须显式给用户过目，否则用户不知道用例是否贴近真实场景。

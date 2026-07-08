@@ -10,6 +10,7 @@ metadata:
 
 ADR-0012「失败回填闭环」原则（失败即用例）的 ob-notes 落地：真实使用中每个失败案例，先回填成 eval 用例、再改源码。本文件是捕获格式、暂存位置、转换流程与发布闸的唯一家。**普通使用者无需理会**：未配置 `dev_repo` 时本通道完全惰性。
 
+
 ## 何时启动
 
 用户在沉淀后（或之后的会话里）指出本次产出有问题并要求记录 / 回填——如「这次沉淀不对，回填用例」「这笔记有问题，记下来待修」。失败类型举例：呈现侧重误判、该留的确切细节被压、无问存档没引导好、误触发 / 漏触发、落点或格式违规。
@@ -51,14 +52,14 @@ ADR-0012「失败回填闭环」原则（失败即用例）的 ob-notes 落地�
 - `produced_note_excerpt` 原样摘录、不概括
 - 判断类字段（`scenario` / `suspected_rule` / `draft_assertion`）由 agent 组织。
 
-**只写这一个 JSON**，不动仓库其他文件、不 commit、不 push——留 dirty 状态即可，下次维护会话的开工巡检（纪律 C 跨设备协作，git 是否 clean）自然看见。
+**只写这一个 JSON**，不动仓库其他文件、不 commit、不 push——留 dirty 状态即可，下次维护会话的开工巡检（§14 跨设备协作，git 是否 clean）自然看见。
 
 跨机注意：pending 留在捕获机的工作区；要跨机处理，随该机下次常规收工 commit + push 带走。
 
 
 ## 回填：pending → evals.json（维护会话，人在环）
 
-1. 开工巡检（纪律 C 跨设备协作）发现 `evals/pending/` 有文件 → 逐个处理。
+1. 开工巡检（§14 跨设备协作）发现 `evals/pending/` 有文件 → 逐个处理。
 2. agent 读 pending JSON，起草正式 eval 条目（`prompt` / `expected_output` / `assertions`，格式同 `evals/evals.json` 既有条目）。
 3. **用户过目批准**（ADR-0012「失败回填闭环」：用例人在环，不许闷头自测）→ 追加进 `evals/evals.json`，删除对应 pending 文件。
 4. 记 dev-log（失败根因 + 是否引出源码修改），随正常流程 commit。

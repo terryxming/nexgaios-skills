@@ -10,6 +10,7 @@ metadata:
 
 本文件是所有笔记**格式细节**的唯一真相源。`distill` 引擎、三种呈现侧重（`presentation`）和铁律三、四都引用这里，不在别处重复定义。写任何笔记前**必读**本文件。
 
+
 ## 目录
 
 - [1. frontmatter-spec：frontmatter 字段规范](#fm)

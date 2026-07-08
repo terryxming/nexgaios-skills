@@ -2,6 +2,7 @@
 
 > 本文件每次收工**覆盖重写**（纪律 C 跨设备协作·收工），历史见 `git log -- handoff.md`，不另存副本。续工：先 `git pull`，读本文件 + `docs/decisions/`；切机器先跑纪律 C「开工」巡检。坑与经验的沉淀见 [docs/lessons-learned.md](docs/lessons-learned.md)（追加式，本文件不复述）。
 
+
 ## 当前状态
 
 分支 `ob-notes`。工程纪律与全仓 markdown 重构**全部完成并入库**（`d222cd8` + `61a612f`），**本地领先 `origin/ob-notes` 2 个 commit、未 push**。

@@ -11,6 +11,7 @@ tags: [状态/持续]
 > [!note] 交接说明
 > 本文件是 ob-notes 这个 skill 自身的维护日志的**索引**，属于仓库内开发记录，不代表 ob-notes 对外提供"写 dev-log"能力。它在一个 Claude 网页对话里设计成型，现由 Claude Code / Codex 接力维护。接手前请先读**本文件 + SKILL.md + references/maintenance.md**，历史决策 / 时间线 / 踩坑见下方分册，即可恢复全部设计上下文，无需原始对话记录。
 
+
 ## 项目意图
 
 做一个遵循 Agent Skills 开放标准、可被 Claude/Codex 等多 agent 通用的 skill，把人与 agent 对话中产生的高价值信息（决策、踩坑、知识点、方案取舍、研究结论、连续追问）按统一规范沉淀成结构化 Markdown 笔记，回写到 Obsidian 知识库。

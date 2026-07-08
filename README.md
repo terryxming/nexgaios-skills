@@ -2,6 +2,7 @@
 
 多 agent（Claude Code + Codex）的 **skill 生产流水线**：开发、测试、评测、发布、迭代一条龙。
 
+
 ## 为什么有这个仓库
 
 过去用单 skill 仓库开发，工程纪律、发布声明、评测等横切工作每次重写，维护累、效率低。本仓库把这些**只写一次**上提到流水线层，skill 目录里只放它独有的东西。
@@ -61,12 +62,12 @@ claude plugin install ob-notes@nexgaios-skills
 
 ## 协作运行手册（跨设备 · 跨 agent）
 
-规则本体常驻 [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)（纪律 C 跨设备协作），本节只做人读的操作指引。
+规则本体常驻 [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)（§14 跨设备协作），本节只做人读的操作指引。
 
 ### 机器与 agent
 
 - 两台 Windows 11 机器经 git/GitHub 接力开发，hostname 即机器识别：家用机 `TerryXming`、公司机 `CHINAMI-5T8IKFA`。铁律：一切需延续的状态**必须进仓库并 push**，git 是唯一同步通道。
-- 两个 agent 共用本仓：Claude Code 读 `CLAUDE.md`，Codex 读 `AGENTS.md`——工程纪律共享段逐字节一致（`tools/check-discipline-drift.py` 校验）。跨 agent 的平台断言不臆测，一律查官方文档（纪律 A 行为闸门）。
+- 两个 agent 共用本仓：Claude Code 读 `CLAUDE.md`，Codex 读 `AGENTS.md`——工程纪律共享段逐字节一致（`tools/check-discipline-drift.py` 校验）。跨 agent 的平台断言不臆测，一律查官方文档（§12 行为闸门）。
 
 ### 交接与续工
 
@@ -80,7 +81,7 @@ claude plugin install ob-notes@nexgaios-skills
 2. clone 本仓，`pip install -r tools/requirements.txt`（skills-ref，lint 依赖）。
 3. Codex 侧：`~/.codex/config.toml` 设 `project_doc_max_bytes = 131072`——纪律常驻超默认 32 KiB 上限，不设会被静默截断（见 ADR-0002）。
 4. 自用 skill 安装见上文「本地安装（自用）」；ob-notes 使用者另配 `~/.config/ob-notes/config.json` 指向本机知识库。
-5. 开工第一件事是纪律 C 跨设备协作（开工）巡检（agent 会自动跑并显式报结果）：git 状态与分支、工具链版本、Codex 上限、读 `handoff.md`。
+5. 开工第一件事是§14 跨设备协作（开工）巡检（agent 会自动跑并显式报结果）：git 状态与分支、工具链版本、Codex 上限、读 `handoff.md`。
 
 ### 环境自检
 

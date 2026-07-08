@@ -4,6 +4,7 @@
 - 日期:2026-07-03
 - 决策人:terry（公司电脑）+ Claude
 
+
 ## 背景
 
 ob-notes 迁入时，按 ADR-0005"skill 内不放 CHANGELOG.md"把 dev-log.md 与 CHANGELOG.md 外迁到 `docs/skill-logs/`。用户纠正：**每个 skill 是单一发布源（自治域），它的 dev-log、CHANGELOG 应留在该 skill 域内**。复盘发现原做法犯了概念错误——官方"skill 不含杂物"约束的真正对象是**分发给使用者的包**，不是**开发源**；把分发约束错套到源域上，代价是拆散 skill 的项目记忆（发现性差：迭代者不会想到去 docs/ 找 dev-log，ob-notes 自身"铁律五：先读 dev-log"也会落空）。
