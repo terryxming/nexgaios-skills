@@ -24,7 +24,7 @@
 
 ## 未决问题
 
-- **s11check 审查器仅存 scratchpad**：本会话的 §11 机械审查器（含新规「所有非一级标题空两行」+ frontmatter/锚点识别）在临时目录、未入仓；要长期化需落成 `tools/` 门禁，否则下次得重造。
+- **§11 机械审查器接门禁待议**：已落成 `tools/check-markdown-format.py`（standalone、可手动跑，含新规「所有非一级标题空两行」+ frontmatter/围栏识别）；接入 `lint.py`/CI 硬门禁尚需先设计"已裁决豁免"机制（锚点/无 H1 日志/生成物 `dependency-map`），否则会误红。
 - **旧纪律引用保留项**：`0004`「私有纪律 A5」、`0009:62`「纪律 B 条/A3/A5/C1-C4」是旧结构史实，有意保留、未转 §-编号。
 - **ob-notes**：逐字正文正向效果未 dogfood；`source-fidelity` 逐字处理 `[待定]`；`run_loop.py` 依赖 `claude -p` 嵌套鉴权坑；Codex 侧逐字全链路待实机。
 - pass^k 阈值、多 skill 触发互斥、ADR-0010 third-party 安装路径 —— 待首个第三方 skill。
