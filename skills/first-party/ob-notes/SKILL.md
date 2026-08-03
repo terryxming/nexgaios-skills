@@ -4,7 +4,7 @@ description: 把人与 agent 对话中产生的高价值信息（决策、踩坑
 metadata:
   version: 2.0.0
   provides: "mode-decision, iron-laws, trigger-rule"
-  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop"
+  depends_on: "kb-root, landing-rule, preflight-flow, signal-noise, evidence-chain, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop"
 ---
 
 # ob-notes — 对话价值写回 Obsidian
@@ -24,9 +24,9 @@ metadata:
 沉淀进度：
 - [ ] 1. 确认触发：用户显式要求沉淀 / 记录 / 回写；否则不动手
 - [ ] 2. 校验落点：按 preflight 确认 {kb_root} 与 Obsidian 入口存在、可写；不确定就停下问，绝不静默新建或退写当前目录
-- [ ] 3. 分离并逐字扣：按 distill 分离信号 / 噪音，正文从会话 transcript 逐字扣、不重写；有图片存进附件目录
-- [ ] 4. 按骨架产出：选一种呈现侧重（追问链 / 解法卡 / 主题网），写「30 秒读法综合头 + 逐字正文」
-- [ ] 5. 质量自检：按 quality-check 过六测（遗漏 / 重写 / 噪音 / 格式…），不合格先修正
+- [ ] 3. 建证据账本：按 distill 捕获来源、分离信号 / 噪音，逐条登记结论、来源轮次、来源时间、事件时间、可信度、保真级别与受保护原子
+- [ ] 4. 受证据约束地成文：选一种呈现侧重（追问链 / 解法卡 / 主题网）；显式问答实录逐字，其余忠实提炼，重要结论加来源脚注
+- [ ] 5. 漂移自检：按 quality-check 核对来源、受保护原子、语气强度、否定 / 条件 / 边界与核心问题，不合格先修正
 - [ ] 6. 落盘并回执：写入入口后，回一句笔记标题与落点路径
 ```
 
@@ -39,7 +39,7 @@ metadata:
 
 **铁律一·先校验，绝不写到不确定的地方。** 写盘前先按 `references/preflight.md` 校验环境。目标目录不存在时，停下来问用户，不静默新建、不退写当前目录——用户最大的恐惧不是「没沉淀」，而是「以为沉淀了、其实写丢或写错地方」。当前 agent 无写入能力时，不假装成功：把内容连同建议文件名（naming-rule）与落点路径一起贴出，让用户复制粘贴就能存对位置。
 
-**铁律二·正文一律逐字，禁止重写。** 三种笔记的正文都从会话 transcript 逐字扣出、再按内容编排，不把内容交给 LLM 重写——重写是又一次概率生成，会丢信息、掺幻觉、对不上当时真正说的。确切的命令、报错原文、数字、路径、版本号、配置片段因此天然一字不改。只在一处允许综合概括：30 秒读法综合头（导航用、明确标为摘要）；正文只许编排（挑块、排序、加小标题 / 双链），不许改写块内文字。完整方法见 `references/distill.md`（signal-noise / transcript-extract）；坏例见 `references/anti-patterns.md`；外部长文保真见 `distill.md` 的 source-fidelity（当前 `[待定]`）。
+**铁律二·结论可追溯，关键细节不漂移。** 先按 `references/distill.md` 建证据账本，再从账本成文。每条重要结论都加来源脚注，脚注带来源时间；来源没有时间就如实写「时间未记录」，绝不拿笔记生成时间冒充。用户决定与约束、命令、代码、配置、报错、数字、日期、版本、路径、字段 / API / 参数名，以及否定、条件、边界等受保护原子必须与来源一致。显式要求问答实录 / 不要压缩时，问与答按 `transcript-extract` 逐字保留；解法卡和主题网可以忠实提炼，但不得新增来源没有的事实、抬高确定性或丢掉限制条件。
 
 **铁律三·每条结论标可信度。** 对话可能出错：agent 会自信地说错，中途结论会被推翻。忠实记录而不甄别，等于把错误固化成带格式的「伪知识」，比不记更危险。给每条结论性内容标可信度；三档定义与标记格式见 `references/frontmatter-tags.md`（credibility-spec）。
 
@@ -51,8 +51,9 @@ metadata:
 这是核心动作，必读 `references/distill.md`（signal-noise）。按三条要点执行：
 
 1. **用判据挑信号**：对每段内容问一句「删掉它，一个没有这场对话记忆、不熟这个主题、但懂通用常识的人会不会看不懂」；受损即信号，留；不受损即噪音，滤。
-2. **问保真、答逐字**：原样保留用户的问；答一律从会话 transcript 逐字扣、不重写（transcript-extract）。三种呈现都是逐字块，差别只在怎么编排。
-3. **操作留结果不留过程**：工具执行、「我去查一下」这类操作旁白是噪音，滤掉；只留构成认知锚点的结果（报错原文、实测数字、跑了才发现的事实）。
+2. **先建证据账本再成文**：给每条候选结论登记来源轮次、来源时间、事件时间、可信度、保真级别和受保护原子；账本只在内部使用，不写进用户笔记。
+3. **按用途选择保真级别**：显式问答实录按 `transcript-extract` 逐字；解法卡和主题网允许忠实提炼，但受保护原子必须原样，重要结论必须能由来源脚注直接支撑。
+4. **操作留结果不留过程**：默认把工具执行、「我去查一下」这类操作旁白当噪音滤掉，只留构成认知锚点的结果（报错原文、实测数字、跑了才发现的事实）；但用户明确要求完整逐字、原样保留时，操作旁白也是原回答的一部分，不得删。
 
 当材料是未消化的顺手存档（没有问、只想存档）时，不归本 skill：点明分工，引导到剪藏 / 稍后读工具。
 
@@ -81,15 +82,16 @@ metadata:
 每篇笔记都是同一骨架，与呈现侧重无关：
 
 1. **frontmatter**：字段与三轴 tag 按 `references/frontmatter-tags.md`；文件名 = 标题，正文不写 H1。
-2. **30 秒读法综合头**：全篇唯一允许综合概括处，六栏——是什么 / 背景 / 解决什么 / 最重要结论（1–3 条，带可信度）/ 怎么用 / 前置；主题网另加「边界」。
-3. **逐字正文**：从 transcript 扣出的逐字块，按呈现侧重编排（追问链逐轮 / 解法卡现象·根因·解法 / 主题网内容结构），只编排不重写。
+2. **30 秒读法综合头**：六栏——是什么 / 背景 / 解决什么 / 最重要结论（1–3 条，带可信度与来源脚注）/ 怎么用 / 前置；主题网另加「边界」。
+3. **结构化正文**：追问链逐轮逐字；解法卡按现象·根因·解法忠实提炼；主题网按内容结构整合。三者都保留受保护原子，并给重要结论加来源脚注。
+4. **来源脚注**：脚注给出来源时间、对话轮次与足以支撑结论的证据片段；事件本身另有明确发生时间时，在正文保留事件时间。
 
 确切骨架与清单见 `references/presentation.md`，本节只声明不变量、不复述骨架。
 
 
 ## 写盘与自检
 
-- **写盘前自检**：按 `references/quality-check.md`（quality-rubric）过六测——30 秒阅读 / 信号噪音 / 证据 / 复用 / 格式合规，主题网另加掌握测试；不合格先修正再写。
+- **写盘前自检**：按 `references/quality-check.md`（quality-rubric）检查 30 秒阅读、信号噪音、证据漂移、复用与格式，主题网另加掌握测试；不合格先修正再写。
 - **定落点写盘**：按 `references/preflight.md`（landing-rule）投递到 Obsidian 入口；校验未过按铁律一停下问。
 - **写盘后回执**：告诉用户沉淀成功、笔记标题与落点路径，让他知道东西落哪了、能去看——这是基本反馈，不是回访监控。
 
@@ -108,21 +110,21 @@ metadata:
 - **无写入能力**：不假装成功——把笔记内容连同建议文件名与落点路径完整贴出，让用户手存（铁律一）。
 - **非触发场景**：当用户只要解释 / 讨论 / 草稿 / README / 代码注释 / 项目 dev-log 时，不用本 skill（见「触发·边界排除」）。
 - **无问的顺手存档**：未消化、只想存档的材料不归本 skill；点明分工，引导到剪藏 / 稍后读工具。
-- **transcript 扣取不可用**：会话记录读不到、或跨文件回溯未通（如 Codex 侧 rollout schema 待验）时，如实说明该侧降级为 agent 转述、不冒充逐字。
+- **来源不可完整取得**：会话记录读不到、或跨文件回溯未通（如 Codex 侧 rollout schema 待验）时，如实标出缺失范围；显式逐字模式无法取得原文就停下来索要材料，不拿 agent 记忆冒充原话。综合模式只使用当前可核对的来源，缺证据的结论不落盘。
 
 
 ## 引用文件（按需读，各注明时机）
 
 - `references/preflight.md` — **每次写盘前必读**：`{kb_root}` 读取、Obsidian 入口落点、存在 / 可写校验、跨 OS 路径归一。
-- `references/distill.md` — **第一步必读**：信号 / 噪音分离引擎（判据 + 逐字扣 transcript-extract + 「重写 vs 编排」界线 + 操作留结果不留过程），含外部材料原文保真（source-fidelity，当前 `[待定]`）。
-- `references/presentation.md` — **定呈现侧重后读**：追问链 / 解法卡骨架、主题网放手写法与掌握视角（mastery-lens）。
-- `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
+- `references/distill.md` — **第一步必读**：信号 / 噪音分离、证据账本、受保护原子、忠实提炼与逐字模式，含外部材料原文保真（source-fidelity，当前 `[待定]`）。
+- `references/presentation.md` — **定呈现侧重后读**：追问链逐字骨架、解法卡与主题网的证据约束提炼，以及掌握视角（mastery-lens）。
+- `references/frontmatter-tags.md` — **写任何笔记前必读**：frontmatter 规范、三轴 tag、可信度标记、来源脚注时间、日期 / 过时标注、双链 / callout、命名（文件名 = 标题）、排版规约（layout-rule）。
 - `references/anti-patterns.md` — **分离噪音时对照**：各类坏笔记的坏例与改写。
 - `references/quality-check.md` — **写盘前自查**：六测 + 主题网掌握测试，不合格先修正。
 
 **脚本（`scripts/`，按需运行，不加载进上下文）：**
 
-- `scripts/extract_transcript.py` — 逐字扣的机械实现：需要从会话 jsonl 扣原话时运行（纯只读、不碰用户库）；扣什么、滤什么见 `distill.md` 的 transcript-extract。
+- `scripts/extract_transcript.py` — 显式逐字模式的机械实现：需要从会话 jsonl 扣原话时运行（纯只读、不碰用户库）；扣什么、滤什么见 `distill.md` 的 transcript-extract。
 - `scripts/build_depmap.py` — **仅维护者**：改本 skill 文件后重跑，刷新依赖图；沉淀笔记时无需理会。
 
 

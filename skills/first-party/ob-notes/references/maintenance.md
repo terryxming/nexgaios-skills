@@ -1,7 +1,7 @@
 ---
 name: maintenance
 metadata:
-  version: 1.4.0
+  version: 2.0.0
   provides: [controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry]
   depends_on: []
 ---
@@ -54,13 +54,14 @@ metadata:
 | `mode-decision` | 呈现侧重判定：消化后按“未来复用什么”选追问链/解法卡/主题网 | SKILL.md |
 | `iron-laws` | 铁律本身 | SKILL.md |
 | `trigger-rule` | 触发方式与边界排除 | SKILL.md |
-| `signal-noise` | 信号/噪音分离引擎：三限定判据 + 正文逐字（重写 vs 编排界线）+ 操作留结果不留过程 | distill.md |
-| `transcript-extract` | 所有正文从会话 transcript 逐字扣：结构层保留/滤除 + 操作旁白也滤 + 图片保留 + 跨文件回溯；脚本 extract_transcript.py 为其实现 | distill.md |
+| `signal-noise` | 信号/噪音分离引擎：三限定判据 + 操作留结果不留过程 | distill.md |
+| `evidence-chain` | 证据约束的忠实提炼：内部证据账本、保真级别、受保护原子、来源时间与漂移边界 | distill.md |
+| `transcript-extract` | 显式逐字模式从会话 transcript 扣原话：结构层保留/滤除 + 完整逐字时保留操作旁白 + 图片保留 + 跨文件回溯；脚本 extract_transcript.py 为其实现 | distill.md |
 | `source-fidelity` | 引用外部材料时的原文保真：结构覆盖，防长文压成观点卡 | distill.md |
-| `presentation-modes` | 三种呈现侧重（均综合头 + 逐字正文）：追问链/解法卡按骨架编排逐字块 + 主题网内容主导编排 | presentation.md |
-| `mastery-lens` | 主题网的掌握视角：写前自问 + 用挑块/编排体现掌握（不自己写讲解顶替、不做章节） | presentation.md |
+| `presentation-modes` | 三种呈现侧重：追问链逐字；解法卡按骨架忠实提炼；主题网按内容结构忠实整合 | presentation.md |
+| `mastery-lens` | 主题网的掌握视角：写前自问 + 用取证与组织体现掌握（不补造答案、不做章节） | presentation.md |
 | `anti-patterns` | 坏例库与改写策略（各类坏笔记，逐条见 anti-patterns） | anti-patterns.md |
-| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据/复用 + 主题网掌握测试） | quality-check.md |
+| `quality-rubric` | 写盘前单篇质量自检量表（30秒阅读/信号噪音/证据漂移/复用/格式 + 主题网掌握测试） | quality-check.md |
 | `feedback-loop` | 失败案例回填闭环：捕获格式、pending 暂存、转换流程与发布闸（仅维护者） | feedback.md |
 | `controlled-vocab` | 受控词表本身（本表第 2 节） | maintenance.md |
 | `dependency-spec` | 依赖声明规范（第 3 节） | maintenance.md |
@@ -74,7 +75,7 @@ metadata:
 - `anti-patterns` 只给坏例与改写方向，**不重新定义**可信度/日期/双链等规则；命中处一律按各自唯一家（如 credibility-spec）处理。
 - `mastery-lens`（主题网**写作时**的思考纪律：写前自问、让掌握从字里行间透出）vs `quality-rubric` 的掌握测试（**写盘前**检验掌握有没有透出来）——前者写时心法、后者写后判据，时机不同，不重复。
 - `layout-rule`（markdown 元素用途的**正面规约**）vs `anti-patterns` 第 5 条格式炫技（**坏例**）——正例与坏例互补；callout / 双链 / 代码块细节仍归 `linking-convention`，`layout-rule` 不重定义。
-- `signal-noise`（判断层：什么进正文 + 「重写 vs 编排」的界线）vs `transcript-extract`（执行层：逐字扣的机械规则，怎么把原话原样扣出）——前者判该留什么、后者管怎么扣，互补不重叠；两者对三种呈现一视同仁，不再按呈现分流。
+- `signal-noise`（判断层：什么进正文）vs `evidence-chain`（约束层：结论如何绑定来源、哪些信息不可漂移）vs `transcript-extract`（执行层：显式逐字模式如何扣原话）——三者分别管取舍、约束与机械提取，互补不重叠。
 
 
 <a id="2"></a>

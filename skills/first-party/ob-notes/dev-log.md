@@ -1,7 +1,7 @@
 ---
 title: ob-notes 开发日志
 date: 2026-06-26
-updated: 2026-07-07
+updated: 2026-08-03
 source: claude (网页对话) / 交接给 Claude Code 续做
 tags: [状态/持续]
 ---
@@ -32,11 +32,11 @@ tags: [状态/持续]
 
 ## 当前状态 / 下一步（覆盖更新）
 
-- 现状：**v2.0.0 候选**（架构再翻转：三种呈现正文一律逐字，宿主 ADR-0014，扩展 0013 作用域）。把 1.0.0 的「主题网/解法卡答重写」翻成「三种呈现统一为 综合头 + 逐字正文、只编排不重写」；立「重写 vs 编排」界线（块内逐字、块间自由）；30 秒读法加"背景"字段并统一套到解法卡；`mastery-lens` 转"挑块/编排体现掌握"；`source-fidelity` 标 `[待定]` 保留原设计。已改：distill/presentation/SKILL/quality-check/maintenance（含版本 bump）+ evals（id6 翻转为 `topic-web-verbatim-organized`、id1 补 30 秒读法/逐字断言）+ 新增 `evals/README.md` 评测规则 + ADR-0014 + CHANGELOG [2.0.0]；dev-log 按单一事实源拆为 `dev-log/` 三分册。当前改动在分支 `ob-notes`，待评测与发布门禁完成才合 main 打 tag `ob-notes/v2.0.0`。
+- 现状：**v2.0.0 候选**（核心改为可追溯的忠实提炼，宿主 ADR-0015，取代 ADR-0014）。显式问答实录继续逐字；解法卡 / 主题网允许忠实提炼。新增内部证据账本、受保护原子、来源时间 / 事件时间区分、重要结论来源脚注与写盘前漂移检查。已同步 SKILL / distill / presentation / quality-check / frontmatter-tags / maintenance / evals / CHANGELOG / ADR；外部长文 source-fidelity、Codex transcript、compaction 回溯等不在本轮范围。当前改动在分支 `ob-notes`，待用户过目 evals、行为评测与发布门禁完成后才合 main 打 tag `ob-notes/v2.0.0`。
 - 下一步：
-  1. **evals 用户过目后跑**：id6/id1 改动及追问链两条，需用户确认贴近真实场景（ADR-0012）再跑 with-skill vs baseline(v1.0.0)。
+  1. **evals 用户过目后跑**：七条用例已按证据链与时间重写，需用户确认贴近真实场景（ADR-0012）再跑 with-skill vs baseline(v1.0.0)。
   2. **跑门禁**：`build_depmap.py` 重生成、宿主 `lint.py` 全绿（已含 `dev-log/` 豁免）。
-  3. **补 dogfood**：主题网逐字块编排的深度成色 n=0，用 CRDT/AWS 类多轮素材实测；解法卡纯逐字是否够扫读也要验。
+  3. **补 dogfood**：用真实多轮素材验证主题网综合后的漂移率与解法卡扫读性，重点查确定性、否定 / 条件 / 边界和来源时间。
   4. **source-fidelity 待定项**：外部长文在逐字架构下怎么处理，单独找用户拍板后重构。
   5. 达标后合 main 打 tag `ob-notes/v2.0.0`。
 - 卡点：无。

@@ -10,20 +10,20 @@
 | 文件 | provides | depends_on |
 |---|---|---|
 | `CHANGELOG.md` | — | — |
-| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, signal-noise, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop |
+| `SKILL.md` | mode-decision, iron-laws, trigger-rule | kb-root, landing-rule, preflight-flow, signal-noise, evidence-chain, transcript-extract, presentation-modes, source-fidelity, credibility-spec, tag-system, frontmatter-spec, naming-rule, datestamp-rule, anti-patterns, quality-rubric, mastery-lens, layout-rule, maintenance-flow, feedback-loop |
 | `dev-log.md` | — | — |
 | `dev-log/decisions.md` | — | — |
 | `dev-log/pitfalls.md` | — | — |
 | `dev-log/timeline.md` | — | — |
 | `evals/README.md` | — | — |
 | `references/anti-patterns.md` | anti-patterns | credibility-spec |
-| `references/distill.md` | signal-noise, source-fidelity, transcript-extract | credibility-spec, anti-patterns |
+| `references/distill.md` | signal-noise, evidence-chain, source-fidelity, transcript-extract | credibility-spec, linking-convention, anti-patterns |
 | `references/feedback.md` | feedback-loop | — |
 | `references/frontmatter-tags.md` | credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule, layout-rule | — |
 | `references/maintenance.md` | controlled-vocab, dependency-spec, version-rule, maintenance-flow, ssot-registry | — |
 | `references/preflight.md` | kb-root, landing-rule, preflight-flow, path-normalize | — |
-| `references/presentation.md` | presentation-modes, mastery-lens | transcript-extract, source-fidelity, credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
-| `references/quality-check.md` | quality-rubric | signal-noise, anti-patterns, credibility-spec, source-fidelity, mastery-lens |
+| `references/presentation.md` | presentation-modes, mastery-lens | evidence-chain, transcript-extract, source-fidelity, credibility-spec, tag-system, frontmatter-spec, linking-convention, naming-rule, datestamp-rule |
+| `references/quality-check.md` | quality-rubric | signal-noise, evidence-chain, anti-patterns, credibility-spec, source-fidelity, mastery-lens, linking-convention |
 | `scripts/build_depmap.py` | — | dependency-spec, controlled-vocab, ssot-registry |
 | `scripts/extract_transcript.py` | — | transcript-extract |
 
@@ -36,13 +36,14 @@
 | `credibility-spec` | `references/frontmatter-tags.md` | `references/anti-patterns.md`, `references/distill.md`, `references/presentation.md`, `references/quality-check.md`, `SKILL.md` |
 | `datestamp-rule` | `references/frontmatter-tags.md` | `references/presentation.md`, `SKILL.md` |
 | `dependency-spec` | `references/maintenance.md` | `scripts/build_depmap.py` |
+| `evidence-chain` | `references/distill.md` | `references/presentation.md`, `references/quality-check.md`, `SKILL.md` |
 | `feedback-loop` | `references/feedback.md` | `SKILL.md` |
 | `frontmatter-spec` | `references/frontmatter-tags.md` | `references/presentation.md`, `SKILL.md` |
 | `iron-laws` | `SKILL.md` | — |
 | `kb-root` | `references/preflight.md` | `SKILL.md` |
 | `landing-rule` | `references/preflight.md` | `SKILL.md` |
 | `layout-rule` | `references/frontmatter-tags.md` | `SKILL.md` |
-| `linking-convention` | `references/frontmatter-tags.md` | `references/presentation.md` |
+| `linking-convention` | `references/frontmatter-tags.md` | `references/distill.md`, `references/presentation.md`, `references/quality-check.md` |
 | `maintenance-flow` | `references/maintenance.md` | `SKILL.md` |
 | `mastery-lens` | `references/presentation.md` | `references/quality-check.md`, `SKILL.md` |
 | `mode-decision` | `SKILL.md` | — |

@@ -33,21 +33,24 @@
 
 | 用例 | 主测 | 对应规则 |
 |---|---|---|
-| `solution-card-exact-details` | 解法卡：30 秒读法 + 现象·根因·解法逐字块 + 确切细节 | iron-laws 二、presentation-modes、transcript-extract |
-| `project-decision-to-obsidian-only` | 只写 Obsidian、不碰项目 dev-log；确切数字保留 | trigger-rule、landing-rule、iron-laws 二 |
+| `solution-card-protected-atoms-and-sources` | 解法卡：忠实提炼 + 受保护原子 + 可信度 + 带时间的来源脚注 | iron-laws 二、evidence-chain、presentation-modes |
+| `project-decision-to-obsidian-only` | 只写 Obsidian、不碰项目 dev-log；区分来源时间与事件时间 | trigger-rule、landing-rule、evidence-chain |
 | `iron-law-1-halt-on-unverified-target` | kb_root 不确定即停问、不静默写盘、不假装成功 | iron-laws 一、preflight-flow |
-| `dialogue-transcript-preserve-questions` | 追问链：三轮问原文保留、答逐字不改讲解体、每轮总纲 | transcript-extract、presentation-modes |
-| `verbatim-extract-no-compress` | 追问链：对比表/确切结论逐字、操作旁白滤除 | transcript-extract、signal-noise ③ |
-| `topic-web-verbatim-organized` | 主题网：逐字块按内容编排、不重写、不留问答形态 | presentation-modes、transcript-extract、signal-noise ② |
+| `dialogue-transcript-preserve-questions` | 追问链：三轮问答逐字、每轮来源时间与总纲脚注 | transcript-extract、presentation-modes、evidence-chain |
+| `verbatim-extract-no-compress` | 显式逐字模式：对比表、确切结论与操作旁白均原样保留 | transcript-extract、signal-noise |
+| `topic-web-evidence-grounded-synthesis` | 主题网：证据约束的综合讲解、受保护原子与带时间脚注 | presentation-modes、evidence-chain |
+| `no-strengthening-or-boundary-loss` | 漂移控制：不升级确定性、不丢否定/条件/边界 | evidence-chain、quality-rubric |
 
 
-## 架构翻转（v2.0.0）后的用例状态
+## 证据约束重构（v2.0.0 候选）后的用例状态
 
-v2.0.0 把「主题网/解法卡答重写」翻成「三种呈现正文一律逐字、只编排不重写」（宿主 ADR-0014）。连带用例改动：
+v2.0.0 候选改为「可追溯的忠实提炼」：显式问答实录逐字，解法卡 / 主题网忠实综合；通用防漂移机制是内部证据账本、受保护原子、可信度与带来源时间的脚注（宿主 ADR-0015）。连带用例改动：
 
-- `topic-web-still-rewrites` → 更名 `topic-web-verbatim-organized`，断言从「综合重写」翻为「逐字块按内容编排、不重写」，prompt 改为真实多轮 transcript（原为内容摘要，逐字扣无从谈起）。
-- `solution-card-exact-details` 补两条断言：30 秒读法综合头齐全、正文逐字块编排不重写。
-- 追问链两条（id 4/5）本就测逐字，与新契约一致，不动。
+- `solution-card-exact-details` → `solution-card-protected-atoms-and-sources`，从全文逐字改测受保护原子、确定性与来源脚注。
+- `topic-web-verbatim-organized` → `topic-web-evidence-grounded-synthesis`，改测跨轮综合后事实、条件与来源仍不漂移。
+- 追问链两条继续测显式逐字，并补来源时间与脚注断言。
+- 新增 `no-strengthening-or-boundary-loss`，专测「可能」不变「一定」、条件与否定不丢。
+- 所有含事实来源的执行用例都补对话时间；事件时间另给时，断言两者不得混淆。
 
 
 ## 怎么跑

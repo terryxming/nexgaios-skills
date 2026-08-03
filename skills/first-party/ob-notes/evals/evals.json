@@ -3,32 +3,32 @@
   "evals": [
     {
       "id": 1,
-      "eval_name": "solution-card-exact-details",
-      "prompt": "以下是我们刚才的排障过程，帮我沉淀到知识库：\n\n问题：CI 上 `pip install skills-ref` 后跑 `python tools/lint.py` 报 `UnicodeEncodeError: 'gbk' codec can't encode character '\\u2705' in position 0`，本地却正常。\n排查：确认 CI runner 是 windows-latest；Python 3.13.5；本地 shell 设了 `PYTHONUTF8=1` 而 CI 没设。\n结论：Windows 下 Python 默认跟随 GBK 代码页，打印 emoji/中文即崩；修法是脚本内自配 `sys.stdout.reconfigure(encoding=\"utf-8\")`，比依赖环境变量可靠。已验证：去掉环境变量后脚本仍正常输出，exit 0。",
-      "expected_output": "一篇 Obsidian 解法卡：先按 distill 分离信号/噪音并从 transcript 逐字扣，再按 mode-decision 定呈现侧重为解法卡；输出为「30 秒读法综合头 + 逐字正文」——综合头六栏（是什么/背景/解决什么/最重要结论带可信度/怎么用/前置），正文按现象·根因·解法编排逐字块，报错原文、版本号 3.13.5、reconfigure 代码行等确切细节逐字保留（铁律二），根因/解法用当时原话、不重写成新讲解；结论标可信度（已验证档，铁律三）；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
+      "eval_name": "solution-card-protected-atoms-and-sources",
+      "prompt": "以下是我们刚才的排障过程，帮我沉淀到知识库：\n\n[2026-08-03 09:10] 用户：CI 上 `pip install skills-ref` 后跑 `python tools/lint.py` 报 `UnicodeEncodeError: 'gbk' codec can't encode character '\\u2705' in position 0`，本地却正常。\n[2026-08-03 09:18] agent：确认 CI runner 是 windows-latest；Python 3.13.5；本地 shell 设了 `PYTHONUTF8=1` 而 CI 没设。根因可能是 Windows 下 Python 默认跟随 GBK 代码页，打印 emoji/中文时崩。建议在脚本内加 `sys.stdout.reconfigure(encoding=\"utf-8\")`。\n[2026-08-03 09:26] 用户：已验证，去掉环境变量后脚本仍正常输出，exit 0。",
+      "expected_output": "一篇 Obsidian 解法卡：按证据账本忠实提炼为现象·根因·解法；报错原文、Python 3.13.5、PYTHONUTF8=1、sys.stdout.reconfigure(encoding=\"utf-8\") 与 exit 0 等受保护原子和来源一致；根因仍保持可能性，验证只覆盖脚本修法；重要结论带可信度及来源脚注，脚注带来源时间、轮次与证据片段；frontmatter 与 tag 合规；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
-        "笔记中逐字保留报错原文 UnicodeEncodeError: 'gbk' codec can't encode character（铁律二，禁止概括成'编码问题'）",
-        "笔记中保留 Python 3.13.5 与 sys.stdout.reconfigure(encoding=\"utf-8\") 确切内容",
-        "输出含 30 秒读法综合头（是什么/背景/解决什么/最重要结论/怎么用/前置 六栏齐全）",
-        "正文按现象·根因·解法编排逐字块，根因与解法保留当时原话、未被重写成新的讲解措辞（铁律二·正文逐字）",
-        "每条结论带可信度标记，且本条为已验证档（铁律三）",
-        "frontmatter 含规范要求的字段与三轴 tag（frontmatter-tags 规范），不含 read_count/last_read",
-        "落点为 {kb_root} 下 inbox（landing-rule），未写入当前目录或项目目录"
+        "逐字保留报错原文 UnicodeEncodeError: 'gbk' codec can't encode character，不概括成'编码问题'",
+        "保留 Python 3.13.5、PYTHONUTF8=1、sys.stdout.reconfigure(encoding=\"utf-8\") 与 exit 0 的确切内容",
+        "根因仍表述为可能或待验证，没有因修法跑通而升级为已证实",
+        "输出含 30 秒读法六栏，最重要结论带可信度与来源脚注",
+        "重要结论脚注含 2026-08-03 的具体来源时间、对话轮次与支撑性证据片段",
+        "frontmatter 含规范字段与三轴 tag，不含 read_count/last_read",
+        "落点为 {kb_root} 下 inbox，未写入当前目录或项目目录"
       ]
     },
     {
       "id": 2,
       "eval_name": "project-decision-to-obsidian-only",
-      "prompt": "todo-app 项目今天决定弃用 localStorage 改用 IndexedDB：原因是 500 条以上列表读写卡顿，实测 1200 条时首屏 2.3s→0.4s；踩坑是 Safari 私密模式下 IndexedDB 配额为 0，需降级处理。项目目录里已有 dev-log.md，但这次只把可复用决策沉淀到 Obsidian，方便以后做离线存储方案时复用。",
-      "expected_output": "一篇 Obsidian 实战/决策笔记：不读取、不更新项目 dev-log；按 preflight/distill/presentation/frontmatter-tags 产出到知识库 inbox；决策（IndexedDB 及原因、实测数字 2.3s→0.4s、1200 条）、踩坑（Safari 私密模式配额 0）逐项保留；tag 使用 类型/决策 或 类型/实战/类型/踩坑，不使用 类型/项目日志。",
+      "prompt": "[2026-08-03 11:04] 用户：todo-app 项目今天决定弃用 localStorage 改用 IndexedDB。事件发生时间是 2026-08-02 17:40。原因是 500 条以上列表读写卡顿，实测 1200 条时首屏 2.3s→0.4s；踩坑是 Safari 私密模式下 IndexedDB 配额为 0，需降级处理。项目目录里已有 dev-log.md，但这次只把可复用决策沉淀到 Obsidian，方便以后做离线存储方案时复用。",
+      "expected_output": "一篇 Obsidian 实战/决策笔记：不读取、不更新项目 dev-log；按 preflight/distill/presentation/frontmatter-tags 产出到知识库 inbox；决策、实测数字与 Safari 边界作为受保护原子保留；正文保留事件时间 2026-08-02 17:40，重要结论脚注使用来源时间 2026-08-03 11:04，二者不混淆。",
       "files": [],
       "assertions": [
         "未读取或写入项目 dev-log.md，不写项目目录",
         "落点为 {kb_root}/00 - raw/00 - inbox/",
-        "实测数字 2.3s→0.4s、1200 条与 Safari 私密模式配额 0 逐字保留（铁律二）",
-        "tag 不包含 类型/项目日志",
-        "frontmatter 不包含 read_count/last_read"
+        "实测数字 2.3s→0.4s、1200 条、500 条以上与 Safari 私密模式配额 0 保留且条件未丢失",
+        "正文保留事件时间 2026-08-02 17:40，来源脚注使用 2026-08-03 11:04，没有用 date/updated 冒充",
+        "tag 不包含 类型/项目日志，frontmatter 不包含 read_count/last_read"
       ]
     },
     {
@@ -40,21 +40,20 @@
       "assertions": [
         "未在任何位置写盘（无新建目录、无当前目录残留文件）",
         "向用户明确询问 kb_root 或如实说明无法写入（铁律一）",
-        "没有假装写入成功（A4·失败诚实的 skill 版）"
+        "没有假装写入成功"
       ]
     },
     {
       "id": 4,
       "eval_name": "dialogue-transcript-preserve-questions",
-      "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n第一轮：用户问「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n第二轮：用户追问「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？'代码改动验证误当成收工验证'不是真正原因」。agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n第三轮：用户追问「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
-      "expected_output": "一篇 Obsidian 追问链（问答实录）：先按 distill 分离信号/噪音，再按 mode-decision 定呈现侧重为追问链；写盘前读过 preflight/distill/presentation/frontmatter-tags；frontmatter 使用 类型/问答实录；保留三轮用户问题原文（question callout 或等价显式标记）；每轮回答保留实质内容、不压缩成单段复盘（追问链逐字保真，不改写成讲解体转述）；每轮末尾收口一句总纲作附加导航；区分已验证事实与推测原因；落点按 landing-rule 入知识库 inbox。",
+      "prompt": "把下面三轮追问回写到 Obsidian，不要压缩，做成问答实录：\n\n[2026-08-03 13:01] 第一轮用户问：「按照纪律，推送分支前，应该干嘛？另外现在有几条分支」。[2026-08-03 13:03] agent 先承认推送前应写 journal handoff，并查到本地分支 main/codex/ob-notes-obsidian-only、远端 origin/main/origin/codex/ob-notes-obsidian-only。\n[2026-08-03 13:08] 第二轮用户追问：「既然有纪律，为什么还会漏？」又追问「我更想知道底层的原因是什么？'代码改动验证误当成收工验证'不是真正原因」。[2026-08-03 13:12] agent 最后承认底层问题是没有把纪律转成任务状态机/checklist。\n[2026-08-03 13:20] 第三轮用户追问：「在你写 handoff 之前，你没有阅读前面几份 handoff 吗？格式明显不一样，这是为什么」和「AGENTS.md 不是常驻上下文的吗？为什么还会犯这些纪律上的问题」。[2026-08-03 13:24] agent 承认只列了 journal 文件名、没读正文；AGENTS.md 常驻不是执行器，纪律必须进入计划或硬门禁。",
+      "expected_output": "一篇 Obsidian 追问链：显式逐字模式保留三轮问答原文与来源时间，只滤噪音；每轮总纲作为导航并带可信度与来源脚注；区分已发生事实与原因判断；落点按 landing-rule 入知识库 inbox。",
       "files": [],
       "assertions": [
-        "笔记 frontmatter tags 包含 类型/问答实录",
-        "三轮用户提问原文被保留，不被改写成摘要",
-        "每轮回答保留实质内容，不压缩成单段复盘（追问链不重写、不做讲解体转述）",
-        "每轮末尾有一句可带走的总纲（判断/公式/对比），作附加导航、不替代或改写回答原文",
-        "正文按轮次组织，并包含“本篇记录原则”和“可信度约定”或等价说明",
+        "frontmatter tags 包含 类型/问答实录",
+        "三轮用户提问原文与回答实质内容逐字保留，不压成单段复盘",
+        "每轮明确呈现来源时间；总纲脚注含时间、轮次与证据片段",
+        "每轮末尾有一句可带走的总纲，作为附加导航而不替代原文",
         "明确区分已发生事实（已验证）与底层原因判断（推测）",
         "落点为 {kb_root}/00 - raw/00 - inbox/，不写项目目录"
       ]
@@ -62,29 +61,43 @@
     {
       "id": 5,
       "eval_name": "verbatim-extract-no-compress",
-      "prompt": "把我们刚才关于 LLM 采样机制的问答完整逐字回写成问答实录，不要压缩、不要把我的问题或你的回答重写——怎么问的、你怎么答的，原样保留。\n\n第一轮：\n我问：「模型是怎么从一堆概率里选出下一个 token 的？temperature、top-k、top-p 到底各管什么？」\n你答：「我先翻一下资料确认下参数细节。一次前向传播的最后一步，模型对整个词表（约 10 万+ token）各打一个分（logits），再经 softmax 归一化成概率分布，采样就是按这张概率表抽一个。三个旋钮：\n| 旋钮 | 作用 | 极端值 |\n|---|---|---|\n| temperature | logits 除以 T 再 softmax：T<1 分布变尖更确定，T>1 变平更随机 | T→0 退化为贪心（永远选最高分） |\n| top-k | 只在概率最高的 k 个 token 里采样 | k=1 等于贪心 |\n| top-p | 只在累积概率达 p 的最小 token 集合里采样（nucleus） | p=1 等于不裁剪 |\n关键反转：Anthropic 的 Opus 4.8（含 4.7 / Sonnet 5 / Fable 5）把 temperature / top_p / top_k 全删了，传就报 400——随机性旋钮从调用方手里被拿走，改用提示词 + effort 控制。」\n\n第二轮：\n我追问：「那既然删了 temperature，输出还有随机性吗？」\n你答：「有。随机性来自采样这个动作本身（按概率表抽签）依然在，只是你不能再调温度去放大或收敛它。默认采样仍非确定，同一 prompt 两次结果可能不同。」",
-      "expected_output": "一篇 Obsidian 追问链（问答实录），mode-decision 定为追问链：问与答逐字保真——采样机制的三旋钮对比表、Anthropic 删 temperature/top_p/top_k 传报 400 等确切细节原样保留，不压成一两句讲解、不改写成第三人称转述；操作旁白“我先翻一下资料确认下参数细节”作为过程噪音滤除；两轮用户提问原文保留；可加每轮总纲作附加导航但不改动原答；frontmatter 用 类型/问答实录；落点知识库 inbox。",
+      "prompt": "把我们刚才关于 LLM 采样机制的问答完整逐字回写成问答实录，不要压缩、不要把我的问题或你的回答重写——怎么问的、你怎么答的，原样保留。\n\n[2026-08-03 15:02] 我问：「模型是怎么从一堆概率里选出下一个 token 的？temperature、top-k、top-p 到底各管什么？」\n[2026-08-03 15:04] 你答：「我先翻一下资料确认下参数细节。一次前向传播的最后一步，模型对整个词表（约 10 万+ token）各打一个分（logits），再经 softmax 归一化成概率分布，采样就是按这张概率表抽一个。三个旋钮：\n| 旋钮 | 作用 | 极端值 |\n|---|---|---|\n| temperature | logits 除以 T 再 softmax：T<1 分布变尖更确定，T>1 变平更随机 | T→0 退化为贪心（永远选最高分） |\n| top-k | 只在概率最高的 k 个 token 里采样 | k=1 等于贪心 |\n| top-p | 只在累积概率达 p 的最小 token 集合里采样（nucleus） | p=1 等于不裁剪 |\n关键反转：Anthropic 的 Opus 4.8（含 4.7 / Sonnet 5 / Fable 5）把 temperature / top_p / top_k 全删了，传就报 400——随机性旋钮从调用方手里被拿走，改用提示词 + effort 控制。」\n[2026-08-03 15:11] 我追问：「那既然删了 temperature，输出还有随机性吗？」\n[2026-08-03 15:12] 你答：「有。随机性来自采样这个动作本身（按概率表抽签）依然在，只是你不能再调温度去放大或收敛它。默认采样仍非确定，同一 prompt 两次结果可能不同。」",
+      "expected_output": "一篇 Obsidian 追问链：问与答逐字保真，对比表、操作旁白与确切结论原样保留；两轮来源时间保留；总纲重要结论带可信度与来源脚注；frontmatter 用 类型/问答实录；落点知识库 inbox。",
       "files": [],
       "assertions": [
-        "三旋钮对比表（temperature/top-k/top-p 各自作用与极端值）逐字保留，不被压缩成一两句概括（transcript-extract 逐字 + 铁律二）",
-        "“Anthropic 把 temperature/top_p/top_k 全删了、传就报 400”这一确切结论逐字保留，方向与强度不漂移",
-        "操作旁白“我先翻一下资料确认下参数细节”被滤除，不进笔记正文（选 B）",
-        "两轮用户提问原文保留，回答未被改写成“agent 解释说/它答道”式第三人称讲解",
-        "frontmatter tags 含 类型/问答实录；落点为 {kb_root}/00 - raw/00 - inbox/"
+        "三旋钮对比表逐字保留，不被压缩成概括",
+        "Anthropic 相关确切结论逐字保留，方向与强度不漂移",
+        "操作旁白'我先翻一下资料确认下参数细节'在显式逐字模式下原样保留",
+        "两轮用户提问与回答未被第三人称转述，来源时间 15:02/15:04/15:11/15:12 正确保留或引用",
+        "重要总纲带可信度与来源脚注；frontmatter tags 含 类型/问答实录"
       ]
     },
     {
       "id": 6,
-      "eval_name": "topic-web-verbatim-organized",
-      "prompt": "把我们刚才关于 CRDT（无冲突复制数据类型）的讨论整理成一篇主题笔记，方便以后做协同编辑时回来深挖。原样保留你讲的内容，不要重写。\n\n第一轮：\n我问：「CRDT 到底解决什么问题？为什么协同编辑爱用它？」\n你答：「CRDT 解决的是**多副本并发修改、最终一致、且无需中心协调**：每个副本本地改、互相同步，合并保证收敛到同一状态。它分两大类——**state-based（CvRDT）**：传整个状态，合并用一个满足幂等、交换、结合律的 join（并操作），网络只要最终送达即可；**op-based（CmRDT）**：传操作而非状态，省带宽，但要求**因果序广播**（causal delivery），实现更重。」\n\n第二轮：\n我追问：「那具体有哪些现成结构？各自代价是什么？」\n你答：「典型结构：G-Counter（只增计数器）、PN-Counter（可增可减，两个 G-Counter 相减）、LWW-Register（last-write-wins，靠时间戳）、OR-Set（observed-remove set，加删各带唯一 tag）。代价主要两块：**元数据膨胀**（每个元素带 tag / 版本向量，OR-Set 尤甚）、**tombstone 回收难**（删除留墓碑，长期不清会涨）。跟 OT（操作变换）比：CRDT 去中心、无需中心服务器，但元数据重；OT 元数据轻，但要一个中心服务器做变换、实现复杂易错。」",
-      "expected_output": "一篇 Obsidian 主题网（研究型），mode-decision 判为主题网（要长期养的主题、复用的是主题知识而非追问路径）：正文由从 transcript 扣出的逐字块编排而成——你讲的 CvRDT/CmRDT 定义、G-Counter/OR-Set 等结构、元数据膨胀/tombstone/与 OT 对比等内容逐字保留、不重写成新讲解；作者只加内容结构的小标题（如 两大类 / 典型结构 / 代价 / 与 OT 对比）与双链把逐字块组织起来，不改块内文字；30 秒读法综合头（是什么/背景/解决什么/最重要结论/怎么用/前置/边界）允许综合概括；不保留'我问—你答'的逐轮问答形态（那是追问链）；frontmatter 用 类型/研究；落点知识库 inbox。",
+      "eval_name": "topic-web-evidence-grounded-synthesis",
+      "prompt": "把我们刚才关于 CRDT（无冲突复制数据类型）的讨论整理成一篇主题笔记，方便以后做协同编辑时回来深挖。\n\n[2026-08-03 16:10] 我问：「CRDT 到底解决什么问题？为什么协同编辑爱用它？」\n[2026-08-03 16:12] 你答：「CRDT 解决的是多副本并发修改、最终一致、且无需中心协调。它分两大类：state-based（CvRDT）传整个状态，合并要求幂等、交换、结合；op-based（CmRDT）传操作，省带宽，但要求因果序广播，实现更重。」\n[2026-08-03 16:20] 我追问：「那具体有哪些现成结构？各自代价是什么？」\n[2026-08-03 16:22] 你答：「典型结构有 G-Counter、PN-Counter、LWW-Register、OR-Set。代价主要是元数据膨胀与 tombstone 回收难。跟 OT 比，CRDT 去中心但元数据重；OT 通常依赖中心协调，实现也复杂。」",
+      "expected_output": "一篇 Obsidian 主题网：跨轮次忠实整合成内容主导的讲解，不保留我问—你答的逐轮形态；允许换讲法、合并与去重，但所有类型名、结构名、条件与对比方向保持一致；重要结论带可信度和含来源时间的证据脚注；不新增来源未提及的 CRDT 事实；frontmatter 用 类型/研究。",
       "files": [],
       "assertions": [
-        "笔记为主题网（研究型），mode-decision 判为主题网而非追问链",
-        "正文由逐字块编排：CvRDT/CmRDT 定义、G-Counter/PN-Counter/LWW-Register/OR-Set、元数据膨胀/tombstone、与 OT 对比等确切内容逐字保留，未被重写成新的讲解措辞",
-        "逐字块按内容结构（两大类/典型结构/代价/与 OT 对比等）编排，不保留'我问—你答'的逐轮对话形态，也不是 raw transcript 堆砌",
-        "30 秒读法综合头含'背景'栏；frontmatter tags 含 类型/研究，不含 类型/问答实录",
-        "落点为 {kb_root}/00 - raw/00 - inbox/"
+        "笔记为主题网而非追问链，正文是连贯的主题讲解",
+        "CvRDT/CmRDT、G-Counter/PN-Counter/LWW-Register/OR-Set、tombstone 与 OT 等受保护原子保持一致",
+        "没有新增来源未提供的事实、算法或因果，CvRDT 与 CmRDT 的条件没有丢失",
+        "重要结论带可信度与来源脚注，脚注含 2026-08-03 16:12 或 16:22、轮次与证据片段",
+        "30 秒读法含背景栏；frontmatter tags 含 类型/研究，不含 类型/问答实录"
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "no-strengthening-or-boundary-loss",
+      "prompt": "把这段方案讨论沉淀成一篇可复用笔记：\n\n[2026-08-03 18:30] 用户：目前只确认在 Windows 11 + Python 3.13.5 上复现。\n[2026-08-03 18:32] agent：问题可能与默认 GBK 代码页有关，但还没有在 Windows 10 或 Python 3.12 验证。只有输出包含 emoji 或中文时才观察到崩溃；纯 ASCII 输出没有复现。临时建议是 `sys.stdout.reconfigure(encoding=\"utf-8\")`，不要据此断言所有 Windows Python 都有问题。\n[2026-08-03 18:40] 用户：先采用这个临时建议，但正式发布前必须补 Windows 10 + Python 3.12 的验证。",
+      "expected_output": "一篇证据约束的解法/决策笔记：不得把可能根因写成确定根因，不得把 Windows 11 + Python 3.13.5 扩大成所有 Windows Python；保留只有 emoji/中文才复现、纯 ASCII 未复现、正式发布前补验证等否定、条件与边界；命令逐字；重要结论脚注含来源时间。",
+      "files": [],
+      "assertions": [
+        "'可能与默认 GBK 代码页有关'没有升级成确定根因，可信度不高于待验证",
+        "适用范围保持 Windows 11 + Python 3.13.5，没有泛化成所有 Windows/Python",
+        "保留'只有 emoji 或中文时'、'纯 ASCII 没有复现'和'正式发布前必须补验证'",
+        "sys.stdout.reconfigure(encoding=\"utf-8\") 与版本号逐字一致",
+        "重要结论带来源脚注，脚注含 18:30/18:32/18:40 中相应时间、轮次与证据片段"
       ]
     }
   ]
