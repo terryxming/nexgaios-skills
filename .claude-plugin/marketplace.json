@@ -12,11 +12,11 @@
       "source": {
         "source": "git-subdir",
         "url": "terryxming/nexgaios-skills",
-        "path": "skills/ob-notes",
-        "ref": "ob-notes/v0.8.0"
+        "path": "skills/first-party/ob-notes",
+        "ref": "ob-notes/v2.0.0"
       },
-      "description": "把与 agent 对话中产生的高价值信息沉淀成结构化 Markdown 笔记，并回写到 Obsidian 知识库或项目目录。",
-      "version": "0.8.0",
+      "description": "把人与 agent 对话中的高价值信息按统一规范沉淀成结构化 Markdown 笔记，并回写到 Obsidian 知识库。",
+      "version": "2.0.0",
       "author": {
         "name": "terryxming"
       },
