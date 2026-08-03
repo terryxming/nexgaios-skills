@@ -28,6 +28,28 @@
         "agent-skills"
       ],
       "category": "productivity"
+    },
+    {
+      "name": "learn-everything",
+      "source": {
+        "source": "git-subdir",
+        "url": "terryxming/nexgaios-skills",
+        "path": "skills/first-party/learn-everything",
+        "ref": "learn-everything/v0.1.0"
+      },
+      "description": "帮你完整掌握任何知识主题：先按主题自身逻辑长出认知地图与学习阶梯（不套框架、从整体拆到原子、从原子逆推整体），再用六法把主题学透；学习产物落盘交给 ob-notes。",
+      "version": "0.1.0",
+      "author": {
+        "name": "terryxming"
+      },
+      "repository": "https://github.com/terryxming/nexgaios-skills",
+      "keywords": [
+        "learning",
+        "cognitive-map",
+        "study",
+        "agent-skills"
+      ],
+      "category": "productivity"
     }
   ]
 }
